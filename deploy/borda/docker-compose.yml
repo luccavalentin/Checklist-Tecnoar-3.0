@@ -1,0 +1,46 @@
+# Traefik — proxy de borda compartilhado da VPS.
+# Sobe UMA vez. Cada sistema novo entra na rede "borda" e se anuncia
+# por labels; não é preciso mexer neste arquivo para adicionar sistemas.
+
+services:
+  traefik:
+    image: traefik:v3.6
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=borda"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      # Todo HTTP vira HTTPS: sistema operacional com login não trafega em claro.
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--certificatesresolvers.letsencrypt.acme.email=luccasantana88@gmail.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--log.level=INFO"
+      - "--accesslog=true"
+    environment:
+      # O Docker 29 exige API >= 1.40. Traefik até a v3.3 negociava 1.24 e
+      # nem enxergava os containers; a v3.6 já fala uma versão aceita, mas
+      # fixar aqui evita surpresa em futuras atualizações do daemon.
+      DOCKER_API_VERSION: "1.44"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Somente leitura: o Traefik precisa observar containers, não controlá-los.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+    networks: [borda]
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  letsencrypt:
+
+networks:
+  borda:
+    external: true

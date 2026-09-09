@@ -1,0 +1,293 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    :root{
+      --navy-900:#050E1E; --navy-800:#081830; --navy-700:#0C2244; --navy-600:#123059;
+      --line:rgba(148,178,214,.14); --line-2:rgba(148,178,214,.28);
+      --ink:#EAF1FA; --ink-2:#9FB4CF; --ink-3:#6A809E;
+      --orange:#FC6400; --cyan:#00A8E8; --ok:#17B890; --warn:#F5A524; --crit:#F0483E;
+      --ui:'IBM Plex Sans',system-ui,sans-serif;
+      --dp:'Archivo',system-ui,sans-serif;
+      --mo:'IBM Plex Mono',ui-monospace,monospace;
+    }
+    body{margin:0;font-family:var(--ui);background:var(--navy-900);color:var(--ink);-webkit-font-smoothing:antialiased;}
+    a{color:var(--cyan);text-decoration:none;} a:hover{color:#5BC8F5;}
+    .lbl{font-family:var(--dp);font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);}
+    .panel{display:flex;flex-direction:column;gap:16px;padding:22px;border:1px solid var(--line);border-radius:9px;background:var(--navy-800);}
+    .h2{margin:0;font-family:var(--dp);font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);}
+    .inp{display:flex;align-items:center;gap:9px;height:40px;padding:0 12px;background:var(--navy-900);border:1px solid var(--line-2);border-radius:6px;font-size:13.5px;color:var(--ink);}
+    .state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;height:186px;border:1px dashed var(--line-2);border-radius:8px;padding:20px;text-align:center;}
+  </style>
+</helmet>
+
+<div style="width:1280px;padding:34px;display:flex;flex-direction:column;gap:22px;background:var(--navy-900);">
+
+  <!-- header -->
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:20px;border-bottom:1px solid var(--line-2);">
+    <div style="display:flex;align-items:center;gap:24px;">
+      <img src="tecnoar-negativo.svg" alt="Tecnoar Freios" style="height:52px;width:auto;display:block;">
+      <div style="width:1px;height:44px;background:var(--line-2);"></div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <span class="lbl">Design System</span>
+        <h1 style="margin:0;font-family:var(--dp);font-size:26px;font-weight:600;letter-spacing:-.01em;">Padrões reutilizáveis</h1>
+      </div>
+    </div>
+    <span style="font-family:var(--mo);font-size:12px;color:var(--ink-3);">Sistema Operacional Tecnoar · v3.0</span>
+  </div>
+
+  <!-- COR + TIPO -->
+  <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:18px;">
+    <section class="panel">
+      <h2 class="h2">Cor</h2>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;">
+        <div style="display:flex;flex-direction:column;gap:8px;"><div style="height:56px;border-radius:6px;background:#081830;border:1px solid var(--line-2);"></div><span class="lbl" style="color:var(--ink-2);">Navy</span><span style="font-family:var(--mo);font-size:11px;color:var(--ink-3);">#081830</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;"><div style="height:56px;border-radius:6px;background:#FC6400;"></div><span class="lbl" style="color:var(--ink-2);">Laranja</span><span style="font-family:var(--mo);font-size:11px;color:var(--ink-3);">#FC6400</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;"><div style="height:56px;border-radius:6px;background:#00A8E8;"></div><span class="lbl" style="color:var(--ink-2);">Ciano</span><span style="font-family:var(--mo);font-size:11px;color:var(--ink-3);">#00A8E8</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;"><div style="height:56px;border-radius:6px;background:#050E1E;border:1px solid var(--line-2);"></div><span class="lbl" style="color:var(--ink-2);">Fundo</span><span style="font-family:var(--mo);font-size:11px;color:var(--ink-3);">#050E1E</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;">
+        <div style="display:flex;flex-direction:column;gap:8px;"><div style="height:36px;border-radius:6px;background:#17B890;"></div><span class="lbl" style="color:var(--ink-2);">Sucesso</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;"><div style="height:36px;border-radius:6px;background:#F5A524;"></div><span class="lbl" style="color:var(--ink-2);">Atenção</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;"><div style="height:36px;border-radius:6px;background:#F0483E;"></div><span class="lbl" style="color:var(--ink-2);">Crítico</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;"><div style="height:36px;border-radius:6px;background:#6A809E;"></div><span class="lbl" style="color:var(--ink-2);">Neutro</span></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="h2">Tipografia</h2>
+      <div style="display:flex;flex-direction:column;gap:13px;">
+        <div style="display:flex;align-items:baseline;gap:16px;"><span style="font-family:var(--mo);font-size:10px;color:var(--ink-3);width:96px;flex-shrink:0;">Archivo 600</span><span style="font-family:var(--dp);font-size:26px;font-weight:600;letter-spacing:-.01em;">Título de tela</span></div>
+        <div style="display:flex;align-items:baseline;gap:16px;"><span style="font-family:var(--mo);font-size:10px;color:var(--ink-3);width:96px;flex-shrink:0;">Archivo 600</span><span style="font-family:var(--dp);font-size:15px;font-weight:600;">Título de seção</span></div>
+        <div style="display:flex;align-items:baseline;gap:16px;"><span style="font-family:var(--mo);font-size:10px;color:var(--ink-3);width:96px;flex-shrink:0;">Archivo 600</span><span class="lbl">Micro-rótulo de instrumento</span></div>
+        <div style="display:flex;align-items:baseline;gap:16px;"><span style="font-family:var(--mo);font-size:10px;color:var(--ink-3);width:96px;flex-shrink:0;">Plex Sans</span><span style="font-size:13.5px;color:var(--ink-2);">Texto de interface e conteúdo corrido.</span></div>
+        <div style="display:flex;align-items:baseline;gap:16px;"><span style="font-family:var(--mo);font-size:10px;color:var(--ink-3);width:96px;flex-shrink:0;">Plex Mono</span><span style="font-family:var(--mo);font-size:17px;font-variant-numeric:tabular-nums;">RTA-2G31 · 1.284 · 02:14</span></div>
+      </div>
+      <p style="margin:0;font-size:12px;color:var(--ink-3);line-height:1.55;">Placas, documentos, protocolos, contadores e tempos usam sempre monoespaçada tabular — alinham em coluna e não “dançam” ao atualizar.</p>
+    </section>
+  </div>
+
+  <!-- CONTROLES -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+    <section class="panel">
+      <h2 class="h2">Ações</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+        <button type="button" style="height:38px;padding:0 18px;border:0;border-radius:6px;background:var(--orange);color:#fff;font-family:var(--dp);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Primária</button>
+        <button type="button" style="height:38px;padding:0 18px;border:1px solid rgba(0,168,232,.45);border-radius:6px;background:rgba(0,168,232,.10);color:var(--cyan);font-family:var(--dp);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Secundária</button>
+        <button type="button" style="height:38px;padding:0 18px;border:1px solid var(--line-2);border-radius:6px;background:transparent;color:var(--ink-2);font-family:var(--dp);font-size:12px;font-weight:600;letter-spacing:.05em;cursor:pointer;">Neutra</button>
+        <button type="button" style="height:38px;padding:0 18px;border:1px solid rgba(240,72,62,.45);border-radius:6px;background:transparent;color:#FF8078;font-family:var(--dp);font-size:12px;font-weight:600;letter-spacing:.05em;cursor:pointer;">Destrutiva</button>
+        <button type="button" style="height:38px;padding:0 18px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--ink-3);font-family:var(--dp);font-size:12px;font-weight:600;letter-spacing:.05em;opacity:.5;cursor:not-allowed;">Sem permissão</button>
+        <div style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid var(--line-2);border-radius:6px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9FB4CF" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg></div>
+      </div>
+
+      <div style="height:1px;background:var(--line);"></div>
+
+      <h2 class="h2">Situação e prioridade</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:9px;">
+        <span style="display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:13px;background:rgba(23,184,144,.13);color:#3FD3A7;font-size:12px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#17B890;"></span>Ativo</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:13px;background:rgba(148,178,214,.1);color:var(--ink-2);font-size:12px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#6A809E;"></span>Inativo</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:13px;background:rgba(0,168,232,.13);color:#5BC8F5;font-size:12px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#00A8E8;"></span>Em execução</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:13px;background:rgba(245,165,36,.13);color:#FFC15E;font-size:12px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#F5A524;"></span>Aguardando</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:13px;background:rgba(240,72,62,.13);color:#FF8078;font-size:12px;font-weight:500;"><span style="width:6px;height:6px;border-radius:50%;background:#F0483E;"></span>Vencido</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;height:26px;padding:0 11px;border-radius:13px;background:rgba(252,100,0,.14);color:#FF9A4D;font-size:12px;font-weight:500;">Urgente</span>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <span class="lbl">SLA</span>
+        <div style="display:flex;gap:10px;">
+          <div style="flex-grow:1;display:flex;flex-direction:column;gap:6px;"><div style="height:4px;border-radius:2px;background:#17B890;"></div><span style="font-size:11.5px;color:var(--ink-3);">No prazo</span></div>
+          <div style="flex-grow:1;display:flex;flex-direction:column;gap:6px;"><div style="height:4px;border-radius:2px;background:#F5A524;"></div><span style="font-size:11.5px;color:var(--ink-3);">Atenção</span></div>
+          <div style="flex-grow:1;display:flex;flex-direction:column;gap:6px;"><div style="height:4px;border-radius:2px;background:#F0483E;"></div><span style="font-size:11.5px;color:var(--ink-3);">Vencido</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="h2">Campos</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:7px;"><span class="lbl">Padrão</span><div class="inp"><span style="color:var(--ink-3);">Placeholder</span></div></div>
+        <div style="display:flex;flex-direction:column;gap:7px;"><span class="lbl">Em foco</span><div class="inp" style="border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,168,232,.18);"><span>Conteúdo digitado</span></div></div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <span class="lbl">Com erro</span>
+          <div class="inp" style="border-color:var(--crit);"><span>0000</span></div>
+          <span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#FF8078;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4.5M12 16h.01"></path></svg>Documento inválido</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;"><span class="lbl">Bloqueado</span><div class="inp" style="opacity:.45;"><span>Somente leitura</span></div></div>
+      </div>
+
+      <div style="height:1px;background:var(--line);"></div>
+
+      <h2 class="h2">Abas</h2>
+      <div style="display:flex;gap:22px;border-bottom:1px solid var(--line);">
+        <div style="padding:0 0 11px;font-family:var(--dp);font-size:13px;font-weight:600;color:var(--ink);border-bottom:2px solid var(--orange);margin-bottom:-1px;">Dados</div>
+        <div style="padding:0 0 11px;font-family:var(--dp);font-size:13px;font-weight:600;color:var(--ink-3);">Histórico</div>
+        <div style="padding:0 0 11px;font-family:var(--dp);font-size:13px;font-weight:600;color:var(--ink-3);">Documentos</div>
+        <div style="padding:0 0 11px;font-family:var(--dp);font-size:13px;font-weight:600;color:var(--ink-3);">Auditoria</div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ESTADOS -->
+  <section class="panel">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <h2 class="h2">Estados obrigatórios de toda tela</h2>
+      <div style="flex-grow:1;height:1px;background:var(--line);"></div>
+      <span style="font-size:11.5px;color:var(--ink-3);">Nenhuma tela vai para produção sem os quatro.</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;">
+
+      <!-- loading -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <span class="lbl">Carregando</span>
+        <div style="display:flex;flex-direction:column;gap:11px;height:186px;padding:18px;border:1px solid var(--line);border-radius:8px;background:var(--navy-900);">
+          <div style="height:11px;width:58%;border-radius:3px;background:rgba(148,178,214,.16);"></div>
+          <div style="height:11px;width:88%;border-radius:3px;background:rgba(148,178,214,.11);"></div>
+          <div style="height:11px;width:72%;border-radius:3px;background:rgba(148,178,214,.11);"></div>
+          <div style="height:1px;background:var(--line);margin:3px 0;"></div>
+          <div style="height:11px;width:80%;border-radius:3px;background:rgba(148,178,214,.09);"></div>
+          <div style="height:11px;width:46%;border-radius:3px;background:rgba(148,178,214,.09);"></div>
+          <div style="height:11px;width:64%;border-radius:3px;background:rgba(148,178,214,.07);"></div>
+        </div>
+      </div>
+
+      <!-- empty -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <span class="lbl">Sem registros</span>
+        <div class="state">
+          <div style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:9px;border:1px dashed var(--line-2);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v13H4Z"></path><path d="M4 7l2-3h12l2 3"></path><path d="M10 12h4"></path></svg>
+          </div>
+          <span style="font-family:var(--dp);font-size:13.5px;font-weight:600;color:var(--ink);">Nenhum registro</span>
+          <span style="font-size:12px;color:var(--ink-3);line-height:1.5;">Ajuste os filtros ou cadastre o primeiro.</span>
+          <button type="button" style="height:32px;padding:0 14px;border:1px solid var(--line-2);border-radius:6px;background:transparent;color:var(--ink);font-family:var(--dp);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Novo</button>
+        </div>
+      </div>
+
+      <!-- erro -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <span class="lbl">Erro</span>
+        <div class="state" style="border-color:rgba(240,72,62,.36);background:rgba(240,72,62,.05);">
+          <div style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:9px;border:1px solid rgba(240,72,62,.4);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F0483E" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5h.01"></path></svg>
+          </div>
+          <span style="font-family:var(--dp);font-size:13.5px;font-weight:600;color:var(--ink);">Não foi possível carregar</span>
+          <span style="font-size:12px;color:var(--ink-3);line-height:1.5;">A causa aparece aqui, sem código cru.</span>
+          <button type="button" style="height:32px;padding:0 14px;border:1px solid rgba(240,72,62,.45);border-radius:6px;background:transparent;color:#FF8078;font-family:var(--dp);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Tentar novamente</button>
+        </div>
+      </div>
+
+      <!-- sem permissão -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <span class="lbl">Sem permissão</span>
+        <div class="state">
+          <div style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:9px;border:1px dashed var(--line-2);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          </div>
+          <span style="font-family:var(--dp);font-size:13.5px;font-weight:600;color:var(--ink);">Acesso restrito</span>
+          <span style="font-size:12px;color:var(--ink-3);line-height:1.5;">Seu perfil não inclui esta ação. Fale com o gestor.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOBREPOSIÇÕES -->
+  <div style="display:grid;grid-template-columns:1.15fr 1fr .85fr;gap:18px;">
+
+    <section class="panel">
+      <h2 class="h2">Confirmação</h2>
+      <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border:1px solid var(--line-2);border-radius:9px;background:var(--navy-700);box-shadow:0 24px 60px -22px rgba(0,0,0,.85);">
+        <div style="display:flex;align-items:flex-start;gap:13px;">
+          <div style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;background:rgba(245,165,36,.13);border:1px solid rgba(245,165,36,.3);flex-shrink:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5A524" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.5 20h19Z"></path><path d="M12 10v4"></path><path d="M12 17.5h.01"></path></svg>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <span style="font-family:var(--dp);font-size:15px;font-weight:600;color:var(--ink);">Inativar cliente?</span>
+            <span style="font-size:13px;color:var(--ink-2);line-height:1.55;">O registro deixa de aparecer nas seleções, mas o histórico de OS e veículos é preservado.</span>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:9px;">
+          <button type="button" style="height:36px;padding:0 16px;border:1px solid var(--line-2);border-radius:6px;background:transparent;color:var(--ink-2);font-family:var(--dp);font-size:12px;font-weight:600;letter-spacing:.05em;cursor:pointer;">Cancelar</button>
+          <button type="button" style="height:36px;padding:0 16px;border:0;border-radius:6px;background:var(--orange);color:#fff;font-family:var(--dp);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Inativar</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="h2">Notificações</h2>
+      <div style="display:flex;flex-direction:column;border:1px solid var(--line-2);border-radius:9px;background:var(--navy-700);overflow:hidden;">
+        <div style="display:flex;gap:18px;padding:13px 16px 0;border-bottom:1px solid var(--line);">
+          <span style="padding-bottom:10px;font-family:var(--dp);font-size:12px;font-weight:600;color:var(--ink);border-bottom:2px solid var(--orange);margin-bottom:-1px;">Todos</span>
+          <span style="padding-bottom:10px;font-family:var(--dp);font-size:12px;font-weight:600;color:var(--ink-3);">Alerta inteligente</span>
+          <span style="padding-bottom:10px;font-family:var(--dp);font-size:12px;font-weight:600;color:var(--ink-3);">Sistema</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:34px 20px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg>
+          <span style="font-size:12.5px;color:var(--ink-3);">Nenhuma notificação.</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-top:1px solid var(--line);">
+          <a href="#" style="font-size:12px;">Marcar todas como lidas</a>
+          <a href="#" style="font-size:12px;color:var(--ink-3);">Configurar</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="h2">Aviso em linha</h2>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid rgba(0,168,232,.32);border-radius:7px;background:rgba(0,168,232,.07);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#00A8E8" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
+          <span style="font-size:12.5px;color:var(--ink);">Informação</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid rgba(23,184,144,.34);border-radius:7px;background:rgba(23,184,144,.07);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#17B890" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"></path></svg>
+          <span style="font-size:12.5px;color:var(--ink);">Concluído</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid rgba(245,165,36,.34);border-radius:7px;background:rgba(245,165,36,.07);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5A524" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.5 20h19Z"></path><path d="M12 10v4M12 17.5h.01"></path></svg>
+          <span style="font-size:12.5px;color:var(--ink);">Atenção</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid rgba(240,72,62,.34);border-radius:7px;background:rgba(240,72,62,.07);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F0483E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5h.01"></path></svg>
+          <span style="font-size:12.5px;color:var(--ink);">Falha</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- LOGO USO -->
+  <section class="panel">
+    <h2 class="h2">Uso da marca</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;justify-content:center;height:130px;border-radius:8px;background:#081830;border:1px solid var(--line);"><img src="tecnoar-negativo.svg" alt="Tecnoar Freios versão negativa" style="height:82px;width:auto;"></div>
+        <span class="lbl" style="color:var(--ink-2);">Negativa · fundos escuros</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;justify-content:center;height:130px;border-radius:8px;background:#FFFFFF;"><img src="tecnoar-positivo.svg" alt="Tecnoar Freios versão positiva" style="height:82px;width:auto;"></div>
+        <span class="lbl" style="color:var(--ink-2);">Positiva · fundos claros</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;justify-content:center;height:130px;border-radius:8px;background:#F1F4F8;"><img src="tecnoar-mono.svg" alt="Tecnoar Freios versão monocromática" style="height:82px;width:auto;"></div>
+        <span class="lbl" style="color:var(--ink-2);">Monocromática · impressão</span>
+      </div>
+    </div>
+    <p style="margin:0;font-size:12px;color:var(--ink-3);line-height:1.55;">Somente estas três versões. Não recortar o brasão, não recolorir, não criar símbolo reduzido alternativo.</p>
+  </section>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

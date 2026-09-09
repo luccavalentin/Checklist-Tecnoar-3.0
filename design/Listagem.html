@@ -1,0 +1,220 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    :root{
+      --navy-900:#050E1E; --navy-800:#081830; --navy-700:#0C2244; --navy-600:#123059;
+      --line:rgba(148,178,214,.14); --line-2:rgba(148,178,214,.28);
+      --ink:#EAF1FA; --ink-2:#9FB4CF; --ink-3:#6A809E;
+      --orange:#FC6400; --cyan:#00A8E8; --ok:#17B890; --warn:#F5A524; --crit:#F0483E;
+      --ui:'IBM Plex Sans',system-ui,sans-serif;
+      --dp:'Archivo',system-ui,sans-serif;
+      --mo:'IBM Plex Mono',ui-monospace,monospace;
+    }
+    body{margin:0;font-family:var(--ui);background:var(--navy-900);color:var(--ink);-webkit-font-smoothing:antialiased;}
+    a{color:var(--cyan);text-decoration:none;} a:hover{color:#5BC8F5;}
+    .lbl{font-family:var(--dp);font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);}
+    .nav{display:flex;align-items:center;gap:11px;height:34px;padding:0 12px;border-radius:5px;font-size:13.5px;color:var(--ink-2);cursor:pointer;}
+    .nav:hover{background:rgba(148,178,214,.06);color:var(--ink);}
+    .th{font-family:var(--dp);font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:0 14px;height:38px;background:var(--navy-800);border-bottom:1px solid var(--line-2);position:sticky;top:0;}
+    .td{padding:0 14px;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--ink-2);vertical-align:middle;}
+    tbody tr:hover .td{background:rgba(148,178,214,.045);}
+    .btn-ghost{display:flex;align-items:center;gap:8px;height:34px;padding:0 13px;border:1px solid var(--line-2);border-radius:6px;background:transparent;color:var(--ink-2);font-family:var(--dp);font-size:12px;font-weight:600;letter-spacing:.05em;cursor:pointer;}
+    .btn-ghost:hover{color:var(--ink);border-color:rgba(148,178,214,.45);}
+    .chip{display:flex;align-items:center;gap:7px;height:28px;padding:0 6px 0 11px;border:1px solid rgba(0,168,232,.4);border-radius:14px;background:rgba(0,168,232,.09);font-size:12px;color:var(--ink);}
+  </style>
+</helmet>
+
+<div style="width:1440px;height:980px;display:grid;grid-template-columns:256px 1fr;background:var(--navy-900);overflow:hidden;">
+
+  <!-- SIDEBAR -->
+  <aside style="display:flex;flex-direction:column;background:var(--navy-800);border-right:1px solid var(--line);overflow:hidden;">
+    <div style="display:flex;align-items:center;height:62px;padding:0 18px;border-bottom:1px solid var(--line);flex-shrink:0;">
+      <img src="tecnoar-negativo.svg" alt="Tecnoar Freios" style="height:34px;width:auto;display:block;">
+    </div>
+    <nav style="display:flex;flex-direction:column;gap:14px;padding:16px 12px;">
+      <div class="nav"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>Visão Geral</div>
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="padding:0 12px 6px;"><span class="lbl" style="color:var(--ink-2);">Cadastros</span></div>
+        <div style="display:flex;align-items:center;gap:11px;height:36px;padding:0 12px;border-radius:5px;background:rgba(252,100,0,.12);color:#FFFFFF;font-weight:600;font-size:13.5px;position:relative;">
+          <div style="position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:0 2px 2px 0;background:var(--orange);"></div>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FC6400" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 21a6 6 0 0 0-12 0"></path><circle cx="12" cy="8" r="4"></circle></svg>
+          Clientes
+        </div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V8l8-4 8 4v12"></path><path d="M9 20v-6h6v6"></path></svg>Fornecedores</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M7 12h10"></path><path d="M10 18h4"></path></svg>Vendedores</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0"></path><path d="M17 11.2A3.2 3.2 0 1 0 17 4.8"></path></svg>Usuários</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16h2l1.4-5a2 2 0 0 1 1.9-1.4h6.4L17 13h3a2 2 0 0 1 2 2v1h-2"></path><circle cx="7" cy="17.5" r="2"></circle><circle cx="17" cy="17.5" r="2"></circle></svg>Veículos</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9Z"></path><path d="m4 7.5 8 4.5 8-4.5"></path></svg>Produtos</div>
+      </div>
+      <div style="padding:0 12px;"><span class="lbl">Operação</span></div>
+      <div style="padding:0 12px;"><span class="lbl">Relacionamento</span></div>
+      <div style="padding:0 12px;"><span class="lbl">Comercial</span></div>
+      <div style="padding:0 12px;"><span class="lbl">Gestão</span></div>
+      <div style="padding:0 12px;"><span class="lbl">Inteligência</span></div>
+      <div style="padding:0 12px;"><span class="lbl">Sistema</span></div>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div style="display:flex;flex-direction:column;overflow:hidden;">
+
+    <header style="display:flex;align-items:center;gap:18px;height:62px;padding:0 26px;border-bottom:1px solid var(--line);background:var(--navy-800);flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;flex-grow:1;max-width:520px;height:36px;padding:0 12px;background:var(--navy-900);border:1px solid var(--line);border-radius:6px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <span style="flex-grow:1;font-size:13.5px;color:var(--ink-3);">Buscar cliente, placa, OS, produto, protocolo…</span>
+        <span style="font-family:var(--mo);font-size:11px;color:var(--ink-3);border:1px solid var(--line);border-radius:4px;padding:1px 6px;">Ctrl K</span>
+      </div>
+      <div style="flex-grow:1;"></div>
+      <div style="display:flex;align-items:center;gap:11px;">
+        <div style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;background:var(--navy-600);border:1px solid var(--line-2);font-family:var(--dp);font-size:13px;font-weight:700;color:var(--ink);">—</div>
+        <div style="display:flex;flex-direction:column;gap:1px;">
+          <span style="font-size:13px;font-weight:600;color:var(--ink);">Nome do usuário</span>
+          <span class="lbl" style="letter-spacing:.12em;">Função</span>
+        </div>
+      </div>
+    </header>
+
+    <div style="flex-grow:1;display:flex;flex-direction:column;overflow:hidden;padding:24px 26px 0;">
+
+      <!-- page head -->
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:18px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <span class="lbl">Cadastros</span>
+          <div style="display:flex;align-items:baseline;gap:12px;">
+            <h1 style="margin:0;font-family:var(--dp);font-size:26px;font-weight:600;letter-spacing:-.01em;color:var(--ink);">Clientes</h1>
+            <span style="font-family:var(--mo);font-size:13px;color:var(--ink-3);font-variant-numeric:tabular-nums;">1.284 registros</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px;">
+          <button type="button" class="btn-ghost"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.2-6.5L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-15.2 6.5L3 16"></path><path d="M3 21v-5h5"></path></svg>Atualizar</button>
+          <button type="button" class="btn-ghost"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M4 21h16"></path></svg>Exportar</button>
+          <button type="button" style="display:flex;align-items:center;gap:8px;height:34px;padding:0 15px;border:0;border-radius:6px;background:var(--orange);color:#fff;font-family:var(--dp);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>Novo cliente
+          </button>
+        </div>
+      </div>
+
+      <!-- toolbar -->
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:8px 8px 0 0;background:var(--navy-800);border-bottom:0;">
+        <div style="display:flex;align-items:center;gap:9px;flex-grow:1;max-width:340px;height:34px;padding:0 12px;background:var(--navy-900);border:1px solid var(--line-2);border-radius:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <span style="font-size:13px;color:var(--ink-3);">Nome, documento ou e-mail</span>
+        </div>
+        <button type="button" class="btn-ghost"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4 2v-8Z"></path></svg>Filtros</button>
+        <div style="display:flex;align-items:center;gap:7px;">
+          <div class="chip">UF: SP <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9FB4CF" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></div>
+          <div class="chip">Situação: Ativo <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9FB4CF" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></div>
+          <a href="#" style="font-size:12px;color:var(--ink-3);">Limpar</a>
+        </div>
+        <div style="flex-grow:1;"></div>
+        <button type="button" class="btn-ghost" style="border-color:rgba(0,168,232,.4);color:var(--cyan);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21 12 17l-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z"></path></svg>Salvar pesquisa</button>
+      </div>
+
+      <!-- table -->
+      <div style="flex-grow:1;overflow:hidden;border:1px solid var(--line);background:var(--navy-800);">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th class="th" style="width:44px;padding-right:0;">
+                <div style="width:15px;height:15px;border:1.5px solid var(--line-2);border-radius:3px;"></div>
+              </th>
+              <th class="th" style="width:78px;">ID</th>
+              <th class="th">Nome / Razão Social</th>
+              <th class="th" style="width:170px;">Tags</th>
+              <th class="th" style="width:64px;">Tipo</th>
+              <th class="th" style="width:158px;">Documento</th>
+              <th class="th" style="width:140px;">Celular</th>
+              <th class="th" style="width:200px;">E-mail</th>
+              <th class="th" style="width:104px;">Situação</th>
+              <th class="th" style="width:52px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{rows}}" as="r" hint-placeholder-count="9">
+              <tr>
+                <td class="td" style="height:{{rowH}}px;padding-right:0;"><div style="width:15px;height:15px;border:1.5px solid var(--line-2);border-radius:3px;"></div></td>
+                <td class="td" style="font-family:var(--mo);color:var(--ink-3);font-variant-numeric:tabular-nums;">{{r.id}}</td>
+                <td class="td" style="color:var(--ink);font-weight:500;">{{r.nome}}</td>
+                <td class="td">
+                  <span style="display:inline-flex;align-items:center;height:21px;padding:0 8px;border-radius:11px;font-size:11px;font-weight:500;background:{{r.tagBg}};color:{{r.tagFg}};">{{r.tag}}</span>
+                </td>
+                <td class="td" style="font-family:var(--mo);font-size:12px;">{{r.tipo}}</td>
+                <td class="td" style="font-family:var(--mo);font-size:12.5px;font-variant-numeric:tabular-nums;">{{r.doc}}</td>
+                <td class="td" style="font-family:var(--mo);font-size:12.5px;font-variant-numeric:tabular-nums;">{{r.fone}}</td>
+                <td class="td" style="font-size:12.5px;">{{r.mail}}</td>
+                <td class="td">
+                  <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:{{r.stFg}};">
+                    <span style="width:6px;height:6px;border-radius:50%;background:{{r.stFg}};"></span>{{r.situacao}}
+                  </span>
+                </td>
+                <td class="td" style="text-align:right;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>
+                </td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- footer -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border:1px solid var(--line);border-top:0;border-radius:0 0 8px 8px;background:var(--navy-800);flex-shrink:0;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <span style="font-family:var(--mo);font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;">1–25 de 1.284</span>
+          <div style="width:1px;height:16px;background:var(--line);"></div>
+          <span style="font-size:12px;color:var(--ink-3);">2 selecionados</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <div style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid var(--line);border-radius:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></div>
+          <div style="display:flex;align-items:center;justify-content:center;min-width:30px;height:30px;border-radius:5px;background:var(--navy-600);font-family:var(--mo);font-size:12.5px;color:var(--ink);">1</div>
+          <div style="display:flex;align-items:center;justify-content:center;min-width:30px;height:30px;border-radius:5px;font-family:var(--mo);font-size:12.5px;color:var(--ink-3);">2</div>
+          <div style="display:flex;align-items:center;justify-content:center;min-width:30px;height:30px;border-radius:5px;font-family:var(--mo);font-size:12.5px;color:var(--ink-3);">3</div>
+          <span style="font-family:var(--mo);font-size:12.5px;color:var(--ink-3);padding:0 4px;">…</span>
+          <div style="display:flex;align-items:center;justify-content:center;min-width:30px;height:30px;border-radius:5px;font-family:var(--mo);font-size:12.5px;color:var(--ink-3);">52</div>
+          <div style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border:1px solid var(--line);border-radius:5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9FB4CF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></div>
+        </div>
+      </div>
+
+      <div style="height:24px;flex-shrink:0;"></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"densidade":{"editor":"enum","options":["Confortável","Compacta"],"default":"Confortável","section":"Tabela"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const compacta = (this.props.densidade ?? 'Confortável') === 'Compacta';
+    const ATIVO = '#17B890', INATIVO = '#6A809E';
+    const t = (label, kind) => {
+      if (kind === 'cyan') return { tag: label, tagBg: 'rgba(0,168,232,.14)', tagFg: '#5BC8F5' };
+      if (kind === 'orange') return { tag: label, tagBg: 'rgba(252,100,0,.15)', tagFg: '#FF9A4D' };
+      return { tag: label, tagBg: 'rgba(148,178,214,.12)', tagFg: '#9FB4CF' };
+    };
+    const base = [
+      { id: '001042', nome: 'Transportadora Rota Sul Ltda',      ...t('Frota', 'cyan'),    tipo: 'PJ', doc: '12.345.678/0001-90', fone: '(11) 98123-4400', mail: 'contato@rotasul.com.br',   situacao: 'Ativo',   stFg: ATIVO },
+      { id: '001041', nome: 'Log Andrade Transportes S.A.',      ...t('Contrato', 'orange'), tipo: 'PJ', doc: '98.765.432/0001-11', fone: '(11) 97744-2210', mail: 'frota@logandrade.com.br',  situacao: 'Ativo',   stFg: ATIVO },
+      { id: '001040', nome: 'Agropecuária Vale Verde',           ...t('Produtor rural', 'gray'), tipo: 'PJ', doc: '45.221.908/0001-33', fone: '(16) 99120-8877', mail: 'adm@valeverde.agr.br',     situacao: 'Ativo',   stFg: ATIVO },
+      { id: '001039', nome: 'Marcos Ribeiro Cargas ME',          ...t('Avulso', 'gray'),   tipo: 'PJ', doc: '31.556.201/0001-72', fone: '(19) 98860-1145', mail: 'marcos@mrcargas.com.br',   situacao: 'Ativo',   stFg: ATIVO },
+      { id: '001038', nome: 'Cooperativa Central de Cargas',     ...t('Frota', 'cyan'),    tipo: 'PJ', doc: '07.998.114/0001-05', fone: '(11) 3355-2100',  mail: 'manutencao@coopcargas.br', situacao: 'Ativo',   stFg: ATIVO },
+      { id: '001037', nome: 'Expresso Bandeirante Ltda',         ...t('Contrato', 'orange'), tipo: 'PJ', doc: '22.410.663/0001-48', fone: '(11) 96632-9010', mail: 'oficina@expbandeirante.br', situacao: 'Inativo', stFg: INATIVO },
+      { id: '001036', nome: 'João Batista dos Santos',           ...t('Avulso', 'gray'),   tipo: 'PF', doc: '412.887.550-21',     fone: '(11) 99410-3320', mail: 'jb.santos@email.com',      situacao: 'Ativo',   stFg: ATIVO },
+      { id: '001035', nome: 'Translitoral Distribuição Ltda',    ...t('Frota', 'cyan'),    tipo: 'PJ', doc: '19.005.772/0001-64', fone: '(13) 98221-7788', mail: 'frota@translitoral.com.br', situacao: 'Ativo',   stFg: ATIVO },
+      { id: '001034', nome: 'Nova Era Locação de Veículos',      ...t('Locadora', 'gray'), tipo: 'PJ', doc: '55.720.339/0001-19', fone: '(11) 3644-8899',  mail: 'contato@novaeraloc.com.br', situacao: 'Ativo',   stFg: ATIVO },
+      { id: '001033', nome: 'Sérgio Almeida Transportes',        ...t('Avulso', 'gray'),   tipo: 'PF', doc: '308.114.902-77',     fone: '(11) 98077-6543', mail: 'sergio.almeida@email.com', situacao: 'Ativo',   stFg: ATIVO },
+      { id: '001032', nome: 'Pampa Logística Integrada S.A.',    ...t('Contrato', 'orange'), tipo: 'PJ', doc: '66.803.457/0001-28', fone: '(51) 99188-4402', mail: 'suprimentos@pampalog.br',  situacao: 'Ativo',   stFg: ATIVO },
+      { id: '001031', nome: 'Usina São Bento Agroindustrial',    ...t('Produtor rural', 'gray'), tipo: 'PJ', doc: '04.339.910/0001-86', fone: '(17) 3622-1400',  mail: 'frota@usinasaobento.br',   situacao: 'Ativo',   stFg: ATIVO }
+    ];
+    const rows = compacta ? base : base.slice(0, 9);
+    return { rows, rowH: compacta ? 34 : 46 };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    :root{
+      --navy-900:#050E1E; --navy-800:#081830; --navy-700:#0C2244; --navy-600:#123059;
+      --line:rgba(148,178,214,.16); --line-2:rgba(148,178,214,.30);
+      --ink:#EAF1FA; --ink-2:#9FB4CF; --ink-3:#6A809E;
+      --orange:#FC6400; --cyan:#00A8E8; --ok:#17B890; --warn:#F5A524; --crit:#F0483E;
+      --ui:'IBM Plex Sans',system-ui,sans-serif;
+      --dp:'Archivo',system-ui,sans-serif;
+      --mo:'IBM Plex Mono',ui-monospace,monospace;
+    }
+    body{margin:0;font-family:var(--ui);background:#03080F;color:var(--ink);-webkit-font-smoothing:antialiased;}
+    a{color:var(--cyan);text-decoration:none;} a:hover{color:#5BC8F5;}
+    .tvlbl{font-family:var(--dp);font-size:15px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);}
+  </style>
+</helmet>
+
+<div style="width:1920px;height:1080px;display:flex;flex-direction:column;background:#03080F;overflow:hidden;position:relative;">
+
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(148,178,214,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(148,178,214,.035) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;"></div>
+  <div style="position:absolute;width:1400px;height:700px;left:50%;margin-left:-700px;top:-360px;border-radius:50%;background:radial-gradient(circle,rgba(0,168,232,.12) 0%,rgba(0,168,232,0) 65%);pointer-events:none;"></div>
+
+  <!-- HEADER -->
+  <header style="position:relative;display:flex;align-items:center;justify-content:space-between;height:118px;padding:0 44px;border-bottom:1px solid var(--line-2);background:rgba(8,24,48,.72);flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:32px;">
+      <img src="tecnoar-negativo.svg" alt="Tecnoar Freios" style="height:66px;width:auto;display:block;">
+      <div style="width:1px;height:56px;background:var(--line-2);"></div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <span class="tvlbl" style="color:var(--cyan);">Painel do Pátio</span>
+        <span style="font-family:var(--dp);font-size:34px;font-weight:700;letter-spacing:-.01em;color:var(--ink);line-height:1;">Operação em tempo real</span>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:30px;">
+      <div style="display:flex;align-items:center;gap:12px;height:44px;padding:0 20px;border:1px solid rgba(23,184,144,.4);border-radius:22px;background:rgba(23,184,144,.10);">
+        <span style="width:11px;height:11px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 5px rgba(23,184,144,.20);"></span>
+        <span style="font-family:var(--dp);font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ok);">Ao vivo</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+        <span style="font-family:var(--mo);font-size:46px;font-weight:500;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:.02em;">14:32</span>
+        <span style="font-family:var(--dp);font-size:14px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);">Quinta · 23 out</span>
+      </div>
+      <button type="button" style="display:flex;align-items:center;gap:11px;height:52px;padding:0 24px;border:1px solid var(--line-2);border-radius:8px;background:rgba(148,178,214,.06);color:var(--ink);font-family:var(--dp);font-size:15px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+        Sair do Modo TV
+      </button>
+    </div>
+  </header>
+
+  <!-- KPI STRIP -->
+  <div style="position:relative;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-bottom:1px solid var(--line-2);background:rgba(8,24,48,.5);flex-shrink:0;">
+    <sc-for list="{{kpis}}" as="k" hint-placeholder-count="6">
+      <div style="display:flex;flex-direction:column;gap:12px;padding:24px 32px;border-right:1px solid var(--line);">
+        <span class="tvlbl" style="font-size:14px;">{{k.label}}</span>
+        <div style="display:flex;align-items:baseline;gap:12px;">
+          <span style="font-family:var(--mo);font-size:62px;font-weight:500;line-height:.9;color:{{k.cor}};font-variant-numeric:tabular-nums;">{{k.valor}}</span>
+          <span style="font-family:var(--dp);font-size:16px;font-weight:600;color:var(--ink-3);">{{k.unid}}</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- BOARD -->
+  <div style="position:relative;flex-grow:1;padding:26px 44px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:20px;height:100%;">
+      <sc-for list="{{stages}}" as="s" hint-placeholder-count="6">
+        <div style="display:flex;flex-direction:column;gap:14px;min-height:0;">
+          <div style="display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:3px solid {{s.cor}};">
+            <span style="flex-grow:1;font-family:var(--dp);font-size:17px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{s.nome}}</span>
+            <span style="font-family:var(--mo);font-size:22px;font-weight:500;color:{{s.cor}};font-variant-numeric:tabular-nums;">{{s.total}}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;overflow:hidden;">
+            <sc-for list="{{s.cards}}" as="c" hint-placeholder-count="4">
+              <div style="position:relative;display:flex;flex-direction:column;gap:8px;padding:16px 18px 16px 21px;border:1px solid var(--line);border-radius:9px;background:rgba(12,34,68,.72);overflow:hidden;">
+                <div style="position:absolute;left:0;top:0;bottom:0;width:5px;background:{{c.spine}};"></div>
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;">
+                  <span style="font-family:var(--mo);font-size:28px;font-weight:600;letter-spacing:.03em;color:var(--ink);line-height:1;">{{c.placa}}</span>
+                  <span style="font-family:var(--mo);font-size:17px;color:{{c.tempoCor}};font-variant-numeric:tabular-nums;">{{c.tempo}}</span>
+                </div>
+                <span style="font-size:15px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{c.cliente}}</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                  <span style="font-family:var(--mo);font-size:14px;color:var(--ink-3);">{{c.os}}</span>
+                  <span style="font-size:14px;font-weight:500;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{c.mec}}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- TICKER -->
+  <footer style="position:relative;display:flex;align-items:center;gap:26px;height:82px;padding:0 44px;border-top:1px solid var(--line-2);background:rgba(8,24,48,.9);flex-shrink:0;">
+    <div style="display:flex;align-items:center;gap:12px;height:44px;padding:0 20px;border-radius:8px;background:rgba(240,72,62,.14);border:1px solid rgba(240,72,62,.42);flex-shrink:0;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F0483E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.5 20h19Z"></path><path d="M12 10v4"></path><path d="M12 17.5h.01"></path></svg>
+      <span style="font-family:var(--dp);font-size:15px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#FF8078;">Alertas</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:36px;flex-grow:1;overflow:hidden;">
+      <span style="display:flex;align-items:center;gap:10px;font-size:19px;color:var(--ink);white-space:nowrap;"><span style="font-family:var(--mo);color:#FF8078;">PMP-9F20</span><span style="color:var(--ink-3);">SLA de aprovação vencido há 2h</span></span>
+      <span style="width:5px;height:5px;border-radius:50%;background:var(--ink-3);flex-shrink:0;"></span>
+      <span style="display:flex;align-items:center;gap:10px;font-size:19px;color:var(--ink);white-space:nowrap;"><span style="font-family:var(--mo);color:#FFB35C;">EXB-6L31</span><span style="color:var(--ink-3);">parado há 2d 06h aguardando peça</span></span>
+      <span style="width:5px;height:5px;border-radius:50%;background:var(--ink-3);flex-shrink:0;"></span>
+      <span style="display:flex;align-items:center;gap:10px;font-size:19px;color:var(--ink);white-space:nowrap;"><span style="font-family:var(--mo);color:#FFB35C;">CCB-4J92</span><span style="color:var(--ink-3);">sem mecânico atribuído</span></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;flex-shrink:0;">
+      <span style="font-family:var(--dp);font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);">Página</span>
+      <div style="display:flex;align-items:center;gap:7px;">
+        <span style="width:28px;height:5px;border-radius:3px;background:var(--cyan);"></span>
+        <span style="width:16px;height:5px;border-radius:3px;background:rgba(148,178,214,.3);"></span>
+        <span style="width:16px;height:5px;border-radius:3px;background:rgba(148,178,214,.3);"></span>
+      </div>
+      <span style="font-family:var(--mo);font-size:16px;color:var(--ink-2);font-variant-numeric:tabular-nums;">1/3</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    const CY = '#00A8E8', OR = '#FC6400', OK = '#17B890', WA = '#F5A524', CR = '#F0483E', MU = '#6A809E', INK = '#EAF1FA';
+    const kpis = [
+      { label: 'No pátio',            valor: '18',    unid: 'veículos',  cor: INK },
+      { label: 'Entradas hoje',       valor: '6',     unid: 'recepções', cor: INK },
+      { label: 'Aguard. aprovação',   valor: '3',     unid: 'OS',        cor: WA },
+      { label: 'Aguard. peça',        valor: '2',     unid: 'OS',        cor: OR },
+      { label: 'Prontos',             valor: '2',     unid: 'para retirada', cor: OK },
+      { label: 'Tempo médio',         valor: '2d 4h', unid: 'no pátio',  cor: INK }
+    ];
+    const c = (placa, cliente, os, mec, tempo, tempoCor, spine) => ({ placa, cliente, os, mec, tempo, tempoCor, spine });
+    const stages = [
+      { nome: 'Recebido', cor: MU, total: '3', cards: [
+        c('RTA-2G31', 'Transportadora Rota Sul', 'OS 2841', 'Não atribuído', '00:42', MU, MU),
+        c('LGA-7H08', 'Log Andrade Transportes', 'OS 2840', 'Não atribuído', '01:15', MU, MU),
+        c('CCB-4J92', 'Coop. Central de Cargas', 'OS 2839', 'Não atribuído', '02:03', WA, WA)
+      ]},
+      { nome: 'Em diagnóstico', cor: CY, total: '4', cards: [
+        c('VVE-1B55', 'Agropecuária Vale Verde', 'OS 2836', 'Mecânico A', '03:20', MU, CY),
+        c('MRC-8K14', 'Marcos Ribeiro Cargas', 'OS 2834', 'Mecânico B', '05:48', WA, CY),
+        c('TRL-3D77', 'Translitoral Distribuição', 'OS 2833', 'Mecânico C', '06:10', WA, CY)
+      ]},
+      { nome: 'Aguard. aprovação', cor: WA, total: '3', cards: [
+        c('PMP-9F20', 'Pampa Logística Integrada', 'OS 2829', 'Mecânico A', '1d 02h', CR, CR),
+        c('NVE-5C63', 'Nova Era Locação', 'OS 2827', 'Mecânico D', '18:40', WA, WA),
+        c('USB-2A47', 'Usina São Bento', 'OS 2825', 'Mecânico B', '09:12', MU, WA)
+      ]},
+      { nome: 'Aguard. peça', cor: OR, total: '2', cards: [
+        c('EXB-6L31', 'Expresso Bandeirante', 'OS 2822', 'Mecânico C', '2d 06h', CR, CR),
+        c('JBS-4M18', 'João Batista dos Santos', 'OS 2819', 'Mecânico D', '1d 03h', WA, OR)
+      ]},
+      { nome: 'Em manutenção', cor: INK, total: '5', cards: [
+        c('SAT-7N02', 'Sérgio Almeida Transportes', 'OS 2816', 'Mecânico A', '04:35', MU, CY),
+        c('RTA-9P84', 'Transportadora Rota Sul', 'OS 2814', 'Mecânico B', '02:50', MU, CY),
+        c('LGA-1Q45', 'Log Andrade Transportes', 'OS 2812', 'Mecânico C', '07:22', WA, CY)
+      ]},
+      { nome: 'Pronto', cor: OK, total: '2', cards: [
+        c('TRL-6T91', 'Translitoral Distribuição', 'OS 2801', 'Recepção', '00:20', OK, OK),
+        c('MRC-2U38', 'Marcos Ribeiro Cargas', 'OS 2798', 'Recepção', '03:55', WA, OK)
+      ]}
+    ];
+    return { kpis, stages };
+  }
+}
+</script>
+</body>
+</html>

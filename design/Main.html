@@ -1,0 +1,224 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    :root{
+      --navy-900:#050E1E; --navy-800:#081830; --navy-700:#0C2244; --navy-600:#123059;
+      --line:rgba(148,178,214,.14); --line-2:rgba(148,178,214,.28);
+      --ink:#EAF1FA; --ink-2:#9FB4CF; --ink-3:#6A809E;
+      --orange:#FC6400; --cyan:#00A8E8; --ok:#17B890; --warn:#F5A524; --crit:#F0483E;
+      --ui:'IBM Plex Sans',system-ui,sans-serif;
+      --dp:'Archivo',system-ui,sans-serif;
+      --mo:'IBM Plex Mono',ui-monospace,monospace;
+    }
+    body{margin:0;font-family:var(--ui);background:var(--navy-900);color:var(--ink);-webkit-font-smoothing:antialiased;}
+    a{color:var(--cyan);text-decoration:none;} a:hover{color:#5BC8F5;}
+    .lbl{font-family:var(--dp);font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);}
+    .nav{display:flex;align-items:center;gap:11px;height:34px;padding:0 12px;border-radius:5px;font-size:13.5px;color:var(--ink-2);cursor:pointer;}
+    .nav:hover{background:rgba(148,178,214,.06);color:var(--ink);}
+  </style>
+</helmet>
+
+<div style="width:1440px;height:980px;display:grid;grid-template-columns:256px 1fr;background:var(--navy-900);overflow:hidden;">
+
+  <!-- SIDEBAR -->
+  <aside style="display:flex;flex-direction:column;background:var(--navy-800);border-right:1px solid var(--line);overflow:hidden;">
+    <div style="display:flex;align-items:center;height:62px;padding:0 18px;border-bottom:1px solid var(--line);flex-shrink:0;">
+      <img src="tecnoar-negativo.svg" alt="Tecnoar Freios" style="height:34px;width:auto;display:block;">
+    </div>
+
+    <nav style="display:flex;flex-direction:column;gap:16px;padding:16px 12px;overflow:hidden;">
+
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="display:flex;align-items:center;gap:11px;height:36px;padding:0 12px;border-radius:5px;background:rgba(252,100,0,.12);color:#FFFFFF;font-weight:600;font-size:13.5px;position:relative;">
+          <div style="position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:0 2px 2px 0;background:var(--orange);"></div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FC6400" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
+          Visão Geral
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 12px 6px;">
+          <span class="lbl">Cadastros</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+        </div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 21a6 6 0 0 0-12 0"></path><circle cx="12" cy="8" r="4"></circle></svg>Clientes</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V8l8-4 8 4v12"></path><path d="M9 20v-6h6v6"></path></svg>Fornecedores</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M7 12h10"></path><path d="M10 18h4"></path></svg>Vendedores</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0"></path><path d="M17 11.2A3.2 3.2 0 1 0 17 4.8"></path><path d="M18 15.4a6.5 6.5 0 0 1 3.5 4.6"></path></svg>Usuários</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16h2l1.4-5a2 2 0 0 1 1.9-1.4h6.4L17 13h3a2 2 0 0 1 2 2v1h-2"></path><circle cx="7" cy="17.5" r="2"></circle><circle cx="17" cy="17.5" r="2"></circle><path d="M9 17.5h6"></path></svg>Veículos</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9Z"></path><path d="m4 7.5 8 4.5 8-4.5"></path><path d="M12 12v9"></path></svg>Produtos</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 1 5 5L10 21l-5 1 1-5Z"></path><path d="m13 8 3 3"></path></svg>Serviços</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.4l6.1-.8Z"></path></svg>Especialidades</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3.2 1.8"></path></svg>Status da OS</div>
+        <div class="nav"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11V4h7l11 11-7 7Z"></path><circle cx="7.5" cy="7.5" r="1.4"></circle></svg>Tags</div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 12px 6px;">
+          <span class="lbl">Operação</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="padding:0 12px 6px;"><span class="lbl">Relacionamento</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="padding:0 12px 6px;"><span class="lbl">Comercial</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="padding:0 12px 6px;"><span class="lbl">Gestão</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="padding:0 12px 6px;"><span class="lbl">Inteligência</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <div style="padding:0 12px 6px;"><span class="lbl">Sistema</span></div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div style="display:flex;flex-direction:column;overflow:hidden;">
+
+    <!-- TOPBAR -->
+    <header style="display:flex;align-items:center;gap:18px;height:62px;padding:0 26px;border-bottom:1px solid var(--line);background:var(--navy-800);flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:10px;flex-grow:1;max-width:520px;height:36px;padding:0 12px;background:var(--navy-900);border:1px solid var(--line);border-radius:6px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <span style="flex-grow:1;font-size:13.5px;color:var(--ink-3);">Buscar cliente, placa, OS, produto, protocolo…</span>
+        <span style="font-family:var(--mo);font-size:11px;color:var(--ink-3);border:1px solid var(--line);border-radius:4px;padding:1px 6px;">Ctrl K</span>
+      </div>
+
+      <div style="flex-grow:1;"></div>
+
+      <button type="button" style="position:relative;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9FB4CF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg>
+      </button>
+      <button type="button" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid var(--line);border-radius:6px;background:transparent;cursor:pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9FB4CF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.6 9.2a2.5 2.5 0 1 1 3.4 2.9c-.6.3-1 .9-1 1.6v.3"></path><path d="M12 17.5h.01"></path></svg>
+      </button>
+
+      <div style="width:1px;height:26px;background:var(--line);"></div>
+
+      <div style="display:flex;align-items:center;gap:11px;padding:4px 8px 4px 4px;border-radius:7px;cursor:pointer;">
+        <div style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:6px;background:var(--navy-600);border:1px solid var(--line-2);font-family:var(--dp);font-size:13px;font-weight:700;color:var(--ink);">—</div>
+        <div style="display:flex;flex-direction:column;gap:1px;">
+          <span style="font-size:13px;font-weight:600;color:var(--ink);">Nome do usuário</span>
+          <span style="font-family:var(--dp);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);">Função</span>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div style="flex-grow:1;overflow:hidden;padding:26px;display:flex;flex-direction:column;gap:20px;">
+
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <span class="lbl">Início</span>
+          <h1 style="margin:0;font-family:var(--dp);font-size:26px;font-weight:600;letter-spacing:-.01em;color:var(--ink);">Visão Geral</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="display:flex;align-items:center;gap:8px;height:34px;padding:0 12px;border:1px solid var(--line);border-radius:6px;font-size:13px;color:var(--ink-2);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9FB4CF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></svg>
+            Hoje
+          </div>
+          <button type="button" style="display:flex;align-items:center;gap:8px;height:34px;padding:0 14px;border:0;border-radius:6px;background:var(--orange);color:#fff;font-family:var(--dp);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+            Nova Recepção
+          </button>
+        </div>
+      </div>
+
+      <!-- honest zero state notice -->
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid rgba(0,168,232,.32);border-radius:7px;background:rgba(0,168,232,.07);">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#00A8E8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 8h.01"></path></svg>
+        <span style="font-size:13.5px;color:var(--ink);">Ainda não há movimentação registrada. Os indicadores passam a ser calculados assim que a operação começar.</span>
+      </div>
+
+      <!-- KPI grid: real zeros -->
+      <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;">
+        <div style="display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--navy-800);position:relative;overflow:hidden;">
+          <div style="position:absolute;left:0;top:0;width:100%;height:2px;background:var(--cyan);opacity:.5;"></div>
+          <span class="lbl">No pátio</span>
+          <span style="font-family:var(--mo);font-size:32px;font-weight:500;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;">0</span>
+          <span style="font-size:11.5px;color:var(--ink-3);">veículos</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--navy-800);">
+          <span class="lbl">Entradas hoje</span>
+          <span style="font-family:var(--mo);font-size:32px;font-weight:500;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;">0</span>
+          <span style="font-size:11.5px;color:var(--ink-3);">recepções</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--navy-800);">
+          <span class="lbl">OS abertas</span>
+          <span style="font-family:var(--mo);font-size:32px;font-weight:500;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;">0</span>
+          <span style="font-size:11.5px;color:var(--ink-3);">em andamento</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--navy-800);">
+          <span class="lbl">Aguardando aprovação</span>
+          <span style="font-family:var(--mo);font-size:32px;font-weight:500;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;">0</span>
+          <span style="font-size:11.5px;color:var(--ink-3);">itens</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--navy-800);">
+          <span class="lbl">Peças em teste</span>
+          <span style="font-family:var(--mo);font-size:32px;font-weight:500;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;">0</span>
+          <span style="font-size:11.5px;color:var(--ink-3);">protocolos</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid var(--line);border-radius:8px;background:var(--navy-800);">
+          <span class="lbl">Tempo médio</span>
+          <span style="font-family:var(--mo);font-size:32px;font-weight:500;line-height:1;color:var(--ink-3);font-variant-numeric:tabular-nums;">—</span>
+          <span style="font-size:11.5px;color:var(--ink-3);">sem base de cálculo</span>
+        </div>
+      </div>
+
+      <!-- two panels -->
+      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px;flex-grow:1;min-height:0;">
+
+        <section style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;background:var(--navy-800);overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);">
+            <h2 style="margin:0;font-family:var(--dp);font-size:14px;font-weight:600;color:var(--ink);">Fluxo do pátio</h2>
+            <a href="#" style="font-family:var(--dp);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;">Abrir painel</a>
+          </div>
+          <div style="flex-grow:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:36px;">
+            <div style="display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:10px;border:1px dashed var(--line-2);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16h2l1.4-5a2 2 0 0 1 1.9-1.4h6.4L17 13h3a2 2 0 0 1 2 2v1h-2"></path><circle cx="7" cy="17.5" r="2"></circle><circle cx="17" cy="17.5" r="2"></circle><path d="M9 17.5h6"></path></svg>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;align-items:center;">
+              <span style="font-family:var(--dp);font-size:15px;font-weight:600;color:var(--ink);">Nenhum veículo no pátio</span>
+              <span style="font-size:13px;color:var(--ink-3);text-align:center;max-width:320px;">Registre a entrada de um veículo na Recepção para acompanhar o fluxo aqui.</span>
+            </div>
+            <button type="button" style="height:34px;padding:0 16px;border:1px solid var(--line-2);border-radius:6px;background:transparent;color:var(--ink);font-family:var(--dp);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">Abrir Recepção</button>
+          </div>
+        </section>
+
+        <section style="display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;background:var(--navy-800);overflow:hidden;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);">
+            <h2 style="margin:0;font-family:var(--dp);font-size:14px;font-weight:600;color:var(--ink);">Atividade recente</h2>
+          </div>
+          <div style="flex-grow:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:36px;">
+            <div style="display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:10px;border:1px dashed var(--line-2);">
+              <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3.2 1.8"></path></svg>
+            </div>
+            <span style="font-size:13px;color:var(--ink-3);text-align:center;">Sem eventos registrados.</span>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

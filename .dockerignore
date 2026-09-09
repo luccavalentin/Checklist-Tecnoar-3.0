@@ -1,0 +1,11 @@
+node_modules
+dist
+.git
+.env
+design
+supabase
+*.log
+# O conteúdo de deploy/ não entra na imagem, com uma exceção:
+# a config do nginx que o estágio de runtime copia.
+deploy
+!deploy/nginx-app.conf

@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    :root{
+      --navy-900:#050E1E; --navy-800:#081830; --navy-700:#0C2244; --navy-600:#123059;
+      --line:rgba(148,178,214,.14); --line-2:rgba(148,178,214,.28);
+      --ink:#EAF1FA; --ink-2:#9FB4CF; --ink-3:#6A809E;
+      --orange:#FC6400; --cyan:#00A8E8; --ok:#17B890; --warn:#F5A524; --crit:#F0483E;
+      --ui:'IBM Plex Sans',system-ui,sans-serif;
+      --dp:'Archivo',system-ui,sans-serif;
+      --mo:'IBM Plex Mono',ui-monospace,monospace;
+    }
+    body{margin:0;font-family:var(--ui);background:var(--navy-900);color:var(--ink);-webkit-font-smoothing:antialiased;}
+    a{color:var(--cyan);text-decoration:none;} a:hover{color:#5BC8F5;}
+    .lbl{font-family:var(--dp);font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);}
+  </style>
+</helmet>
+
+<div style="width:390px;height:844px;display:flex;flex-direction:column;background:var(--navy-900);overflow:hidden;">
+
+  <!-- app header -->
+  <header style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--navy-800);flex-shrink:0;">
+    <img src="tecnoar-negativo.svg" alt="Tecnoar Freios" style="height:30px;width:auto;display:block;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;width:38px;height:38px;border:1px solid var(--line);border-radius:8px;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9FB4CF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg>
+        <span style="position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--orange);border:2px solid var(--navy-800);"></span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;background:var(--navy-600);border:1px solid var(--line-2);font-family:var(--dp);font-size:13px;font-weight:700;color:var(--ink);">—</div>
+    </div>
+  </header>
+
+  <div style="flex-grow:1;overflow:hidden;display:flex;flex-direction:column;">
+
+    <div style="padding:18px 16px 14px;display:flex;flex-direction:column;gap:14px;flex-shrink:0;">
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <span class="lbl">Operação</span>
+        <h1 style="margin:0;font-family:var(--dp);font-size:24px;font-weight:600;letter-spacing:-.01em;color:var(--ink);">Minha Operação</h1>
+      </div>
+
+      <div style="display:flex;height:40px;padding:3px;background:var(--navy-800);border:1px solid var(--line);border-radius:8px;gap:3px;">
+        <div style="flex-grow:1;display:flex;align-items:center;justify-content:center;gap:7px;border-radius:5px;background:var(--navy-600);font-family:var(--dp);font-size:12.5px;font-weight:600;color:var(--ink);">
+          Minhas <span style="font-family:var(--mo);font-size:11px;color:var(--cyan);">3</span>
+        </div>
+        <div style="flex-grow:1;display:flex;align-items:center;justify-content:center;gap:7px;border-radius:5px;font-family:var(--dp);font-size:12.5px;font-weight:600;color:var(--ink-3);">
+          Disponíveis <span style="font-family:var(--mo);font-size:11px;">5</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex-grow:1;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:12px;">
+
+      <!-- active task -->
+      <div style="position:relative;display:flex;flex-direction:column;gap:13px;padding:16px 16px 16px 19px;border:1px solid rgba(0,168,232,.4);border-radius:11px;background:var(--navy-800);overflow:hidden;">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--cyan);"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <span style="font-family:var(--mo);font-size:22px;font-weight:600;letter-spacing:.03em;color:var(--ink);line-height:1;">VVE-1B55</span>
+            <span style="font-size:13px;color:var(--ink-2);">Agropecuária Vale Verde</span>
+          </div>
+          <span style="display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 11px;border-radius:13px;background:rgba(0,168,232,.14);color:#5BC8F5;font-family:var(--dp);font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;">Em execução</span>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;">
+          <span style="font-family:var(--mo);font-size:12px;color:var(--ink-3);">OS 2836</span>
+          <span style="width:3px;height:3px;border-radius:50%;background:var(--ink-3);"></span>
+          <span style="display:inline-flex;align-items:center;height:21px;padding:0 8px;border-radius:11px;font-size:11px;background:rgba(148,178,214,.1);color:var(--ink-2);">Pneumática</span>
+          <span style="width:3px;height:3px;border-radius:50%;background:var(--ink-3);"></span>
+          <span style="display:flex;align-items:center;gap:5px;font-family:var(--mo);font-size:12px;color:var(--ink-2);font-variant-numeric:tabular-nums;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 1.8"></path></svg>01:24:07
+          </span>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:7px;background:rgba(245,165,36,.09);border:1px solid rgba(245,165,36,.28);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5A524" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2 2 4-4"></path><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M8 2v4M16 2v4"></path></svg>
+          <span style="flex-grow:1;font-size:12.5px;color:var(--ink);">Checklist técnico — 12 de 28 itens</span>
+        </div>
+
+        <div style="display:flex;gap:9px;">
+          <button type="button" style="flex-grow:1;display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border:1px solid var(--line-2);border-radius:8px;background:transparent;color:var(--ink);font-family:var(--dp);font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>Pausar
+          </button>
+          <button type="button" style="flex-grow:1;display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border:0;border-radius:8px;background:var(--orange);color:#fff;font-family:var(--dp);font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2 2 4-4"></path><rect x="3" y="4" width="18" height="17" rx="2"></rect></svg>Continuar checklist
+          </button>
+        </div>
+      </div>
+
+      <!-- queued tasks -->
+      <sc-for list="{{tarefas}}" as="t" hint-placeholder-count="2">
+        <div style="position:relative;display:flex;flex-direction:column;gap:11px;padding:15px 15px 15px 18px;border:1px solid var(--line);border-radius:11px;background:var(--navy-800);overflow:hidden;">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:{{t.spine}};"></div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+            <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+              <span style="font-family:var(--mo);font-size:19px;font-weight:600;letter-spacing:.03em;color:var(--ink);line-height:1;">{{t.placa}}</span>
+              <span style="font-size:12.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{t.cliente}}</span>
+            </div>
+            <span style="display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:12px;background:{{t.stBg}};color:{{t.stFg}};font-family:var(--dp);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;">{{t.status}}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:9px;">
+            <span style="font-family:var(--mo);font-size:12px;color:var(--ink-3);">{{t.os}}</span>
+            <span style="width:3px;height:3px;border-radius:50%;background:var(--ink-3);"></span>
+            <span style="display:inline-flex;align-items:center;height:21px;padding:0 8px;border-radius:11px;font-size:11px;background:rgba(148,178,214,.1);color:var(--ink-2);">{{t.esp}}</span>
+          </div>
+          <button type="button" style="display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border:1px solid var(--line-2);border-radius:8px;background:transparent;color:var(--ink);font-family:var(--dp);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;">{{t.acao}}</button>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- bottom nav -->
+  <nav style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid var(--line);background:var(--navy-800);flex-shrink:0;padding-bottom:6px;">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 0 9px;position:relative;">
+      <div style="position:absolute;top:0;left:22%;right:22%;height:2px;background:var(--orange);border-radius:0 0 2px 2px;"></div>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FC6400" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 1 5 5L10 21l-5 1 1-5Z"></path><path d="m13 8 3 3"></path></svg>
+      <span style="font-family:var(--dp);font-size:9.5px;font-weight:600;letter-spacing:.06em;color:var(--orange);">Operação</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 0 9px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13"></path><path d="M9 6V3h6v3"></path></svg>
+      <span style="font-family:var(--dp);font-size:9.5px;font-weight:600;letter-spacing:.06em;color:var(--ink-3);">Recepção</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 0 9px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="7" rx="1"></rect><rect x="14" y="4" width="7" height="11" rx="1"></rect><rect x="3" y="15" width="7" height="5" rx="1"></rect></svg>
+      <span style="font-family:var(--dp);font-size:9.5px;font-weight:600;letter-spacing:.06em;color:var(--ink-3);">Pátio</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 0 9px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2 2 4-4"></path><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M8 2v4M16 2v4"></path></svg>
+      <span style="font-family:var(--dp);font-size:9.5px;font-weight:600;letter-spacing:.06em;color:var(--ink-3);">Checklists</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 0 9px;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <span style="font-family:var(--dp);font-size:9.5px;font-weight:600;letter-spacing:.06em;color:var(--ink-3);">Buscar</span>
+    </div>
+  </nav>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tarefas = [
+      { placa: 'MRC-8K14', cliente: 'Marcos Ribeiro Cargas ME', os: 'OS 2834', esp: 'ABS / EBS',
+        status: 'Atribuída', stBg: 'rgba(148,178,214,.12)', stFg: '#9FB4CF', spine: '#6A809E', acao: 'Iniciar serviço' },
+      { placa: 'TRL-3D77', cliente: 'Translitoral Distribuição', os: 'OS 2833', esp: 'Pneumática',
+        status: 'Pausada', stBg: 'rgba(245,165,36,.13)', stFg: '#F5A524', spine: '#F5A524', acao: 'Retomar' }
+    ];
+    return { tarefas };
+  }
+}
+</script>
+</body>
+</html>

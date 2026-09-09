@@ -1,0 +1,35 @@
+{
+  "pages": [
+    { "id": "produto", "name": "Produto" },
+    { "id": "sistema", "name": "Design System" }
+  ],
+  "artboards": [
+    { "file": "Login.html",      "page": "produto", "title": "Login",                 "x": 0,    "y": 0,    "w": 1440, "h": 900 },
+    { "file": "Main.html",       "page": "produto", "title": "Shell + Visão Geral",   "x": 1520, "y": 0,    "w": 1440, "h": 980 },
+    { "file": "Mobile.html",     "page": "produto", "title": "Minha Operação (mobile)", "x": 3040, "y": 0,  "w": 390,  "h": 844 },
+    { "file": "Listagem.html",   "page": "produto", "title": "Padrão de Listagem",    "x": 0,    "y": 1120, "w": 1440, "h": 980 },
+    { "file": "Formulario.html", "page": "produto", "title": "Padrão de Formulário",  "x": 1520, "y": 1120, "w": 1440, "h": 980 },
+    { "file": "Patio.html",      "page": "produto", "title": "Painel do Pátio",       "x": 0,    "y": 2240, "w": 1440, "h": 980 },
+    { "file": "ModoTV.html",     "page": "produto", "title": "Modo TV",               "x": 1520, "y": 2240, "w": 1920, "h": 1080 },
+    { "file": "Sistema.html",    "page": "sistema", "title": "Padrões reutilizáveis", "x": 0,    "y": 0,    "w": 1348, "h": 1800 }
+  ],
+  "annotations": [
+    {
+      "id": "nota-dados",
+      "page": "produto",
+      "x": 0,
+      "y": -170,
+      "w": 620,
+      "text": "As linhas de Listagem, Pátio e Modo TV são AMOSTRA DE LAYOUT, só para julgar densidade e hierarquia.\nO sistema real nasce vazio: a Visão Geral aqui ao lado mostra o comportamento verdadeiro com base sem dados — zeros reais e estados vazios, nunca número inventado."
+    },
+    {
+      "id": "nota-tv",
+      "page": "produto",
+      "x": 1520,
+      "y": 2130,
+      "w": 470,
+      "text": "Modo TV nunca inicia sozinho: só abre pelo botão no Painel do Pátio e sempre expõe \"Sair do Modo TV\". Com mais veículos do que cabem, a tela pagina (1/3) em vez de esconder."
+    }
+  ],
+  "launch": { "view": "canvas", "page": "produto" }
+}

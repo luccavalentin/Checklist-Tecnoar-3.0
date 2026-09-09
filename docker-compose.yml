@@ -1,0 +1,30 @@
+# Checklist Tecnoar — container da aplicação.
+# A rede "borda" é externa e compartilhada: é por ela que o Traefik
+# alcança este e os demais sistemas da VPS.
+
+services:
+  checklist:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
+    image: checklist-tecnoar:latest
+    container_name: checklist-tecnoar
+    restart: unless-stopped
+    networks: [borda]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=borda"
+      - "traefik.http.routers.checklist.rule=Host(`checklist.tecnoarsistemas.com.br`)"
+      - "traefik.http.routers.checklist.entrypoints=websecure"
+      - "traefik.http.routers.checklist.tls.certresolver=letsencrypt"
+      - "traefik.http.services.checklist.loadbalancer.server.port=8080"
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+networks:
+  borda:
+    external: true

@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    :root{
+      --navy-900:#050E1E; --navy-800:#081830; --navy-700:#0C2244; --navy-600:#123059;
+      --line:rgba(148,178,214,.14); --line-2:rgba(148,178,214,.28);
+      --ink:#EAF1FA; --ink-2:#9FB4CF; --ink-3:#6A809E;
+      --orange:#FC6400; --cyan:#00A8E8; --ok:#17B890; --warn:#F5A524; --crit:#F0483E;
+      --ui:'IBM Plex Sans',system-ui,sans-serif;
+      --dp:'Archivo',system-ui,sans-serif;
+      --mo:'IBM Plex Mono',ui-monospace,monospace;
+    }
+    body{margin:0;font-family:var(--ui);background:var(--navy-900);color:var(--ink);-webkit-font-smoothing:antialiased;}
+    a{color:var(--cyan);text-decoration:none;}
+    a:hover{color:#5BC8F5;}
+    .lbl{font-family:var(--dp);font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);}
+  </style>
+</helmet>
+
+<div style="width:1440px;height:900px;display:grid;grid-template-columns:1fr 560px;background:var(--navy-900);overflow:hidden;position:relative;">
+
+  <!-- BRAND PANEL -->
+  <div style="position:relative;background:var(--navy-800);overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:56px 64px;">
+
+    <!-- technical grid -->
+    <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(148,178,214,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(148,178,214,.05) 1px,transparent 1px);background-size:56px 56px;"></div>
+    <div style="position:absolute;width:900px;height:900px;left:-180px;top:-160px;border-radius:50%;background:radial-gradient(circle,rgba(0,168,232,.16) 0%,rgba(0,168,232,0) 62%);"></div>
+    <div style="position:absolute;width:620px;height:620px;right:-200px;bottom:-220px;border-radius:50%;background:radial-gradient(circle,rgba(252,100,0,.14) 0%,rgba(252,100,0,0) 64%);"></div>
+
+    <div style="position:relative;display:flex;flex-direction:column;gap:8px;">
+      <div class="lbl" style="color:var(--cyan);">Sistema Operacional</div>
+    </div>
+
+    <div style="position:relative;display:flex;flex-direction:column;gap:40px;max-width:600px;">
+      <img src="tecnoar-negativo.svg" alt="Tecnoar Freios" style="width:340px;height:auto;display:block;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <h1 style="margin:0;font-family:var(--dp);font-weight:700;font-size:46px;line-height:1.05;letter-spacing:-.02em;color:var(--ink);text-wrap:balance;">Controle total<br>da sua oficina<span style="color:var(--orange);">.</span></h1>
+        <p style="margin:0;font-size:16px;line-height:1.6;color:var(--ink-2);max-width:440px;">Recepção, ordens de serviço, pátio, checklists técnicos e laboratório de peças — em um só lugar, com rastreabilidade de ponta a ponta.</p>
+      </div>
+    </div>
+
+    <div style="position:relative;display:flex;gap:0;align-items:stretch;border-top:1px solid var(--line);padding-top:22px;">
+      <div style="display:flex;flex-direction:column;gap:6px;padding-right:40px;">
+        <span class="lbl">Especialidade</span>
+        <span style="font-family:var(--dp);font-size:14px;font-weight:600;color:var(--ink);">Freios pneumáticos</span>
+      </div>
+      <div style="width:1px;background:var(--line);"></div>
+      <div style="display:flex;flex-direction:column;gap:6px;padding:0 40px;">
+        <span class="lbl">Diagnóstico</span>
+        <span style="font-family:var(--dp);font-size:14px;font-weight:600;color:var(--ink);">ABS · EBS · APU</span>
+      </div>
+      <div style="width:1px;background:var(--line);"></div>
+      <div style="display:flex;flex-direction:column;gap:6px;padding-left:40px;">
+        <span class="lbl">Frota</span>
+        <span style="font-family:var(--dp);font-size:14px;font-weight:600;color:var(--ink);">Cavalo e carreta</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM PANEL -->
+  <div style="position:relative;background:var(--navy-900);border-left:1px solid var(--line);display:flex;align-items:center;justify-content:center;padding:0 72px;">
+    <div style="position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,rgba(0,168,232,0) 0%,var(--cyan) 22%,var(--cyan) 42%,rgba(252,100,0,.9) 70%,rgba(252,100,0,0) 100%);opacity:.65;"></div>
+
+    <div style="width:100%;max-width:416px;display:flex;flex-direction:column;gap:28px;">
+
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <span class="lbl">Acesso</span>
+        <h2 style="margin:0;font-family:var(--dp);font-size:28px;font-weight:600;letter-spacing:-.01em;color:var(--ink);">Entrar</h2>
+        <p style="margin:0;font-size:14px;color:var(--ink-3);">Use as credenciais fornecidas pela Tecnoar.</p>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:18px;">
+
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <label class="lbl" for="email">E-mail</label>
+          <div style="display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;background:var(--navy-800);border:1px solid var(--line-2);border-radius:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A809E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="m2 7 10 6 10-6"></path></svg>
+            <span style="font-size:15px;color:var(--ink-3);">nome@tecnoar.com.br</span>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <label class="lbl" for="senha">Senha</label>
+          <div style="display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;background:var(--navy-800);border:1px solid var(--cyan);border-radius:6px;box-shadow:0 0 0 3px rgba(0,168,232,.18);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00A8E8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            <span style="flex-grow:1;font-family:var(--mo);font-size:15px;letter-spacing:.18em;color:var(--ink);">••••••••••</span>
+            <button type="button" style="display:flex;align-items:center;gap:6px;background:none;border:0;padding:0;cursor:pointer;font-family:var(--dp);font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9FB4CF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              Mostrar
+            </button>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin-top:-4px;">
+          <a href="#" style="font-size:13px;font-weight:500;">Esqueci minha senha</a>
+        </div>
+
+        <button type="button" style="display:flex;align-items:center;justify-content:center;gap:10px;height:50px;border:0;border-radius:6px;background:var(--orange);color:#FFFFFF;font-family:var(--dp);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;box-shadow:0 8px 24px -10px rgba(252,100,0,.9);">
+          Entrar
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13"></path><path d="m12 5 7 7-7 7"></path></svg>
+        </button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="flex-grow:1;height:1px;background:var(--line);"></div>
+        <span class="lbl">ou</span>
+        <div style="flex-grow:1;height:1px;background:var(--line);"></div>
+      </div>
+
+      <button type="button" style="display:flex;align-items:center;justify-content:center;gap:10px;height:48px;border:1px solid var(--line-2);border-radius:6px;background:transparent;color:var(--ink);font-family:var(--dp);font-size:13px;font-weight:600;letter-spacing:.04em;cursor:pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EAF1FA" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M19 8v6"></path><path d="M22 11h-6"></path></svg>
+        Solicitar acesso
+      </button>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:20px;border-top:1px solid var(--line);">
+        <a href="#" style="font-size:12px;color:var(--ink-3);">Política de Privacidade</a>
+        <span style="font-family:var(--mo);font-size:11px;color:var(--ink-3);">v3.0</span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

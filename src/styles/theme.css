@@ -1,0 +1,438 @@
+@import 'tailwindcss';
+
+/* Tema por classe: `dark` no <html>, aplicado antes da primeira pintura. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   TOKENS — modo claro (padrão) e modo escuro
+   As duas versões são projetadas, não derivadas: contraste,
+   profundidade e peso do laranja mudam de acordo com o fundo.
+   ============================================================ */
+:root {
+  --c-canvas: #f1f4f9;
+  --c-surface: #ffffff;
+  --c-surface-2: #f7f9fc;
+  --c-inset: #ffffff;
+
+  --c-line: #dde4ee;
+  --c-line-strong: #c2cddd;
+
+  --c-ink: #0b1c33;
+  --c-ink-2: #4a5d77;
+  --c-ink-3: #71829b;
+
+  --c-accent: #fc6400;
+  --c-accent-hover: #e35a00;
+  --c-accent-ink: #b84b00;
+  --c-accent-soft: #fff1e6;
+  --c-on-accent: #ffffff;
+
+  --c-cyan: #0086c4;
+  --c-cyan-ink: #00648f;
+  --c-cyan-soft: #e6f4fb;
+
+  --c-ok: #0e9c74;
+  --c-ok-ink: #0a7458;
+  --c-ok-soft: #e6f6f1;
+
+  --c-warn: #b87400;
+  --c-warn-ink: #8f5b00;
+  --c-warn-soft: #fdf3e0;
+
+  --c-crit: #d13328;
+  --c-crit-ink: #a5261d;
+  --c-crit-soft: #fdecea;
+
+  --c-skeleton: #e6ebf3;
+  --c-overlay: rgb(11 28 51 / 0.42);
+  --c-grid: rgb(11 28 51 / 0.06);
+
+  --sh-1: 0 1px 2px rgb(11 28 51 / 0.06), 0 1px 3px rgb(11 28 51 / 0.05);
+  --sh-2: 0 4px 14px -4px rgb(11 28 51 / 0.12), 0 2px 6px -2px rgb(11 28 51 / 0.08);
+  --sh-3: 0 24px 60px -22px rgb(11 28 51 / 0.28), 0 8px 20px -10px rgb(11 28 51 / 0.14);
+  /* Elevação da ação primária: apoio no plano + um resíduo quente curto.
+     O halo largo anterior lia como néon, não como botão de ferramenta. */
+  --sh-accent: 0 1px 2px rgb(11 28 51 / 0.10), 0 4px 12px -7px rgb(252 100 0 / 0.40);
+}
+
+.dark {
+  --c-canvas: #050e1e;
+  --c-surface: #081830;
+  --c-surface-2: #0c2244;
+  --c-inset: #050e1e;
+
+  --c-line: rgb(148 178 214 / 0.14);
+  --c-line-strong: rgb(148 178 214 / 0.28);
+
+  --c-ink: #eaf1fa;
+  --c-ink-2: #9fb4cf;
+  --c-ink-3: #6a809e;
+
+  --c-accent: #fc6400;
+  --c-accent-hover: #ff7a22;
+  --c-accent-ink: #ff9a4d;
+  --c-accent-soft: rgb(252 100 0 / 0.13);
+  --c-on-accent: #ffffff;
+
+  --c-cyan: #00a8e8;
+  --c-cyan-ink: #5bc8f5;
+  --c-cyan-soft: rgb(0 168 232 / 0.12);
+
+  --c-ok: #17b890;
+  --c-ok-ink: #3fd3a7;
+  --c-ok-soft: rgb(23 184 144 / 0.13);
+
+  --c-warn: #f5a524;
+  --c-warn-ink: #ffc15e;
+  --c-warn-soft: rgb(245 165 36 / 0.13);
+
+  --c-crit: #f0483e;
+  --c-crit-ink: #ff8078;
+  --c-crit-soft: rgb(240 72 62 / 0.13);
+
+  --c-skeleton: rgb(148 178 214 / 0.11);
+  --c-overlay: rgb(2 6 14 / 0.66);
+  --c-grid: rgb(148 178 214 / 0.05);
+
+  --sh-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --sh-2: 0 6px 18px -6px rgb(0 0 0 / 0.55);
+  --sh-3: 0 24px 60px -22px rgb(0 0 0 / 0.85);
+  --sh-accent: 0 1px 2px rgb(0 0 0 / 0.5), 0 4px 14px -8px rgb(252 100 0 / 0.45);
+}
+
+@theme inline {
+  --color-canvas: var(--c-canvas);
+  --color-surface: var(--c-surface);
+  --color-surface-2: var(--c-surface-2);
+  --color-inset: var(--c-inset);
+
+  --color-line: var(--c-line);
+  --color-line-strong: var(--c-line-strong);
+
+  --color-ink: var(--c-ink);
+  --color-ink-2: var(--c-ink-2);
+  --color-ink-3: var(--c-ink-3);
+
+  --color-accent: var(--c-accent);
+  --color-accent-hover: var(--c-accent-hover);
+  --color-accent-ink: var(--c-accent-ink);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-on-accent: var(--c-on-accent);
+
+  --color-cyan: var(--c-cyan);
+  --color-cyan-ink: var(--c-cyan-ink);
+  --color-cyan-soft: var(--c-cyan-soft);
+
+  --color-ok: var(--c-ok);
+  --color-ok-ink: var(--c-ok-ink);
+  --color-ok-soft: var(--c-ok-soft);
+
+  --color-warn: var(--c-warn);
+  --color-warn-ink: var(--c-warn-ink);
+  --color-warn-soft: var(--c-warn-soft);
+
+  --color-crit: var(--c-crit);
+  --color-crit-ink: var(--c-crit-ink);
+  --color-crit-soft: var(--c-crit-soft);
+
+  --color-skeleton: var(--c-skeleton);
+  --color-overlay: var(--c-overlay);
+
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Archivo', 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', 'Consolas', monospace;
+
+  --shadow-e1: var(--sh-1);
+  --shadow-e2: var(--sh-2);
+  --shadow-e3: var(--sh-3);
+  --shadow-accent: var(--sh-accent);
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+@layer base {
+  * {
+    border-color: var(--c-line);
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--c-canvas);
+    color: var(--c-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior-y: none;
+    /* Ligaduras e formas alternativas contextuais — refina o texto corrido. */
+    font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  }
+
+  /*
+   * Quebra de linha tipográfica: títulos equilibram as linhas entre si,
+   * parágrafos evitam deixar uma palavra órfã na última linha. É o tipo de
+   * ajuste que não se percebe quando está certo — só quando falta.
+   */
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Foco visível e consistente em todo o sistema (acessibilidade). */
+  :focus-visible {
+    outline: 2px solid var(--c-cyan);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: var(--c-accent);
+    color: var(--c-on-accent);
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--c-ink-3);
+  }
+
+  /* Barras de rolagem discretas, coerentes nos dois temas. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--c-line-strong) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--c-line-strong);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--c-ink-3);
+  }
+}
+
+/* ============================================================
+   ESCALA DE RAIOS — três degraus, por função da peça
+   ------------------------------------------------------------
+   rounded-md  (6px)  controles: botão, entrada, seleção, chip
+   rounded-lg  (8px)  superfícies: painel, cartão, tabela, métrica
+   rounded-xl (12px)  sobreposições: modal, painel de formulário
+   rounded-full       pastilhas e selos
+
+   Três degraus bastam. Um valor arbitrário no meio (o antigo
+   `rounded-[10px]` do estado vazio) não se lê como intenção, se lê
+   como descuido — é o tipo de detalhe que tira o ar de produto.
+   ============================================================ */
+
+/* ============================================================
+   UTILITÁRIOS DO SISTEMA
+   ============================================================ */
+@utility num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+/*
+ * Aresta de luz no topo do cartão.
+ *
+ * No tema escuro uma superfície sem aresta parece um recorte no fundo; a linha
+ * de 1px simula a quina iluminada e devolve espessura à peça. No tema claro a
+ * borda já cumpre esse papel, então a aresta não aparece.
+ */
+@utility aresta {
+  position: relative;
+}
+.dark .aresta::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  border-radius: inherit;
+  background: linear-gradient(to right, transparent, rgb(255 255 255 / 0.06) 22%, rgb(255 255 255 / 0.06) 78%, transparent);
+  pointer-events: none;
+}
+
+/* Micro-rótulo de instrumento — usado em toda a interface. */
+@utility lbl {
+  font-family: var(--font-display);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: var(--c-ink-3);
+}
+
+/* Malha técnica de fundo (login, painéis de operação). */
+@utility malha-tecnica {
+  background-image:
+    linear-gradient(var(--c-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--c-grid) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+
+@utility area-segura {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+
+@keyframes tec-pulso {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 var(--c-ok-soft);
+  }
+  50% {
+    opacity: 0.75;
+    box-shadow: 0 0 0 4px var(--c-ok-soft);
+  }
+}
+
+@keyframes tec-brilho {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes tec-entrada {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tec-toast {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility pulso-ativo {
+  animation: tec-pulso 2s ease-in-out infinite;
+}
+
+@utility entrada-suave {
+  animation: tec-entrada 0.18s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/*
+ * A lista aberta de um <select> é desenhada pelo sistema operacional, fora do
+ * nosso controle de cor de fundo. Sem estas regras, no tema escuro o texto
+ * claro cai sobre o fundo branco do Windows e some. Pintamos cada opção com o
+ * par de cores do tema para a lista ficar legível nos dois modos.
+ */
+select option,
+select optgroup {
+  background-color: var(--c-surface);
+  color: var(--c-ink);
+}
+
+select option:disabled {
+  color: var(--c-ink-3);
+}
+
+/*
+ * IMPRESSÃO
+ *
+ * Documento impresso é sempre preto sobre branco, independente do tema em que
+ * o operador está trabalhando. Sem isto, quem usa o sistema no tema escuro
+ * manda para a impressora uma folha preta — gasta tinta e sai ilegível.
+ *
+ * A troca é feita nos tokens, então todo documento do sistema (OS, checklist
+ * de entrada, protocolo do laboratório, termo de recusa, e-book) herda o
+ * comportamento sem precisar de regra própria.
+ */
+@media print {
+  :root,
+  .dark {
+    --c-canvas: #ffffff;
+    --c-surface: #ffffff;
+    --c-surface-2: #f4f6fa;
+    --c-inset: #ffffff;
+
+    --c-line: #c8d2e0;
+    --c-line-strong: #7b8ba3;
+
+    --c-ink: #000000;
+    --c-ink-2: #2b3a4f;
+    --c-ink-3: #55647a;
+
+    --c-accent-ink: #8a3900;
+    --c-cyan-ink: #004f73;
+    --c-ok-ink: #045c44;
+    --c-warn-ink: #6d4500;
+    --c-crit-ink: #8c1f18;
+
+    --sh-1: none;
+    --sh-2: none;
+    --sh-3: none;
+    --sh-accent: none;
+  }
+
+  body {
+    background: #ffffff;
+  }
+
+  /* Cor de fundo em pastilhas e faixas não sobrevive à impressão econômica;
+     forçamos a preservação só onde a cor carrega significado. */
+  .imprimir-cor {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Tailwind já cobre line-clamp nativamente; mantido por compatibilidade. */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
