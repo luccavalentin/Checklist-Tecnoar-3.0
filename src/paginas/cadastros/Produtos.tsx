@@ -1,22 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import {
-  AlertTriangle,
-  Ban,
-  Cloud,
-  CloudOff,
-  Package,
-  Pencil,
-  Plus,
-  RotateCcw,
-  Shield,
-  TriangleAlert,
-} from 'lucide-react'
+import { AlertTriangle, Ban, Cloud, CloudOff, Package, Pencil, Plus, RotateCcw, Shield, Trash2, TriangleAlert } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { cn, mensagemErro } from '@/lib/utils'
 import { moeda, numeroBR, paraNumero } from '@/lib/formatos'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
 import { useControleListagem, useListagem, termoBusca, type Consulta } from '@/dados/useListagem'
 import { BarraFiltros } from '@/componentes/ui/BarraFiltros'
 import { Botao, BotaoIcone } from '@/componentes/ui/Botao'
@@ -126,6 +116,8 @@ export function Produtos() {
   const podeCriar = pode('produtos', 'criar')
   const podeEditar = pode('produtos', 'editar')
   const podeInativar = pode('produtos', 'inativar')
+
+  const exclusao = useExclusao({ tabela: 'produtos', invalidar: [['produtos'], ['estoque']] })
   const podeCusto = pode('produtos', 'editar') || pode('estoque_vendas', 'visualizar')
 
   /**
@@ -419,7 +411,7 @@ export function Produtos() {
     {
       chave: 'acoes',
       cabecalho: '',
-      largura: '84px',
+      largura: '118px',
       alinhamento: 'direita',
       celula: (p) => (
         <div className="flex justify-end gap-0.5">
@@ -435,6 +427,11 @@ export function Produtos() {
               onClick={() => setAlvo(p)}
             >
               {p.situacao === 'ativo' ? <Ban /> : <RotateCcw />}
+            </BotaoIcone>
+          )}
+          {podeInativar && (
+            <BotaoIcone rotulo={`Excluir ${p.descricao}`} tamanho="sm" onClick={() => exclusao.pedir(p.id)}>
+              <Trash2 />
             </BotaoIcone>
           )}
         </div>
@@ -759,6 +756,8 @@ export function Produtos() {
           </>
         }
       />
+
+      <DialogoExclusao ctrl={exclusao} />
     </div>
   )
 }

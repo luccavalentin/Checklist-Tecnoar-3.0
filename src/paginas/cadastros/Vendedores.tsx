@@ -19,6 +19,7 @@ import { supabase } from '@/lib/supabase'
 import { mensagemErro, cn } from '@/lib/utils'
 import { mascaraCEP, mascaraDocumento, paraNumero, validarDocumento } from '@/lib/formatos'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
 import { useControleListagem, useListagem, termoBusca, type Consulta } from '@/dados/useListagem'
 import { Botao } from '@/componentes/ui/Botao'
 import { Alternador, Campo, Entrada, Selecao } from '@/componentes/ui/Campo'
@@ -144,11 +145,13 @@ function VendedorRow({
   vendedor,
   onEdit,
   onSituacao,
+  onExcluir,
 }: {
   vendedor: Vendedor
   /** Ausente quando o perfil não pode editar: a linha deixa de ser clicável. */
   onEdit?: () => void
   onSituacao?: () => void
+  onExcluir?: () => void
 }) {
   const [hover, setHover] = useState(false)
 
@@ -191,15 +194,26 @@ function VendedorRow({
         </span>
       </td>
       <td className="px-4 py-3.5 text-right">
-        {onSituacao && (
-          <Botao
-            tamanho="sm"
-            variante="fantasma"
-            onClick={(e) => { e.stopPropagation(); onSituacao() }}
-          >
-            {vendedor.situacao === 'ativo' ? 'Inativar' : 'Ativar'}
-          </Botao>
-        )}
+        <div className="flex justify-end gap-1">
+          {onSituacao && (
+            <Botao
+              tamanho="sm"
+              variante="fantasma"
+              onClick={(e) => { e.stopPropagation(); onSituacao() }}
+            >
+              {vendedor.situacao === 'ativo' ? 'Inativar' : 'Ativar'}
+            </Botao>
+          )}
+          {onExcluir && (
+            <Botao
+              tamanho="sm"
+              variante="fantasma"
+              onClick={(e) => { e.stopPropagation(); onExcluir() }}
+            >
+              Excluir
+            </Botao>
+          )}
+        </div>
       </td>
     </tr>
   )
@@ -226,6 +240,8 @@ export function Vendedores() {
   const podeCriar = pode('vendedores', 'criar')
   const podeEditar = pode('vendedores', 'editar')
   const podeInativar = pode('vendedores', 'inativar')
+
+  const exclusao = useExclusao({ tabela: 'vendedores', invalidar: [['vendedores']] })
 
   // Estatísticas
   const stats = useQuery({
@@ -506,6 +522,7 @@ export function Vendedores() {
                   vendedor={v}
                   onEdit={podeEditar ? () => setEditando(v) : undefined}
                   onSituacao={podeInativar ? () => setAlvo(v) : undefined}
+                  onExcluir={podeInativar ? () => exclusao.pedir(v.id) : undefined}
                 />
               ))}
             </tbody>
@@ -748,6 +765,8 @@ export function Vendedores() {
         rotuloConfirmar={alvo?.situacao === 'ativo' ? 'Inativar' : 'Reativar'}
         descricao={<><strong>{alvo?.descricao}</strong> {alvo?.situacao === 'ativo' ? 'deixa de aparecer na seleção de vendedores.' : 'volta a ficar disponível.'}</>}
       />
+
+      <DialogoExclusao ctrl={exclusao} />
     </div>
   )
 }

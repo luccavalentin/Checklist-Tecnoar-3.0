@@ -5,6 +5,7 @@ import { Plus, Shield } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { mensagemErro } from '@/lib/utils'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
 import { CabecalhoPagina, Painel, CabecalhoPainel } from '@/componentes/ui/Painel'
 import { Botao } from '@/componentes/ui/Botao'
 import { Campo, AreaTexto, Entrada, Segmentado } from '@/componentes/ui/Campo'
@@ -32,6 +33,10 @@ export function PerfisPermissoes() {
   const podeEditar = pode('perfis_permissoes', 'editar')
   const podeConfigurar = pode('perfis_permissoes', 'configurar')
   const podeInativar = pode('perfis_permissoes', 'inativar')
+
+  /* Perfil com usuario vinculado nao pode sumir: a prevía do banco conta
+     quantos sao e recusa antes de qualquer coisa acontecer. */
+  const exclusao = useExclusao({ tabela: 'perfis', invalidar: [['perfis'], ['minhas-permissoes']] })
 
   const [selecionado, setSelecionado] = useState<string | null>(null)
   const [editando, setEditando] = useState<PerfilAcesso | null>(null)
@@ -217,6 +222,11 @@ export function PerfisPermissoes() {
                       {perfilAtual.situacao === 'ativo' ? 'Inativar' : 'Reativar'}
                     </Botao>
                   )}
+                  {podeInativar && (
+                    <Botao tamanho="sm" variante="fantasma" onClick={() => exclusao.pedir(perfilAtual.id)}>
+                      Excluir
+                    </Botao>
+                  )}
                 </div>
               ) : undefined
             }
@@ -329,6 +339,8 @@ export function PerfisPermissoes() {
             : 'O perfil volta a ficar disponível para atribuição.'
         }
       />
+
+      <DialogoExclusao ctrl={exclusao} />
     </div>
   )
 }

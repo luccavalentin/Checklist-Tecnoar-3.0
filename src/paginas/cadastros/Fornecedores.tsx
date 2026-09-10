@@ -19,6 +19,7 @@ import { mensagemErro, cn } from '@/lib/utils'
 import { UFS, mascaraCEP, mascaraDocumento, mascaraTelefone, somenteDigitos, validarDocumento } from '@/lib/formatos'
 import { consultarCNPJ } from '@/lib/consultasExternas'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
 import { useControleListagem, useListagem, termoBusca, type Consulta } from '@/dados/useListagem'
 import { Botao } from '@/componentes/ui/Botao'
 import { AreaTexto, Campo, Entrada, Segmentado, Selecao } from '@/componentes/ui/Campo'
@@ -493,11 +494,13 @@ function FornecedorRow({
   fornecedor,
   onEdit,
   onSituacao,
+  onExcluir,
 }: {
   fornecedor: Fornecedor
   /** Ausente quando o perfil não pode editar: a linha para de ser clicável. */
   onEdit?: () => void
   onSituacao?: () => void
+  onExcluir?: () => void
 }) {
   const [hover, setHover] = useState(false)
 
@@ -551,15 +554,28 @@ function FornecedorRow({
         <StatusBadge status={fornecedor.situacao} origem={fornecedor.origem} />
       </td>
       <td className="px-4 py-3.5 text-right">
-        {onSituacao && (
-          <Botao
-            tamanho="sm"
-            variante="fantasma"
-            onClick={(e) => { e.stopPropagation(); onSituacao() }}
-          >
-            {fornecedor.situacao === 'ativo' ? 'Inativar' : 'Ativar'}
-          </Botao>
-        )}
+        <div className="flex justify-end gap-1">
+          {onSituacao && (
+            <Botao
+              tamanho="sm"
+              variante="fantasma"
+              onClick={(e) => { e.stopPropagation(); onSituacao() }}
+            >
+              {fornecedor.situacao === 'ativo' ? 'Inativar' : 'Ativar'}
+            </Botao>
+          )}
+          {onExcluir && (
+            <Botao
+              tamanho="sm"
+              variante="fantasma"
+              /* A linha inteira abre o fornecedor: o clique em excluir para
+                 aqui, senão o cadastro abriria por baixo da confirmação. */
+              onClick={(e) => { e.stopPropagation(); onExcluir() }}
+            >
+              Excluir
+            </Botao>
+          )}
+        </div>
       </td>
     </tr>
   )
@@ -806,6 +822,8 @@ export function Fornecedores() {
   const podeCriar = pode('fornecedores', 'criar')
   const podeEditar = pode('fornecedores', 'editar')
   const podeInativar = pode('fornecedores', 'inativar')
+
+  const exclusao = useExclusao({ tabela: 'fornecedores', invalidar: [['fornecedores']] })
 
   const form = useForm<FormFornecedor>({ defaultValues: VAZIO })
   const tipo = form.watch('tipo_pessoa')
@@ -1132,6 +1150,7 @@ export function Fornecedores() {
                     fornecedor={f}
                     onEdit={podeEditar ? () => setEditando(f) : undefined}
                     onSituacao={podeInativar ? () => setAlvo(f) : undefined}
+                    onExcluir={podeInativar ? () => exclusao.pedir(f.id) : undefined}
                   />
                 ))}
               </tbody>
@@ -1223,6 +1242,8 @@ export function Fornecedores() {
           </>
         }
       />
+
+      <DialogoExclusao ctrl={exclusao} />
     </div>
   )
 }

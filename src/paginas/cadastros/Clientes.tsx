@@ -20,6 +20,7 @@ import { supabase } from '@/lib/supabase'
 import { mensagemErro, cn } from '@/lib/utils'
 import { mascaraDocumento } from '@/lib/formatos'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
 import { useControleListagem, useListagem, termoBusca, type Consulta } from '@/dados/useListagem'
 import { Botao } from '@/componentes/ui/Botao'
 import { Paginacao } from '@/componentes/ui/Tabela'
@@ -509,11 +510,13 @@ function ClienteRow({
   cliente,
   onEdit,
   onSituacao,
+  onExcluir,
 }: {
   cliente: ClienteListado
   /** Ausente quando o perfil não pode editar: a linha para de ser clicável. */
   onEdit?: () => void
   onSituacao?: () => void
+  onExcluir?: () => void
 }) {
   const [hover, setHover] = useState(false)
   const tags = cliente.cliente_tags?.map((ct) => ct.tag).filter(Boolean) as TagTipo[]
@@ -571,15 +574,28 @@ function ClienteRow({
       </td>
       <td className="px-4 py-3.5"><StatusBadge status={cliente.situacao} origem={cliente.origem} /></td>
       <td className="px-4 py-3.5 text-right">
-        {onSituacao && (
-          <Botao
-            tamanho="sm"
-            variante="fantasma"
-            onClick={(e) => { e.stopPropagation(); onSituacao() }}
-          >
-            {cliente.situacao === 'ativo' ? 'Inativar' : 'Ativar'}
-          </Botao>
-        )}
+        <div className="flex justify-end gap-1">
+          {onSituacao && (
+            <Botao
+              tamanho="sm"
+              variante="fantasma"
+              onClick={(e) => { e.stopPropagation(); onSituacao() }}
+            >
+              {cliente.situacao === 'ativo' ? 'Inativar' : 'Ativar'}
+            </Botao>
+          )}
+          {onExcluir && (
+            <Botao
+              tamanho="sm"
+              variante="fantasma"
+              /* A linha inteira abre o cliente; sem isto o clique em excluir
+                 abriria o cadastro por baixo da confirmação. */
+              onClick={(e) => { e.stopPropagation(); onExcluir() }}
+            >
+              Excluir
+            </Botao>
+          )}
+        </div>
       </td>
     </tr>
   )
@@ -609,6 +625,8 @@ export function Clientes() {
   const podeCriar = pode('clientes', 'criar')
   const podeEditar = pode('clientes', 'editar')
   const podeInativar = pode('clientes', 'inativar')
+
+  const exclusao = useExclusao({ tabela: 'clientes', invalidar: [['clientes']] })
 
   // Estatísticas
   const stats = useQuery({
@@ -908,6 +926,7 @@ export function Clientes() {
                   cliente={cliente}
                   onEdit={podeEditar ? () => setEditando(cliente.id) : undefined}
                   onSituacao={podeInativar ? () => setAlvo(cliente) : undefined}
+                  onExcluir={podeInativar ? () => exclusao.pedir(cliente.id) : undefined}
                 />
               ))}
             </tbody>
@@ -970,6 +989,8 @@ export function Clientes() {
         rotuloConfirmar={alvo?.situacao === 'ativo' ? 'Inativar' : 'Reativar'}
         descricao={<><strong>{alvo?.nome_razao}</strong> {alvo?.situacao === 'ativo' ? 'deixa de aparecer nas Seleções' : 'volta a ficar disponível'}.</>}
       />
+      <DialogoExclusao ctrl={exclusao} />
+
     </div>
   )
 }
