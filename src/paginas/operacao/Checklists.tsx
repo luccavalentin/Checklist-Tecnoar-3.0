@@ -613,7 +613,15 @@ export function Checklists() {
         ativa={aba}
         aoMudar={setAba}
         abas={[
-          { valor: 'modelos', rotulo: 'Modelos', contador: modelos.data?.length },
+          {
+            valor: 'modelos',
+            rotulo: 'Modelos',
+            /* O que a aba mostra, nao o que existe no banco: o total cru
+               somava os modelos 5S, que esta tela nunca exibe, e ignorava o
+               recorte da rota. Contador que nao conta o que esta na tela e
+               so ruido. */
+            contador: contadorModelos,
+          },
           { valor: 'historico', rotulo: 'Histórico' },
         ]}
       />
