@@ -77,7 +77,7 @@ export interface MetricaProps {
  * `1.284`, `R$ 4.200,00`, `-12,4%`, `48 h`. Qualquer outra coisa é uma frase
  * ocupando o lugar do número, e não deve ser tipografada como número.
  */
-function ehMedida(valor: ReactNode): boolean {
+export function ehMedida(valor: ReactNode): boolean {
   if (typeof valor === 'number') return true
   if (typeof valor !== 'string') return true
   return /^[\s]*[-+]?(R\$\s*)?\d/.test(valor)

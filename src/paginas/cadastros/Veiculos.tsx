@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { cn, dataHora, mensagemErro } from '@/lib/utils'
 import { mascaraPlaca, UFS } from '@/lib/formatos'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
 import { useControleListagem, useListagem, termoBusca, type Consulta } from '@/dados/useListagem'
 import { BarraFiltros } from '@/componentes/ui/BarraFiltros'
 import { Botao } from '@/componentes/ui/Botao'
@@ -105,6 +106,8 @@ export function Veiculos() {
   const podeCriar = pode('veiculos', 'criar')
   const podeEditar = pode('veiculos', 'editar')
   const podeInativar = pode('veiculos', 'inativar')
+
+  const exclusao = useExclusao({ tabela: 'veiculos', invalidar: [['veiculos']] })
 
   // Estatísticas
   const stats = useQuery({
@@ -321,7 +324,7 @@ export function Veiculos() {
     { chave: 'municipio', cabecalho: 'Município', largura: '150px', classeResponsiva: 'hidden xl:table-cell', celula: (v) => v.municipio ?? <span className="text-ink-3">—</span> },
     { chave: 'uf', cabecalho: 'UF', largura: '60px', classeResponsiva: 'hidden xl:table-cell', celula: (v) => <span className="num">{v.uf ?? '—'}</span> },
     { chave: 'situacao', cabecalho: 'Situação', largura: '190px', celula: (v) => <div className="flex flex-wrap items-center gap-1.5"><Selo tom={v.situacao === 'ativo' ? 'ok' : 'neutro'} ponto>{v.situacao === 'ativo' ? 'Ativo' : 'Inativo'}</Selo>{v.alerta_operador && <Selo tom="atencao">Alerta</Selo>}</div> },
-    { chave: 'acoes', cabecalho: '', largura: '210px', alinhamento: 'direita', celula: (v) => <div className="flex justify-end gap-1"><Botao tamanho="sm" variante="fantasma" iconeInicio={<History />} onClick={() => setVerHistorico(v)}>Histórico</Botao>{podeEditar && <Botao tamanho="sm" variante="fantasma" onClick={() => setEditando(v)}>Editar</Botao>}{podeInativar && <Botao tamanho="sm" variante="fantasma" onClick={() => setAlvo(v)}>{v.situacao === 'ativo' ? 'Inativar' : 'Reativar'}</Botao>}</div> },
+    { chave: 'acoes', cabecalho: '', largura: '280px', alinhamento: 'direita', celula: (v) => <div className="flex justify-end gap-1"><Botao tamanho="sm" variante="fantasma" iconeInicio={<History />} onClick={() => setVerHistorico(v)}>Histórico</Botao>{podeEditar && <Botao tamanho="sm" variante="fantasma" onClick={() => setEditando(v)}>Editar</Botao>}{podeInativar && <Botao tamanho="sm" variante="fantasma" onClick={() => setAlvo(v)}>{v.situacao === 'ativo' ? 'Inativar' : 'Reativar'}</Botao>}{podeInativar && <Botao tamanho="sm" variante="fantasma" onClick={() => exclusao.pedir(v.id)}>Excluir</Botao>}</div> },
   ]
 
   return (
@@ -578,6 +581,8 @@ export function Veiculos() {
         rotuloConfirmar={alvo?.situacao === 'ativo' ? 'Inativar' : 'Reativar'}
         descricao={<><strong className="font-semibold text-ink">{alvo?.placa}</strong> {alvo?.situacao === 'ativo' ? 'deixa de aparecer na Recepção e na abertura de OS. O prontuário é preservado.' : 'volta a ficar disponível para atendimento.'}</>}
       />
+
+      <DialogoExclusao ctrl={exclusao} />
     </div>
   )
 }

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -25,7 +25,9 @@
       // Aplica o tema antes da primeira pintura para não haver flash.
       (function () {
         try {
-          var t = localStorage.getItem('tecnoar.tema') || 'sistema'
+          // Claro e o padrao da casa: a oficina trabalha em ambiente iluminado,
+          // e o aparelho no modo escuro nao deve decidir isso pelo sistema.
+          var t = localStorage.getItem('tecnoar.tema') || 'claro'
           var escuro =
             t === 'escuro' ||
             (t === 'sistema' && window.matchMedia('(prefers-color-scheme: dark)').matches)

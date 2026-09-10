@@ -8,6 +8,7 @@ import { mensagemErro } from '@/lib/utils'
 import { data as fmtData, moeda } from '@/lib/formatos'
 import { useAuth } from '@/auth/AuthProvider'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
 import { useControleListagem, useListagem, termoBusca, type Consulta } from '@/dados/useListagem'
 import { Botao } from '@/componentes/ui/Botao'
 import { BarraFiltros } from '@/componentes/ui/BarraFiltros'
@@ -92,6 +93,11 @@ function ListaOrdensServico({
 
   const podeVer = pode('ordens_servico', 'visualizar')
   const podeCriar = pode('ordens_servico', 'criar')
+  const podeExcluir = pode('ordens_servico', 'inativar')
+
+  /* Excluir OS arrasta serviços, produtos, apontamentos, eventos e faturas —
+     a confirmação mostra a conta antes de apagar. */
+  const exclusao = useExclusao({ tabela: 'ordens_servico', invalidar: [['os']] })
 
   const termo = termoBusca(ctrl.busca)
   const alvo = alvoDaBusca(termo)
@@ -206,6 +212,30 @@ function ListaOrdensServico({
       alinhamento: 'direita',
       celula: (o) => <span className="num">{moeda(Number(o.valor_total || 0))}</span>,
     },
+    ...(podeExcluir
+      ? [
+          {
+            chave: 'acoes',
+            cabecalho: '',
+            largura: '96px',
+            alinhamento: 'direita' as const,
+            celula: (o: OSListada) => (
+              <Botao
+                tamanho="sm"
+                variante="fantasma"
+                onClick={(e) => {
+                  /* A linha inteira abre a OS; sem isto o clique em excluir
+                     abriria o editor por baixo da confirmação. */
+                  e.stopPropagation()
+                  exclusao.pedir(o.id)
+                }}
+              >
+                Excluir
+              </Botao>
+            ),
+          } satisfies Coluna<OSListada>,
+        ]
+      : []),
   ]
 
   return (
@@ -297,6 +327,8 @@ function ListaOrdensServico({
           />
         )}
       </div>
+
+      <DialogoExclusao ctrl={exclusao} />
     </div>
   )
 }
