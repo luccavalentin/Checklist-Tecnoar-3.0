@@ -12,6 +12,7 @@ import { BarreiraErro } from '@/componentes/BarreiraErro'
 import { ProvedorPermissoes } from '@/permissoes/PermissoesProvider'
 import { ReconhecimentoPlacaProvider, provedorPadrao } from '@/dados/ReconhecimentoPlaca'
 import { AvisoAtualizacao } from '@/layout/StatusApp'
+import { ConviteInstalacao } from '@/layout/ConviteInstalacao'
 
 const cliente = new QueryClient({
   defaultOptions: {
@@ -54,6 +55,12 @@ createRoot(raiz).render(
               </ProvedorPermissoes>
               {/* Registra o service worker em qualquer rota, inclusive no login. */}
               <AvisoAtualizacao />
+              {/*
+                Fora das rotas protegidas pelo mesmo motivo: o navegador oferece
+                a instalação logo no carregamento, quando a tela ainda é a de
+                login. Montado só depois de entrar, o convite chegaria tarde.
+              */}
+              <ConviteInstalacao />
             </ProvedorAuth>
           </ProvedorToast>
         </QueryClientProvider>
