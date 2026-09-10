@@ -93,13 +93,10 @@ function ListaOrdensServico({
 
   const podeVer = pode('ordens_servico', 'visualizar')
   const podeCriar = pode('ordens_servico', 'criar')
-  /* `inativar` nao existe para este recurso: a tabela `recursos` define
-     ordens_servico como visualizar/criar/editar/aprovar/cancelar/exportar.
-     Preso nela, o botao nunca renderizava — nem para administrador, que
-     recebe todas as acoes que existem. `cancelar` e a autoridade destrutiva
-     sobre a OS, e quem a tem pode apaga-la. A regra real continua no banco:
-     previa_exclusao e excluir_registro decidem, e negam quem nao pode. */
-  const podeExcluir = pode('ordens_servico', 'cancelar')
+  /* Mesma acao que a previa_exclusao cobra no banco, via tem_permissao. Tela e
+     servidor precisam concordar: gate diferente da regra do banco produz botao
+     que aparece e recusa, ou regra que existe e ninguem alcanca. */
+  const podeExcluir = pode('ordens_servico', 'inativar')
 
   /* Excluir OS arrasta serviços, produtos, apontamentos, eventos e faturas —
      a confirmação mostra a conta antes de apagar. */
