@@ -546,14 +546,29 @@ export function Checklists() {
     },
   ]
 
+  /*
+   * Os modelos seguem o mesmo recorte da rota que o histórico já seguia.
+   *
+   * Sem isto, quem clicava em "Checklist de Entrada" no menu via o histórico
+   * filtrado mas os modelos de entrada E de saída lado a lado — e podia
+   * começar um checklist de saída dentro da tela de entrada. Uma tela que
+   * filtra pela metade é pior do que uma que não filtra: ela promete um
+   * recorte e entrega outro.
+   */
+  const modelosDoRecorte = (modelos.data ?? []).filter(
+    (modelo) =>
+      TIPOS_CHECKLIST_OPERACAO.includes(modelo.tipo) &&
+      (recorte === 'todos' || modelo.tipo === recorte),
+  )
+
   const porTipo = new Map<TipoChecklist, ChecklistModelo[]>()
-  for (const m of (modelos.data ?? []).filter((modelo) => TIPOS_CHECKLIST_OPERACAO.includes(modelo.tipo))) {
+  for (const m of modelosDoRecorte) {
     const lista = porTipo.get(m.tipo) ?? []
     lista.push(m)
     porTipo.set(m.tipo, lista)
   }
 
-  const contadorModelos = modelos.data?.filter((modelo) => TIPOS_CHECKLIST_OPERACAO.includes(modelo.tipo)).length
+  const contadorModelos = modelosDoRecorte.length
 
   return (
     <div className="flex flex-col gap-5">
@@ -665,14 +680,20 @@ export function Checklists() {
             atualizando={historico.buscando}
             filtros={
               <>
-                <Campo rotulo="Tipo">
-                  {(p) => (
-                    <Selecao {...p} value={fTipo} onChange={(e) => { setFTipo(e.target.value as TipoChecklist | ''); ctrl.reiniciar() }}>
-                      <option value="">Todos</option>
-                      {TIPOS_CHECKLIST_OPERACAO.map((v) => <option key={v} value={v}>{ROTULO_TIPO_CHECKLIST[v]}</option>)}
-                    </Selecao>
-                  )}
-                </Campo>
+                {/* Em /entrada e /saida a rota ja e o filtro de tipo. Oferecer
+                    o seletor ali deixava escolher "Saida" dentro da Entrada, o
+                    que somava duas condicoes contraditorias e devolvia lista
+                    vazia sem dizer por que. */}
+                {recorte === 'todos' && (
+                  <Campo rotulo="Tipo">
+                    {(p) => (
+                      <Selecao {...p} value={fTipo} onChange={(e) => { setFTipo(e.target.value as TipoChecklist | ''); ctrl.reiniciar() }}>
+                        <option value="">Todos</option>
+                        {TIPOS_CHECKLIST_OPERACAO.map((v) => <option key={v} value={v}>{ROTULO_TIPO_CHECKLIST[v]}</option>)}
+                      </Selecao>
+                    )}
+                  </Campo>
+                )}
                 <Campo rotulo="Situação">
                   {(p) => (
                     <Selecao {...p} value={fSituacao} onChange={(e) => { setFSituacao(e.target.value as SituacaoChecklist | ''); ctrl.reiniciar() }}>
