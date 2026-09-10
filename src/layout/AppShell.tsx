@@ -12,7 +12,6 @@ import { MenuConta } from './MenuConta'
 import { PainelNotificacoes, useNaoLidas } from './PainelNotificacoes'
 import { IndicadorOffline } from './StatusApp'
 import { EnviosPendentes } from './EnviosPendentes'
-import { ConviteInstalacao } from './ConviteInstalacao'
 import '@/busca/fonteNavegacao'
 
 const CHAVE_MENU_RECOLHIDO = 'tecnoar.menu.recolhido'
@@ -170,8 +169,6 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
-
-      <ConviteInstalacao />
 
       <BuscaGlobal aberto={buscaAberta} aoFechar={() => setBuscaAberta(false)} />
       {usuario && (
