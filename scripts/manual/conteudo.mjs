@@ -303,36 +303,4 @@ export const SECOES = [
     ],
   },
 
-  {
-    id: 'duvidas',
-    titulo: 'Dúvidas comuns',
-    resumo: '',
-    blocos: [
-      {
-        tipo: 'perguntas',
-        itens: [
-          {
-            p: 'Cliquei em salvar e não aconteceu nada.',
-            r: 'Verifique o aviso de Sem conexão no alto da tela. Sem internet, o sistema bloqueia em vez de fingir que salvou.',
-          },
-          {
-            p: 'Não consigo excluir um cadastro.',
-            r: 'O sistema recusa quando outro registro depende dele, e diz qual e quantos. Resolva o que depende primeiro, ou use Inativar.',
-          },
-          {
-            p: 'O sistema diz que a peça veio da Omie.',
-            r: 'Produtos, clientes e serviços sincronizados do OMIE são controlados lá. Altere no OMIE e sincronize.',
-          },
-          {
-            p: 'Sumiu um menu que eu usava.',
-            r: 'Seu perfil deixou de ter aquela permissão. Fale com o administrador.',
-          },
-          {
-            p: 'A foto não subiu.',
-            r: 'Fotos entram numa fila de envio e sobem quando a conexão permite. O contador de envios pendentes fica no alto da tela.',
-          },
-        ],
-      },
-    ],
-  },
 ]
