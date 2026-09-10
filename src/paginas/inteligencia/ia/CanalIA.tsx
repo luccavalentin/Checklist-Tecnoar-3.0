@@ -26,6 +26,7 @@ import { Selo } from '@/componentes/ui/Selo'
 import { Aviso } from '@/componentes/ui/Aviso'
 import { EstadoCarregando, EstadoVazio } from '@/componentes/ui/Estados'
 import { useToast } from '@/componentes/ui/Toast'
+import { Confirmacao } from '@/componentes/ui/Sobreposicoes'
 import {
   GravadorDeVoz,
   extensaoDeAudio,
@@ -48,6 +49,32 @@ interface AnexoGravado {
  * fotografa ou filma, e a perita responde no mesmo fio. O que ela responde só
  * vira conhecimento da casa depois que um técnico marca como útil.
  */
+/**
+ * O motivo que a funcao de borda escreveu.
+ *
+ * Em resposta fora do 2xx o supabase-js entrega apenas "Edge Function returned
+ * a non-2xx status code" e guarda a resposta em `context`. A funcao sempre
+ * responde `{ erro }` — sem ler isso, a tela troca um motivo util ("Esta
+ * conversa pertence a outro usuario") por uma frase que nao ajuda ninguem.
+ */
+async function motivoDaFuncao(erro: unknown): Promise<Error> {
+  const ctx = (erro as { context?: Response })?.context
+  if (ctx && typeof ctx.json === 'function') {
+    try {
+      const corpo = await ctx.clone().json()
+      const motivo = typeof corpo?.erro === 'string' ? corpo.erro : ''
+      if (motivo) return new Error(motivo)
+    } catch {
+      /* Corpo ilegivel: fica com o erro original, que ao menos existe. */
+    }
+  }
+  if (erro instanceof Error) return erro
+  /* PostgrestError nao e Error: sem isto, String() daria "[object Object]" e a
+     tela mostraria isso no lugar da mensagem do banco. */
+  const msg = (erro as { message?: string })?.message
+  return new Error(msg && msg.trim() ? msg : String(erro))
+}
+
 export function CanalIA({ configurada }: { configurada: boolean }) {
   const { usuario } = useAuth()
   const qc = useQueryClient()
@@ -66,12 +93,17 @@ export function CanalIA({ configurada }: { configurada: boolean }) {
   const entradaCamera = useRef<HTMLInputElement>(null)
 
   const conversas = useQuery({
-    queryKey: ['ia-conversas'],
+    queryKey: ['ia-conversas', usuario?.id],
     queryFn: async (): Promise<IAConversa[]> => {
+      /* Administrador enxerga a conversa dos outros por RLS (precisa disso na
+          Configuracao), mas o canal de atendimento e pessoal: listar conversa
+          alheia so oferece uma thread que a funcao vai recusar no envio, com
+          "Esta conversa pertence a outro usuario". */
       const { data, error } = await supabase
         .from('ia_conversas')
         .select('*')
         .eq('arquivada', false)
+        .eq('usuario_id', usuario?.id ?? '')
         .order('updated_at', { ascending: false })
         .limit(60)
       if (error) throw error
@@ -90,7 +122,7 @@ export function CanalIA({ configurada }: { configurada: boolean }) {
         .select('*')
         .eq('conversa_id', selecionada!)
         .order('created_at')
-      if (error) throw error
+      if (error) throw await motivoDaFuncao(error)
       return data ?? []
     },
   })
@@ -102,7 +134,7 @@ export function CanalIA({ configurada }: { configurada: boolean }) {
       const ids = (mensagens.data ?? []).map((m) => m.id)
       if (!ids.length) return []
       const { data, error } = await supabase.from('ia_fontes').select('*').in('mensagem_id', ids)
-      if (error) throw error
+      if (error) throw await motivoDaFuncao(error)
       return data ?? []
     },
   })
@@ -132,7 +164,7 @@ export function CanalIA({ configurada }: { configurada: boolean }) {
         .insert({ titulo: 'Nova conversa', usuario_id: usuario?.id ?? null })
         .select('id')
         .single()
-      if (error) throw error
+      if (error) throw await motivoDaFuncao(error)
       return data.id as string
     },
     onSuccess: (id) => {
@@ -171,7 +203,7 @@ export function CanalIA({ configurada }: { configurada: boolean }) {
             texto?: string
             erro?: string
           }>('ia', { body: { acao: 'transcrever', caminho, nome: a.nome } })
-          if (error) throw error
+          if (error) throw await motivoDaFuncao(error)
           if (data?.status === 'ok' && data.texto) {
             transcricao = [transcricao, data.texto].filter(Boolean).join('\n')
           } else if (data?.status === 'sem_transcricao') {
@@ -210,7 +242,7 @@ export function CanalIA({ configurada }: { configurada: boolean }) {
           anexos: gravados,
         },
       })
-      if (error) throw error
+      if (error) throw await motivoDaFuncao(error)
       return data
     },
     onSuccess: (d) => {
@@ -227,12 +259,33 @@ export function CanalIA({ configurada }: { configurada: boolean }) {
     onError: (e) => setErro(mensagemErro(e)),
   })
 
+  const [aExcluir, setAExcluir] = useState<IAConversa | null>(null)
+
+  /* Conversa e dado pessoal, nao registro operacional: sai por DELETE direto,
+     sob a politica que ja existe (dono + permissao de uso da IA). Nao passa
+     por excluir_registro, que serve ao cadastro da oficina e exige auditoria. */
+  const excluirConversa = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('ia_conversas').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: (_r, id) => {
+      if (selecionada === id) setConversaAtiva(null)
+      setAExcluir(null)
+      void qc.invalidateQueries({ queryKey: ['ia-conversas', usuario?.id] })
+    },
+    onError: (e) => {
+      setAExcluir(null)
+      toast.erro('Não foi possível excluir a conversa', mensagemErro(e))
+    },
+  })
+
   const avaliar = useMutation({
     mutationFn: async ({ id, util }: { id: string; util: boolean }) => {
       const { data, error } = await supabase.functions.invoke<{ erro?: string }>('ia', {
         body: { acao: 'avaliar', mensagem_id: id, util },
       })
-      if (error) throw error
+      if (error) throw await motivoDaFuncao(error)
       if (data?.erro) throw new Error(data.erro)
     },
     onSuccess: () => void qc.invalidateQueries({ queryKey: ['ia-mensagens', selecionada] }),
@@ -245,7 +298,7 @@ export function CanalIA({ configurada }: { configurada: boolean }) {
         erro?: string
         artigo?: { numero: number; titulo: string }
       }>('ia', { body: { acao: 'gerar_artigo', mensagem_id: id } })
-      if (error) throw error
+      if (error) throw await motivoDaFuncao(error)
       if (data?.erro) throw new Error(data.erro)
       return data?.artigo
     },
@@ -334,18 +387,31 @@ export function CanalIA({ configurada }: { configurada: boolean }) {
           )}
           <ul className="flex flex-col">
             {(conversas.data ?? []).map((c) => (
-              <li key={c.id}>
+              <li
+                key={c.id}
+                className={cn(
+                  'group flex items-start border-b border-line transition-colors',
+                  selecionada === c.id ? 'bg-cyan-soft' : 'hover:bg-surface-2',
+                )}
+              >
                 <button
                   type="button"
                   onClick={() => setConversaAtiva(c.id)}
-                  className={cn(
-                    'flex w-full flex-col gap-0.5 border-b border-line px-3.5 py-2.5 text-left transition-colors',
-                    selecionada === c.id ? 'bg-cyan-soft' : 'hover:bg-surface-2',
-                  )}
+                  className="flex min-w-0 flex-1 flex-col gap-0.5 px-3.5 py-2.5 text-left"
                 >
                   <span className="line-clamp-2 text-[12.5px] leading-snug text-ink">{c.titulo}</span>
                   <span className="num text-[11px] text-ink-3">{dataHora(c.updated_at)}</span>
                 </button>
+                <BotaoIcone
+                  rotulo={`Excluir conversa ${c.titulo}`}
+                  tamanho="sm"
+                  /* No toque nao existe hover: o botao fica sempre visivel no
+                     celular e aparece no hover apenas onde o mouse existe. */
+                  className="mt-2 mr-1.5 shrink-0 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100"
+                  onClick={() => setAExcluir(c)}
+                >
+                  <Trash2 />
+                </BotaoIcone>
               </li>
             ))}
           </ul>
@@ -525,6 +591,22 @@ export function CanalIA({ configurada }: { configurada: boolean }) {
           </div>
         </div>
       </section>
+      <Confirmacao
+        aberto={Boolean(aExcluir)}
+        aoFechar={() => setAExcluir(null)}
+        aoConfirmar={() => aExcluir && excluirConversa.mutate(aExcluir.id)}
+        carregando={excluirConversa.isPending}
+        destrutivo
+        titulo="Excluir conversa?"
+        rotuloConfirmar="Excluir"
+        descricao={
+          <>
+            <strong className="font-semibold text-ink">{aExcluir?.titulo}</strong> sai junto com todas as
+            mensagens, anexos e avaliações dela. Esta ação não pode ser desfeita.
+          </>
+        }
+      />
+
     </div>
   )
 }
