@@ -88,7 +88,7 @@ function ListaOrdensServico({
 }) {
   const { pode } = usePermissoes()
   const ctrl = useControleListagem(20)
-  const [fSituacao, setFSituacao] = useState<'abertas' | 'encerradas' | 'todas'>('abertas')
+  const [fSituacao, setFSituacao] = useState<'abertas' | 'encerradas' | 'todas' | 'inativas'>('abertas')
   const [fTipo, setFTipo] = useState<'' | TipoOS>('')
 
   const podeVer = pode('ordens_servico', 'visualizar')
@@ -116,7 +116,10 @@ function ListaOrdensServico({
 
   const filtrar = useMemo(
     () => (q: Consulta) => {
-      let r = q.eq('situacao', 'ativo')
+      /* OS inativada some da operacao, mas nao pode sumir do sistema: sem
+         um jeito de lista-la ninguem consegue rever, reativar ou excluir o
+         registro. O filtro 'Inativadas' e a unica porta para ela. */
+      let r = q.eq('situacao', fSituacao === 'inativas' ? 'inativo' : 'ativo')
       if (alvo === 'numero') r = r.eq('numero', Number(termo))
       if (alvo === 'cliente') r = r.ilike('clientes.nome_razao', `%${termo}%`)
       if (alvo === 'veiculo') {
@@ -153,7 +156,7 @@ function ListaOrdensServico({
   const chips = [
     fSituacao !== 'abertas' && {
       id: 's',
-      rotulo: `Situação: ${fSituacao === 'todas' ? 'Todas' : 'Encerradas'}`,
+      rotulo: `Situação: ${fSituacao === 'todas' ? 'Todas' : fSituacao === 'inativas' ? 'Inativadas' : 'Encerradas'}`,
       aoRemover: () => setFSituacao('abertas'),
     },
     fTipo && { id: 't', rotulo: `Tipo: ${ROTULO_TIPO[fTipo]}`, aoRemover: () => setFTipo('') },
@@ -283,6 +286,7 @@ function ListaOrdensServico({
                   >
                     <option value="abertas">Em aberto</option>
                     <option value="encerradas">Encerradas</option>
+                    <option value="inativas">Inativadas</option>
                     <option value="todas">Todas</option>
                   </Selecao>
                 )}
