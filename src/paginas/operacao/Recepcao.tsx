@@ -524,7 +524,7 @@ export function Recepcao() {
                   Entrada + Nova OS
                 </Botao>
               </div>
-              <div className="area-segura fixed inset-x-0 bottom-0 z-40 flex gap-2 overflow-x-auto border-t border-line bg-surface px-4 py-2.5 sm:hidden">
+              <div className="area-segura fixed inset-x-0 bottom-0 z-40 flex flex-wrap items-center gap-2 border-t border-line bg-surface px-4 py-2.5 sm:hidden">
                 <Botao
                   variante="primario"
                   tamanho="sm"

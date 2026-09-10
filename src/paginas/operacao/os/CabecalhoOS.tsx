@@ -156,7 +156,7 @@ export function CabecalhoOS({
       {createPortal(
         <div
           ref={barra}
-          className="area-segura fixed inset-x-0 bottom-0 z-40 flex gap-2 overflow-x-auto border-t border-line bg-surface px-4 py-2.5 lg:hidden"
+          className="area-segura fixed inset-x-0 bottom-0 z-40 flex flex-wrap items-center gap-2 border-t border-line bg-surface px-4 py-2.5 lg:hidden"
         >
           <BarraAcoes acoes={acoes} encerrada={encerrada} compacto />
         </div>,
@@ -178,9 +178,10 @@ function Dado({ rotulo, children }: { rotulo: string; children: ReactNode }) {
 /**
  * Ação de uso eventual.
  *
- * No celular mantém o rótulo curto (a barra rola na horizontal). No desktop
- * fica só o ícone até `2xl`, onde sobra largura para o texto — é o que impede
- * sete botões com rótulo longo de expulsarem a identidade da OS da tela.
+ * No celular mantém o rótulo curto, para caber mais botão por linha. No
+ * desktop fica só o ícone até `2xl`, onde sobra largura para o texto — é o
+ * que impede sete botões com rótulo longo de expulsarem a identidade da OS
+ * da tela.
  */
 function AcaoSecundaria({
   compacto,
@@ -220,7 +221,10 @@ function BarraAcoes({
   compacto?: boolean
 }) {
   /* No rodapé do celular os botões são 'md': 'sm' dá alvo de 30px, que a mão
-     de luva erra. A barra rola na horizontal, então largura não é problema.
+     de luva erra. A barra quebra em linhas em vez de rolar na horizontal —
+     rolando, Encerrar e Cancelar OS ficavam fora da tela e ninguém descobria
+     que existiam. A altura é medida e publicada em `--barra-acoes`, então
+     quem flutua no rodapé acompanha o crescimento.
      No desktop o mouse acerta 'sm', e a barra fica com a altura de uma barra
      de ferramentas em vez de roubar um sexto da tela do laptop. */
   const tamanho = compacto ? ('md' as const) : ('sm' as const)
@@ -235,7 +239,7 @@ function BarraAcoes({
             iconeInicio={<Save />}
             carregando={acoes.salvando}
             onClick={acoes.aoSalvar}
-            className={cn(compacto && 'shrink-0')}
+            className={cn(compacto && 'grow basis-32')}
           >
             Salvar
           </Botao>
