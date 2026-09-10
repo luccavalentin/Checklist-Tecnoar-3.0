@@ -18,7 +18,10 @@ function lerPreferencia(): TemaInterface {
   } catch {
     /* localStorage indisponível */
   }
-  return 'sistema'
+  /* Claro por padrão, para qualquer perfil. Seguir o aparelho ('sistema')
+     fazia o sistema abrir escuro no celular de quem usa modo noturno — sem
+     que ninguém tivesse escolhido isso aqui dentro. */
+  return 'claro'
 }
 
 function resolverEscuro(t: TemaInterface): boolean {

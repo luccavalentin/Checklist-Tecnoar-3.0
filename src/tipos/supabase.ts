@@ -6175,6 +6175,20 @@ export type Database = {
           valor: number
         }[]
       }
+      excluir_registro: {
+        Args: {
+          p_id: string | null
+          p_tabela: string | null
+        }
+        Returns: Json
+      }
+      previa_exclusao: {
+        Args: {
+          p_id: string | null
+          p_tabela: string | null
+        }
+        Returns: Json
+      }
       excluir_checklist: {
         Args: { p_checklist: string | null; p_motivo?: string | null }
         Returns: string

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { ArrowDownRight, ArrowRight, ArrowUpRight, TriangleAlert } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ehMedida } from '@/componentes/ui/Metrica'
 import type { TomMetrica } from '@/componentes/ui/Metrica'
 
 /**
@@ -248,8 +249,17 @@ export function CartaoIndicador({
 
       <div className="flex items-end justify-between gap-3 pl-1.5">
         <span className="line-clamp-2 min-w-0 flex-1 text-[11.5px] leading-snug text-ink-3">{pergunta}</span>
-        <span className="flex shrink-0 flex-col items-end gap-1">
+        <span className="flex min-w-0 shrink flex-col items-end gap-1">
+          {/* Sem dado, o cartão explica o motivo — e explicação é texto, não
+            número. Na face tabular de 23px com `shrink-0`, uma frase estourava
+            o cartão e era cortada no meio da palavra. */}
+        {ehMedida(valor) ? (
           <span className="num text-right text-[23px] leading-none font-semibold text-ink">{valor}</span>
+        ) : (
+          <span className="max-w-[15ch] text-right text-[12.5px] leading-snug font-medium text-balance text-ink-2">
+            {valor}
+          </span>
+        )}
           {variacao && <Delta variacao={variacao} />}
         </span>
       </div>
