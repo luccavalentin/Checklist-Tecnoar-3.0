@@ -103,7 +103,13 @@ function ListaOrdensServico({
 
   /* Excluir OS arrasta serviços, produtos, apontamentos, eventos e faturas —
      a confirmação mostra a conta antes de apagar. */
-  const exclusao = useExclusao({ tabela: 'ordens_servico', invalidar: [['os']] })
+  const exclusao = useExclusao({
+    /* A lista usa ['ordens_servico', 'lista', ...] e o quadro do patio usa
+       ['patio']. Invalidar ['os'] nao acertava chave nenhuma: o registro
+       sumia do banco e continuava na tela ate alguem recarregar. */
+    tabela: 'ordens_servico',
+    invalidar: [['ordens_servico'], ['patio']],
+  })
 
   const termo = termoBusca(ctrl.busca)
   const alvo = alvoDaBusca(termo)
