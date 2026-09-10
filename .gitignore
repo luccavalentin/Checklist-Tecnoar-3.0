@@ -8,3 +8,7 @@ dist-ssr
 .vite
 node_modules/.tmp
 *.log
+
+# manual do usuario
+scripts/manual/.sessao.json
+docs/manual/*.png
