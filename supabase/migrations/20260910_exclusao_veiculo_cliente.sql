@@ -31,7 +31,7 @@ alter table public.pecas_teste
 --    da OS era codigo inalcancavel na tela — nem admin recebia a permissao.
 --    A funcao no banco sempre cobrou tem_permissao(recurso,'inativar').
 update public.recursos
-set acoes = array['visualizar','criar','editar','aprovar','cancelar','inativar','exportar']
+set acoes = array['visualizar','criar','editar','aprovar','cancelar','inativar','exportar']::acao_permissao[]
 where chave = 'ordens_servico';
 
 commit;
