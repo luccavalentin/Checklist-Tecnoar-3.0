@@ -8,12 +8,14 @@ import {
   Plus,
   Printer,
   Timer,
+  Trash2,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { data as fmtData } from '@/lib/formatos'
 import { dataHora, mensagemErro } from '@/lib/utils'
 import { useAuth } from '@/auth/AuthProvider'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
 import { useControleListagem, useListagem, termoBusca, type Consulta } from '@/dados/useListagem'
 import { Botao, BotaoIcone } from '@/componentes/ui/Botao'
 import { AreaTexto, Campo, Entrada, Selecao } from '@/componentes/ui/Campo'
@@ -127,6 +129,14 @@ export function PecasEmTeste() {
   const podeCriar = pode('pecas_em_teste', 'criar')
   const podeEditar = pode('pecas_em_teste', 'editar')
   const podeConfigurar = pode('pecas_em_teste', 'configurar')
+  const podeExcluir = pode('pecas_em_teste', 'inativar')
+
+  /* Excluir peça arrasta os eventos do laboratório junto — a prévia mostra a
+     conta antes, como em toda exclusão do sistema. */
+  const exclusao = useExclusao({
+    tabela: 'pecas_teste',
+    invalidar: [['pecas_teste'], ['pecas-sla']],
+  })
 
   const mecanicosLab = useQuery({
     queryKey: ['mecanicos-laboratorio'],
@@ -394,12 +404,23 @@ export function PecasEmTeste() {
     {
       chave: 'acoes',
       cabecalho: '',
-      largura: '56px',
+      largura: '92px',
       alinhamento: 'direita',
       celula: (p) => (
-        <BotaoIcone rotulo={`Detalhes do protocolo ${p.protocolo}`} tamanho="sm" onClick={() => setAberta(p)}>
-          <Eye />
-        </BotaoIcone>
+        <div className="flex justify-end gap-0.5">
+          <BotaoIcone rotulo={`Detalhes do protocolo ${p.protocolo}`} tamanho="sm" onClick={() => setAberta(p)}>
+            <Eye />
+          </BotaoIcone>
+          {podeExcluir && (
+            <BotaoIcone
+              rotulo={`Excluir protocolo ${p.protocolo}`}
+              tamanho="sm"
+              onClick={() => exclusao.pedir(p.id)}
+            >
+              <Trash2 />
+            </BotaoIcone>
+          )}
+        </div>
       ),
     },
   ]
@@ -687,6 +708,8 @@ export function PecasEmTeste() {
       </PainelLateral>
 
       {imprimindo && <DocumentoProtocolo peca={imprimindo} aoFechar={() => setImprimindo(null)} />}
+      <DialogoExclusao ctrl={exclusao} />
+
     </div>
   )
 }
