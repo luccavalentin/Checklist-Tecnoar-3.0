@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react'
 import { tabelaDinamica } from '@/lib/supabase'
 import { mensagemErro } from '@/lib/utils'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
 import { useControleListagem, useListagem, termoBusca, type Consulta } from '@/dados/useListagem'
 import { CabecalhoPagina } from '@/componentes/ui/Painel'
 import { BarraFiltros } from '@/componentes/ui/BarraFiltros'
@@ -69,6 +70,10 @@ export function CadastroSimples({ config }: { config: ConfigCadastroSimples }) {
   const podeCriar = pode(config.recurso, 'criar')
   const podeEditar = pode(config.recurso, 'editar')
   const podeInativar = pode(config.recurso, 'inativar')
+
+  /* Um so caminho de exclusao para todo cadastro simples: a prevía do banco
+     e quem diz se pode, e o que sai junto. */
+  const exclusao = useExclusao({ tabela: config.tabela, invalidar: [[config.tabela]] })
   const podeVer = pode(config.recurso, 'visualizar')
 
   const booleanos = useMemo(() => config.camposBooleanos ?? [], [config.camposBooleanos])
@@ -214,6 +219,13 @@ export function CadastroSimples({ config }: { config: ConfigCadastroSimples }) {
           {podeInativar && !r.is_system && (
             <Botao tamanho="sm" variante="fantasma" onClick={() => setInativando(r)}>
               {r.situacao === 'ativo' ? 'Inativar' : 'Reativar'}
+            </Botao>
+          )}
+          {/* Registro de sistema sustenta o fluxo: nao se inativa nem se
+              apaga, e por isso os dois botoes somem juntos. */}
+          {podeInativar && !r.is_system && (
+            <Botao tamanho="sm" variante="fantasma" onClick={() => exclusao.pedir(r.id)}>
+              Excluir
             </Botao>
           )}
           {r.is_system && <Selo tom="neutro">Sistema</Selo>}
@@ -394,6 +406,8 @@ export function CadastroSimples({ config }: { config: ConfigCadastroSimples }) {
           )
         }
       />
+
+      <DialogoExclusao ctrl={exclusao} />
     </div>
   )
 }

@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { cn, mensagemErro } from '@/lib/utils'
 import { moeda, paraNumero } from '@/lib/formatos'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
 import { useControleListagem, useListagem, termoBusca, type Consulta } from '@/dados/useListagem'
 import { BarraFiltros } from '@/componentes/ui/BarraFiltros'
 import { Botao } from '@/componentes/ui/Botao'
@@ -61,6 +62,8 @@ export function Servicos() {
   const podeCriar = pode('servicos', 'criar')
   const podeEditar = pode('servicos', 'editar')
   const podeInativar = pode('servicos', 'inativar')
+
+  const exclusao = useExclusao({ tabela: 'servicos', invalidar: [['servicos']] })
 
   // Estatísticas
   const stats = useQuery({
@@ -219,7 +222,7 @@ export function Servicos() {
     { chave: 'tempo', cabecalho: 'Tempo', largura: '100px', alinhamento: 'direita', classeResponsiva: 'hidden xl:table-cell', celula: (s) => s.tempo_estimado_min ? <span className="num text-[12.5px] text-ink-2">{s.tempo_estimado_min} min</span> : <span className="text-ink-3">—</span> },
     { chave: 'valor', cabecalho: 'Valor padrão', largura: '115px', alinhamento: 'direita', celula: (s) => <span className="num whitespace-nowrap text-[13px] text-ink">{moeda(s.valor_padrao)}</span> },
     { chave: 'situacao', cabecalho: 'Situação', largura: '190px', celula: (s) => <div className="flex flex-wrap items-center gap-1.5"><Selo tom={s.situacao === 'ativo' ? 'ok' : 'neutro'} ponto>{s.situacao === 'ativo' ? 'Ativo' : 'Inativo'}</Selo>{s.origem === 'omie' && <Selo tom="info">Omie</Selo>}</div> },
-    { chave: 'acoes', cabecalho: '', largura: '176px', alinhamento: 'direita', celula: (s) => <div className="flex justify-end gap-1.5">{podeEditar && <Botao tamanho="sm" variante="fantasma" onClick={() => setEditando(s)}>Editar</Botao>}{podeInativar && <Botao tamanho="sm" variante="fantasma" onClick={() => setAlvo(s)}>{s.situacao === 'ativo' ? 'Inativar' : 'Reativar'}</Botao>}</div> },
+    { chave: 'acoes', cabecalho: '', largura: '246px', alinhamento: 'direita', celula: (s) => <div className="flex justify-end gap-1.5">{podeEditar && <Botao tamanho="sm" variante="fantasma" onClick={() => setEditando(s)}>Editar</Botao>}{podeInativar && <Botao tamanho="sm" variante="fantasma" onClick={() => setAlvo(s)}>{s.situacao === 'ativo' ? 'Inativar' : 'Reativar'}</Botao>}{podeInativar && <Botao tamanho="sm" variante="fantasma" onClick={() => exclusao.pedir(s.id)}>Excluir</Botao>}</div> },
   ]
 
   return (
@@ -372,6 +375,8 @@ export function Servicos() {
         rotuloConfirmar={alvo?.situacao === 'ativo' ? 'Inativar' : 'Reativar'}
         descricao={<><strong className="font-semibold text-ink">{alvo?.descricao}</strong> {alvo?.situacao === 'ativo' ? 'deixa de aparecer na OS. O histórico é preservado.' : 'volta a ficar disponível.'}</>}
       />
+
+      <DialogoExclusao ctrl={exclusao} />
     </div>
   )
 }

@@ -18,6 +18,7 @@ import { supabase } from '@/lib/supabase'
 import { iniciais, mensagemErro } from '@/lib/utils'
 import { useAuth } from '@/auth/AuthProvider'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
 import { useControleListagem, useListagem, termoBusca, type Consulta } from '@/dados/useListagem'
 import { BarraFiltros } from '@/componentes/ui/BarraFiltros'
 import { Botao } from '@/componentes/ui/Botao'
@@ -146,6 +147,8 @@ export function Usuarios() {
   const podeCriar = pode('usuarios', 'criar')
   const podeEditar = pode('usuarios', 'editar')
   const podeInativar = pode('usuarios', 'inativar')
+
+  const exclusao = useExclusao({ tabela: 'usuarios', invalidar: [['usuarios']] })
   const podeConfigurarPermissoes = pode('perfis_permissoes', 'configurar')
   const podeVerFuncoes = pode('funcoes', 'visualizar')
   const podeVerEspecialidades = pode('especialidades', 'visualizar')
@@ -444,7 +447,7 @@ export function Usuarios() {
     {
       chave: 'funcao',
       cabecalho: 'Função',
-      largura: '170px',
+      largura: '240px',
       classeResponsiva: 'hidden md:table-cell',
       celula: (u) => u.funcao?.nome ?? <span className="text-ink-3">—</span>,
     },
@@ -500,6 +503,13 @@ export function Usuarios() {
           {podeInativar && u.id !== eu?.id && (
             <Botao tamanho="sm" variante="fantasma" onClick={() => setAlvoSituacao(u)}>
               {u.situacao === 'ativo' ? 'Inativar' : 'Ativar'}
+            </Botao>
+          )}
+          {/* A propria conta fica de fora, como no Inativar: ninguem se apaga
+              e perde o acesso no meio do expediente. */}
+          {podeInativar && u.id !== eu?.id && (
+            <Botao tamanho="sm" variante="fantasma" onClick={() => exclusao.pedir(u.id)}>
+              Excluir
             </Botao>
           )}
         </div>
@@ -975,6 +985,8 @@ export function Usuarios() {
           )
         }
       />
+
+      <DialogoExclusao ctrl={exclusao} />
     </div>
   )
 }

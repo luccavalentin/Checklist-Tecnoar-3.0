@@ -5,6 +5,7 @@ import { CheckCircle2, ChevronDown, ChevronUp, Circle, Clock, Flag, ListChecks, 
 import { supabase } from '@/lib/supabase'
 import { cn, mensagemErro } from '@/lib/utils'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
 import { Painel, CabecalhoPainel } from '@/componentes/ui/Painel'
 import { Botao, BotaoIcone } from '@/componentes/ui/Botao'
 import { Alternador, AreaTexto, Campo, Entrada, Selecao } from '@/componentes/ui/Campo'
@@ -123,6 +124,8 @@ export function StatusOS() {
   const podeCriar = pode('status_os', 'criar')
   const podeEditar = pode('status_os', 'editar')
   const podeInativar = pode('status_os', 'inativar')
+
+  const exclusao = useExclusao({ tabela: 'status_os', invalidar: [['status_os'], ['os'], ['patio']] })
   const podeConfigurar = pode('status_os', 'configurar')
 
   const lista = useQuery({
@@ -340,6 +343,13 @@ export function StatusOS() {
                       {s.situacao === 'ativo' ? 'Inativar' : 'Reativar'}
                     </Botao>
                   )}
+                  {/* Status de sistema sustenta o fluxo da oficina: some o
+                      Excluir junto com o Inativar, pela mesma razão. */}
+                  {podeInativar && !s.is_system && (
+                    <Botao tamanho="sm" variante="fantasma" onClick={() => exclusao.pedir(s.id)}>
+                      Excluir
+                    </Botao>
+                  )}
                 </div>
               </div>
             ))}
@@ -435,6 +445,8 @@ export function StatusOS() {
         rotuloConfirmar={alvo?.situacao === 'ativo' ? 'Inativar' : 'Reativar'}
         descricao={<><strong className="font-semibold text-ink">{alvo?.nome}</strong> {alvo?.situacao === 'ativo' ? 'deixa de ser oferecido em novas OS. As OS que já estão nele continuam válidas.' : 'volta a ficar disponível no fluxo.'}</>}
       />
+
+      <DialogoExclusao ctrl={exclusao} />
     </div>
   )
 }
