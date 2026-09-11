@@ -293,8 +293,19 @@
   background-size: 56px 56px;
 }
 
+/*
+ * Barras encostadas no rodapé da tela: respiro próprio + a faixa do indicador
+ * de início do iPhone. Antes era só `env(...)`, que substituía o `py-*` da
+ * barra — zero de respiro no Safari e o dobro no app instalado.
+ * Peças flutuantes (avisos, toasts) não usam isto: sobem pelo `bottom`.
+ */
 @utility area-segura {
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+}
+
+/* Topo que fica sob o relógio e a bateria no app instalado do iPhone. */
+@utility topo-seguro {
+  padding-top: env(safe-area-inset-top);
 }
 
 

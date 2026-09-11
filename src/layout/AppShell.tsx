@@ -100,7 +100,9 @@ export function AppShell() {
       )}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b border-line bg-surface/95 px-3 backdrop-blur-sm sm:gap-3 sm:px-5">
+        {/* No app instalado do iPhone a tela começa sob o relógio e a bateria:
+            o cabeçalho cresce essa faixa para os botões ficarem abaixo dela. */}
+        <header className="topo-seguro sticky top-0 z-30 flex h-[calc(4rem+env(safe-area-inset-top))] shrink-0 items-center gap-2 border-b border-line bg-surface/95 px-3 backdrop-blur-sm sm:gap-3 sm:px-5">
           <div className="lg:hidden">
             <BotaoIcone rotulo="Abrir menu" onClick={() => setMenuAberto(true)}>
               <Menu />

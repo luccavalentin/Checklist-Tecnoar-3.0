@@ -1,5 +1,5 @@
-import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react'
-import { Compass, Copy, Download, Share, SquarePlus, X } from 'lucide-react'
+import { Fragment, useEffect, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { ArrowDown, Check, ChevronRight, Compass, Copy, Download, Share, SquarePlus, X } from 'lucide-react'
 import { Botao } from '@/componentes/ui/Botao'
 import { Modal } from '@/componentes/ui/Sobreposicoes'
 
@@ -173,7 +173,125 @@ export function useInstalacao() {
   return { disponivel, instalar: () => void instalarAgora() }
 }
 
-/* ── Tela ──────────────────────────────────────────────────────────────── */
+/* ── Passos, por aparelho ──────────────────────────────────────────────────
+   Cada passo mostra o botão como ele aparece na tela do iPhone: a pessoa
+   procura um desenho, não uma palavra. */
+
+type Glifo = 'mais' | 'compartilhar' | 'adicionar' | 'safari' | 'confirmar'
+
+interface PassoInstalacao {
+  glifo: Glifo
+  /** Rótulo curto do convite — cabe em três colunas de 375px. */
+  curto: string
+  /** Frase completa do guia. */
+  completo: ReactNode
+}
+
+type Cenario = 'safari-novo' | 'safari' | 'outro-navegador' | 'embutido'
+
+function cenarioAtual(): Cenario {
+  const onde = navegadorIOS()
+  if (onde === 'safari') return safariNovo() ? 'safari-novo' : 'safari'
+  return onde
+}
+
+const PASSOS: Record<Cenario, PassoInstalacao[]> = {
+  'safari-novo': [
+    { glifo: 'mais', curto: 'Toque em •••', completo: <>Toque em <b>•••</b>, no canto de baixo, ao lado do endereço.</> },
+    { glifo: 'compartilhar', curto: 'Compartilhar', completo: <>Toque em <b>Compartilhar</b>.</> },
+    {
+      glifo: 'adicionar',
+      curto: 'Adicionar à Tela de Início',
+      completo: (
+        <>
+          Toque em <b>Adicionar à Tela de Início</b>. Se não aparecer, toque antes em <b>Ver Mais</b>.
+        </>
+      ),
+    },
+    {
+      glifo: 'confirmar',
+      curto: 'Adicionar',
+      completo: (
+        <>
+          Deixe <b>Abrir como App da Web</b> ligado e toque em <b>Adicionar</b>.
+        </>
+      ),
+    },
+  ],
+  safari: [
+    {
+      glifo: 'compartilhar',
+      curto: 'Compartilhar',
+      completo: <>Toque em <b>Compartilhar</b>, o quadrado com a seta, no meio da barra de baixo.</>,
+    },
+    {
+      glifo: 'adicionar',
+      curto: 'Adicionar à Tela de Início',
+      completo: <>Role a lista e toque em <b>Adicionar à Tela de Início</b>.</>,
+    },
+    { glifo: 'confirmar', curto: 'Adicionar', completo: <>Toque em <b>Adicionar</b>, no canto de cima.</> },
+  ],
+  'outro-navegador': [
+    {
+      glifo: 'compartilhar',
+      curto: 'Compartilhar',
+      completo: <>Toque em <b>Compartilhar</b>, na barra do endereço.</>,
+    },
+    {
+      glifo: 'adicionar',
+      curto: 'Adicionar à Tela de Início',
+      completo: (
+        <>
+          Toque em <b>Adicionar à Tela de Início</b>. Se a opção não existir, abra o endereço no <b>Safari</b>.
+        </>
+      ),
+    },
+    { glifo: 'confirmar', curto: 'Adicionar', completo: <>Toque em <b>Adicionar</b>.</> },
+  ],
+  embutido: [
+    { glifo: 'mais', curto: 'Toque em •••', completo: <>Toque em <b>•••</b> ou em <b>Compartilhar</b>.</> },
+    { glifo: 'safari', curto: 'Abrir no Safari', completo: <>Escolha <b>Abrir no Safari</b>.</> },
+    {
+      glifo: 'adicionar',
+      curto: 'Adicionar à Tela de Início',
+      completo: <>Já no Safari, siga o passo a passo para <b>Adicionar à Tela de Início</b>.</>,
+    },
+  ],
+}
+
+/** O botão do iPhone, desenhado. */
+function BotaoDoIPhone({ glifo, tamanho = 'md' }: { glifo: Glifo; tamanho?: 'sm' | 'md' }) {
+  const caixa = tamanho === 'md' ? 'size-10' : 'size-9'
+  const icone = '[&>svg]:size-[18px] [&>svg]:stroke-[1.9]'
+  return (
+    <span
+      aria-hidden
+      className={
+        `${caixa} ${icone} flex shrink-0 items-center justify-center border border-line-strong bg-surface text-ink shadow-e1 ` +
+        (glifo === 'mais' ? 'rounded-full' : 'rounded-[10px]')
+      }
+    >
+      {glifo === 'mais' && <span className="-mt-1 text-[15px] leading-none font-bold tracking-[0.08em]">•••</span>}
+      {glifo === 'compartilhar' && <Share />}
+      {glifo === 'adicionar' && <SquarePlus />}
+      {glifo === 'safari' && <Compass />}
+      {glifo === 'confirmar' && <Check />}
+    </span>
+  )
+}
+
+function IconeDoApp({ className = 'size-11' }: { className?: string }) {
+  /* O mesmo ícone que vai para a tela do iPhone: mostra o que vai aparecer. */
+  return (
+    <img
+      src="/apple-touch-icon.png"
+      alt=""
+      className={`${className} shrink-0 rounded-[22%] shadow-e1 ring-1 ring-black/5`}
+    />
+  )
+}
+
+/* ── Convite ───────────────────────────────────────────────────────────── */
 
 export function ConviteInstalacao() {
   const evento = useSyncExternalStore(assinar, () => eventoGuardado)
@@ -204,82 +322,131 @@ export function ConviteInstalacao() {
 
   return (
     <>
-      {convite && (
-        <div
-          role="dialog"
-          aria-label="Instalar aplicativo"
-          className="area-segura fixed inset-x-3 z-[60] flex items-center gap-3 rounded-xl border border-line-strong bg-surface p-3 shadow-e3 lg:hidden"
-          /* Se a tela tem barra de ações fixa (a OS no celular), sobe acima dela. */
-          style={{ bottom: 'calc(var(--barra-acoes, 0px) + 0.75rem)' }}
-        >
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent-ink">
-            {evento ? <Download aria-hidden className="size-4" /> : <SquarePlus aria-hidden className="size-4" />}
-          </span>
-
-          <div className="min-w-0 flex-1">
-            <p className="text-[13px] font-semibold text-ink">Instalar o Tecnoar Checklist</p>
-            <p className="text-[11.5px] leading-snug text-balance text-ink-3">
-              {evento
-                ? 'Abre em tela cheia e a câmera das evidências funciona melhor.'
-                : 'No iPhone são três toques. Mostramos onde.'}
-            </p>
-          </div>
-
-          <Botao
-            tamanho="sm"
-            onClick={() => {
-              /* O convite do Android é de uso único; o do iPhone vira guia. */
-              if (evento) setDispensado(true)
+      {convite &&
+        (evento ? (
+          <ConviteAndroid
+            aoInstalar={() => {
+              /* O convite do Android é de uso único. */
+              setDispensado(true)
               void instalarAgora()
             }}
-          >
-            {evento ? 'Instalar' : 'Ver como'}
-          </Botao>
-
-          <button
-            type="button"
-            onClick={dispensar}
-            aria-label="Agora não"
-            className="flex size-9 shrink-0 items-center justify-center rounded-md text-ink-3 hover:bg-surface-2 hover:text-ink"
-          >
-            <X aria-hidden className="size-4" />
-          </button>
-        </div>
-      )}
+            aoDispensar={dispensar}
+          />
+        ) : (
+          <ConviteIPhone aoDispensar={dispensar} />
+        ))}
 
       <GuiaInstalacaoIOS aberto={guia} aoFechar={fecharGuia} />
     </>
   )
 }
 
-/* ── Passo a passo do iPhone ───────────────────────────────────────────── */
+/** Cartão flutuante: acima da barra de ações da OS e do indicador de início. */
+const CARTAO =
+  'entrada-suave fixed inset-x-3 z-[60] mx-auto max-w-md rounded-2xl border border-line-strong bg-surface shadow-e3 lg:hidden'
+const POSICAO = { bottom: 'calc(max(var(--barra-acoes, 0px), env(safe-area-inset-bottom)) + 0.75rem)' }
 
-function Passo({ numero, children }: { numero: number; children: ReactNode }) {
+function BotaoFechar({ aoClicar }: { aoClicar: () => void }) {
   return (
-    <li className="flex gap-3">
-      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-accent-soft font-display text-[12px] font-bold text-accent-ink">
-        {numero}
-      </span>
-      <p className="pt-0.5 text-[13.5px] leading-relaxed text-ink-2">{children}</p>
-    </li>
+    <button
+      type="button"
+      onClick={aoClicar}
+      aria-label="Agora não"
+      className="-mt-1 -mr-1 flex size-9 shrink-0 items-center justify-center rounded-full text-ink-3 hover:bg-surface-2 hover:text-ink"
+    >
+      <X aria-hidden className="size-4" />
+    </button>
   )
 }
 
-/** Ícone no meio da frase, do jeito que aparece na tela do iPhone. */
-function Tecla({ icone, children }: { icone?: ReactNode; children: ReactNode }) {
+function ConviteAndroid({ aoInstalar, aoDispensar }: { aoInstalar: () => void; aoDispensar: () => void }) {
   return (
-    <span className="mx-0.5 inline-flex items-center gap-1 rounded-md border border-line-strong bg-surface-2 px-1.5 py-px align-middle text-[12.5px] font-semibold whitespace-nowrap text-ink [&>svg]:size-3.5">
-      {icone}
-      {children}
-    </span>
+    <div role="dialog" aria-label="Instalar aplicativo" className={`${CARTAO} flex items-center gap-3 p-3`} style={POSICAO}>
+      <IconeDoApp />
+      <div className="min-w-0 flex-1">
+        <p className="font-display text-[14px] font-semibold text-ink">Instale o app Tecnoar</p>
+        <p className="text-[12px] leading-snug text-ink-3">Ícone na tela e abre em tela cheia.</p>
+      </div>
+      <Botao tamanho="sm" variante="primario" iconeInicio={<Download aria-hidden />} onClick={aoInstalar}>
+        Instalar
+      </Botao>
+      <BotaoFechar aoClicar={aoDispensar} />
+    </div>
   )
 }
+
+function ConviteIPhone({ aoDispensar }: { aoDispensar: () => void }) {
+  const cenario = cenarioAtual()
+  const passos = PASSOS[cenario].slice(0, 3)
+  /* Só onde a barra do Safari fica embaixo dá para apontar o botão certo. */
+  const noIPhone = /iPhone|iPod/.test(navigator.userAgent)
+  const seta = !noIPhone ? null : cenario === 'safari-novo' ? 'direita' : cenario === 'safari' ? 'centro' : null
+
+  return (
+    <div role="dialog" aria-label="Como instalar o aplicativo" className={`${CARTAO} p-4`} style={POSICAO}>
+      <div className="flex items-start gap-3">
+        <IconeDoApp />
+        <div className="min-w-0 flex-1">
+          <p className="font-display text-[14.5px] leading-tight font-semibold text-ink">
+            {cenario === 'embutido' ? 'Abra no Safari para instalar' : 'Instale o app no seu iPhone'}
+          </p>
+          <p className="mt-0.5 text-[12px] leading-snug text-ink-3">
+            {cenario === 'embutido'
+              ? 'Dentro deste aplicativo o iPhone não deixa instalar.'
+              : 'Ícone na tela de início e abre em tela cheia.'}
+          </p>
+        </div>
+        <BotaoFechar aoClicar={aoDispensar} />
+      </div>
+
+      <ol className="mt-3.5 grid grid-cols-[1fr_auto_1fr_auto_1fr] items-start gap-x-1">
+        {passos.map((p, i) => (
+          <Fragment key={p.curto}>
+            {i > 0 && <ChevronRight aria-hidden className="mt-3 size-4 text-ink-3" />}
+            <li className="flex min-w-0 flex-col items-center gap-1.5 text-center">
+              <span className="relative">
+                <BotaoDoIPhone glifo={p.glifo} />
+                <span className="absolute -top-1.5 -left-1.5 flex size-[18px] items-center justify-center rounded-full bg-accent font-display text-[10px] font-bold text-on-accent ring-2 ring-surface">
+                  {i + 1}
+                </span>
+              </span>
+              <span className="text-[11.5px] leading-tight font-medium text-balance text-ink-2">{p.curto}</span>
+            </li>
+          </Fragment>
+        ))}
+      </ol>
+
+      <button
+        type="button"
+        onClick={abrirGuia}
+        className="mt-3 w-full rounded-md py-1 text-center text-[12px] font-medium text-cyan-ink underline-offset-2 hover:underline"
+      >
+        Não encontrou? Ver passo a passo com detalhes
+      </button>
+
+      {/* Aponta para o botão do Safari, que fica logo abaixo da tela. */}
+      {seta && (
+        <span
+          aria-hidden
+          className={
+            'absolute top-full flex size-5 items-center justify-center text-accent ' +
+            (seta === 'direita' ? 'right-[2.1rem]' : 'left-1/2 -ml-2.5')
+          }
+        >
+          <ArrowDown className="size-5 animate-bounce stroke-[2.5] motion-reduce:animate-none" />
+        </span>
+      )}
+    </div>
+  )
+}
+
+/* ── Guia completo ─────────────────────────────────────────────────────── */
 
 function GuiaInstalacaoIOS({ aberto, aoFechar }: { aberto: boolean; aoFechar: () => void }) {
   const [copiado, setCopiado] = useState(false)
   if (!aberto) return null
 
-  const onde = navegadorIOS()
+  const cenario = cenarioAtual()
   const endereco = window.location.origin
 
   async function copiarEndereco() {
@@ -291,58 +458,8 @@ function GuiaInstalacaoIOS({ aberto, aoFechar }: { aberto: boolean; aoFechar: ()
     }
   }
 
-  const passosSafari = (
-    <ol className="flex flex-col gap-3.5">
-      {safariNovo() ? (
-        <Passo numero={1}>
-          Na barra do endereço, toque em <Tecla>•••</Tecla> e depois em{' '}
-          <Tecla icone={<Share />}>Compartilhar</Tecla>.
-        </Passo>
-      ) : (
-        <Passo numero={1}>
-          Toque em <Tecla icone={<Share />}>Compartilhar</Tecla> na barra do Safari (o quadrado com a seta para cima).
-          Se estiver no iOS 26, ele fica dentro do botão <Tecla>•••</Tecla>.
-        </Passo>
-      )}
-      <Passo numero={2}>
-        Role a lista e toque em <Tecla icone={<SquarePlus />}>Adicionar à Tela de Início</Tecla>. Se não aparecer, toque
-        em <Tecla>Ver Mais</Tecla> primeiro.
-      </Passo>
-      <Passo numero={3}>
-        Deixe <Tecla>Abrir como App da Web</Tecla> ligado, se aparecer, e toque em <Tecla>Adicionar</Tecla>. O ícone da
-        Tecnoar aparece na tela do iPhone.
-      </Passo>
-    </ol>
-  )
-
-  const abrirNoSafari = (
-    <div className="flex flex-col gap-3 rounded-lg border border-line bg-surface-2 p-3.5">
-      <p className="text-[13px] leading-relaxed text-ink-2">
-        {onde === 'embutido' ? (
-          <>
-            Este link está aberto <strong className="text-ink">dentro de outro aplicativo</strong> (WhatsApp, Instagram,
-            e-mail…), e daqui o iPhone não deixa instalar. Abra no Safari: procure{' '}
-            <Tecla icone={<Compass />}>Abrir no Safari</Tecla> no menu <Tecla>•••</Tecla> ou{' '}
-            <Tecla icone={<Share />}>Compartilhar</Tecla>, ou copie o endereço e cole no Safari.
-          </>
-        ) : (
-          <>
-            O jeito garantido é pelo <strong className="text-ink">Safari</strong>. No Chrome ou outro navegador, tente{' '}
-            <Tecla icone={<Share />}>Compartilhar</Tecla> → <Tecla>Adicionar à Tela de Início</Tecla>; se não houver
-            essa opção, copie o endereço e abra no Safari.
-          </>
-        )}
-      </p>
-      <div className="flex flex-wrap items-center gap-2">
-        <code className="min-w-0 flex-1 truncate rounded-md border border-line bg-surface px-2.5 py-1.5 font-mono text-[12px] text-ink">
-          {endereco}
-        </code>
-        <Botao tamanho="sm" variante="neutro" iconeInicio={<Copy aria-hidden />} onClick={() => void copiarEndereco()}>
-          {copiado ? 'Copiado' : 'Copiar'}
-        </Botao>
-      </div>
-    </div>
-  )
+  const passosSafari = PASSOS[safariNovo() ? 'safari-novo' : 'safari']
+  const passos = cenario === 'embutido' ? passosSafari : PASSOS[cenario]
 
   return (
     <Modal
@@ -352,19 +469,70 @@ function GuiaInstalacaoIOS({ aberto, aoFechar }: { aberto: boolean; aoFechar: ()
         aoFechar()
       }}
       titulo="Instalar no iPhone"
-      descricao="A Apple não permite instalar com um toque só: é pelo menu Compartilhar do Safari."
-      rodape={<Botao onClick={aoFechar}>Entendi</Botao>}
+      descricao="A Apple não deixa nenhum site instalar sozinho — são poucos toques, pelo Safari."
+      rodape={
+        <Botao variante="primario" onClick={aoFechar}>
+          Entendi
+        </Botao>
+      }
     >
       <div className="flex flex-col gap-5">
-        {onde !== 'safari' && abrirNoSafari}
-        {onde === 'embutido' ? (
-          <div className="flex flex-col gap-3">
-            <p className="lbl">Depois, já no Safari</p>
-            {passosSafari}
+        <div className="flex items-center gap-3 rounded-xl border border-line bg-surface-2 p-3">
+          <IconeDoApp className="size-12" />
+          <p className="text-[12.5px] leading-snug text-ink-2">
+            No fim, este ícone aparece na tela do iPhone e o sistema abre em tela cheia, como um aplicativo.
+          </p>
+        </div>
+
+        {cenario !== 'safari' && cenario !== 'safari-novo' && (
+          <div className="flex flex-col gap-3 rounded-xl border border-warn/40 bg-warn-soft p-3.5">
+            <p className="text-[13px] leading-relaxed text-ink-2">
+              {cenario === 'embutido' ? (
+                <>
+                  Este link está aberto <b className="text-ink">dentro de outro aplicativo</b>, e daqui o iPhone não
+                  deixa instalar. Toque em <b className="text-ink">•••</b> ou <b className="text-ink">Compartilhar</b> e
+                  escolha <b className="text-ink">Abrir no Safari</b> — ou copie o endereço e cole no Safari.
+                </>
+              ) : (
+                <>
+                  O caminho garantido é o <b className="text-ink">Safari</b>. Se o seu navegador não tiver a opção,
+                  copie o endereço e abra no Safari.
+                </>
+              )}
+            </p>
+            <div className="flex items-center gap-2">
+              <code className="min-w-0 flex-1 truncate rounded-md border border-line bg-surface px-2.5 py-2 font-mono text-[12px] text-ink">
+                {endereco}
+              </code>
+              <Botao tamanho="sm" iconeInicio={<Copy aria-hidden />} onClick={() => void copiarEndereco()}>
+                {copiado ? 'Copiado' : 'Copiar'}
+              </Botao>
+            </div>
           </div>
-        ) : (
-          passosSafari
         )}
+
+        <div className="flex flex-col gap-3">
+          {cenario === 'embutido' && <p className="lbl">Depois, já no Safari</p>}
+          <ol className="flex flex-col">
+            {passos.map((p, i) => (
+              <li key={p.curto} className="relative flex gap-3.5 pb-4 last:pb-0">
+                {/* Trilho entre os passos: lê-se como sequência, não como lista solta. */}
+                {i < passos.length - 1 && (
+                  <span aria-hidden className="absolute top-11 bottom-1 left-5 w-px bg-line-strong" />
+                )}
+                <span className="relative">
+                  <BotaoDoIPhone glifo={p.glifo} />
+                  <span className="absolute -top-1.5 -left-1.5 flex size-[18px] items-center justify-center rounded-full bg-accent font-display text-[10px] font-bold text-on-accent ring-2 ring-surface">
+                    {i + 1}
+                  </span>
+                </span>
+                <p className="pt-2 text-[13.5px] leading-relaxed text-ink-2 [&_b]:font-semibold [&_b]:text-ink">
+                  {p.completo}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
     </Modal>
   )

@@ -124,7 +124,7 @@ export function MolduraAuth({
           }}
         />
 
-        <div className="absolute top-5 right-5">
+        <div className="absolute top-[calc(1.25rem+env(safe-area-inset-top))] right-5">
           <SeletorTema />
         </div>
 

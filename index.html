@@ -3,6 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script>
+      // iPhone e iPad aproximam a tela ao tocar num campo com letra menor que
+      // 16px, e no app instalado o zoom nunca volta: a tela fica cortada à
+      // direita e as barras de baixo somem. `maximum-scale=1` desliga só esse
+      // zoom automático — o iOS continua deixando a pessoa ampliar com os dedos.
+      // No Android a mesma regra bloquearia o gesto de pinça, por isso só no iOS.
+      (function () {
+        var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+        if (!ios) return
+        var meta = document.querySelector('meta[name="viewport"]')
+        if (meta) meta.setAttribute('content', meta.getAttribute('content') + ', maximum-scale=1')
+      })()
+    </script>
     <title>Tecnoar — Sistema Operacional</title>
     <meta name="description" content="Sistema operacional Tecnoar Freios: recepção, ordens de serviço, pátio, checklists técnicos e laboratório de peças." />
 

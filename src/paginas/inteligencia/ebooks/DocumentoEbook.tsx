@@ -59,7 +59,7 @@ export function DocumentoEbook({ ebook, aoFechar }: { ebook: Ebook; aoFechar: ()
   const empresaNome = empresa.data?.nome_fantasia || empresa.data?.razao_social || 'Tecnoar Freios'
 
   return createPortal(
-    <div className="fixed inset-0 z-70 overflow-y-auto bg-canvas">
+    <div className="fixed inset-0 top-[env(safe-area-inset-top)] z-70 overflow-y-auto bg-canvas">
       <style>{`@media print {
         .sem-impressao { display:none !important }
         .quebra { break-before: page }

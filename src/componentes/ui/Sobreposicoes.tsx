@@ -180,6 +180,8 @@ export function PainelLateral({
         tabIndex={-1}
         className={cn(
           'entrada-suave relative flex h-dvh max-h-dvh w-full flex-col overflow-hidden bg-surface shadow-e3',
+          /* Tela cheia no celular: o título não pode ficar sob o relógio. */
+          'topo-seguro sm:pt-0',
           'border-line-strong sm:h-auto sm:max-h-[88dvh] sm:rounded-xl sm:border',
           larguras[largura],
         )}
