@@ -44,7 +44,7 @@ export function DocumentoProtocolo({ peca, aoFechar }: { peca: PecaTesteListada;
   const empresaNome = empresa.data?.nome_fantasia || empresa.data?.razao_social || 'Tecnoar Freios'
 
   return createPortal(
-    <div className="fixed inset-0 z-70 overflow-y-auto bg-canvas">
+    <div className="fixed inset-0 top-[env(safe-area-inset-top)] z-70 overflow-y-auto bg-canvas">
       <style>{`@media print { .sem-impressao { display:none !important } .area-impressao { padding:0 !important } }`}</style>
 
       <div className="sem-impressao sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-line bg-surface px-5 py-3">

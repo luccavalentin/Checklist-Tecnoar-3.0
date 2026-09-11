@@ -49,7 +49,7 @@ export function LeitorArtigo({ artigoId, aoFechar }: { artigoId: string; aoFecha
     .map((l) => l.replace(/^#{2,3}\s+/, '').trim())
 
   return createPortal(
-    <div className="fixed inset-0 z-70 overflow-y-auto bg-canvas">
+    <div className="fixed inset-0 top-[env(safe-area-inset-top)] z-70 overflow-y-auto bg-canvas">
       <style>{`
         @media print {
           @page { size: A4; margin: 14mm; }

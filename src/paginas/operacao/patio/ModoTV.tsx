@@ -184,7 +184,7 @@ export function ModoTV({ aoSair }: { aoSair: () => void }) {
   )
 
   return createPortal(
-    <div className="fixed inset-0 z-[80] flex flex-col overflow-hidden bg-[#050b16] text-slate-100">
+    <div className="topo-seguro fixed inset-0 z-[80] flex flex-col overflow-hidden bg-[#050b16] text-slate-100">
       {/* cabeçalho */}
       <header className="relative flex shrink-0 items-center justify-between gap-6 border-b border-white/10 bg-[#071225]/95 px-8 py-4 shadow-[0_20px_60px_rgb(0_0_0_/_0.25)]">
         <div className="flex items-center gap-6">

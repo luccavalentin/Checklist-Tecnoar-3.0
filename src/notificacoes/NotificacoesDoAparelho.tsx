@@ -168,8 +168,10 @@ export function ConviteNotificacoes({ usuarioId }: { usuarioId: string }) {
     <div
       role="dialog"
       aria-label="Ativar notificações"
-      className="area-segura fixed inset-x-3 z-[60] flex items-center gap-3 rounded-xl border border-line-strong bg-surface p-3 shadow-e3 sm:inset-x-auto sm:right-4 sm:w-[390px]"
-      style={{ bottom: 'calc(var(--barra-acoes, 0px) + 0.75rem)' }}
+      className="fixed inset-x-3 z-[60] flex items-center gap-3 rounded-xl border border-line-strong bg-surface p-3 shadow-e3 sm:inset-x-auto sm:right-4 sm:w-[390px]"
+      /* Acima da barra de ações fixa (a OS no celular) ou do indicador de início
+         do iPhone — a barra já inclui essa faixa, então vale o maior dos dois. */
+      style={{ bottom: 'calc(max(var(--barra-acoes, 0px), env(safe-area-inset-bottom)) + 0.75rem)' }}
     >
       <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent-ink">
         <BellRing aria-hidden className="size-4" />

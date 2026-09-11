@@ -69,7 +69,7 @@ export function ProvedorToast({ children }: { children: ReactNode }) {
         <div
           aria-live="polite"
           aria-atomic="false"
-          className="pointer-events-none fixed inset-x-0 bottom-0 z-[70] flex flex-col items-center gap-2 p-4 sm:inset-x-auto sm:right-0 sm:items-end"
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-[70] flex flex-col items-center gap-2 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-0 sm:items-end"
         >
           {toasts.map((t) => (
             <div

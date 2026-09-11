@@ -82,7 +82,7 @@ export function BarraLateral({
     return (
       <div
         className={cn(
-          'flex h-full flex-col',
+          'topo-seguro flex h-full flex-col',
           modoEscuro ? 'bg-[#071225] text-white' : 'bg-white text-[#071225]',
         )}
       >
@@ -145,7 +145,13 @@ export function BarraLateral({
   }
 
   return (
-    <div className={cn('flex h-full flex-col', modoEscuro ? 'bg-[#071225] text-white' : 'bg-white text-[#071225]')}>
+    <div
+      className={cn(
+        /* No app instalado do iPhone o topo fica sob o relógio e a bateria. */
+        'topo-seguro flex h-full flex-col',
+        modoEscuro ? 'bg-[#071225] text-white' : 'bg-white text-[#071225]',
+      )}
+    >
       <div
         className={cn(
           'flex h-16 shrink-0 items-center justify-between border-b px-4',

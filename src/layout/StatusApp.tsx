@@ -42,9 +42,10 @@ export function AvisoAtualizacao() {
 
   return (
     <div
-      className="area-segura fixed inset-x-0 z-[65] flex justify-center p-4 sm:inset-x-auto sm:right-4"
-      /* Se a tela tem barra de ações fixa (a OS no celular), sobe acima dela. */
-      style={{ bottom: 'var(--barra-acoes, 0px)' }}
+      className="fixed inset-x-0 z-[65] flex justify-center p-4 sm:inset-x-auto sm:right-4"
+      /* Acima da barra de ações fixa (a OS no celular) ou do indicador de início
+         do iPhone — a barra já inclui essa faixa, então vale o maior dos dois. */
+      style={{ bottom: 'max(var(--barra-acoes, 0px), env(safe-area-inset-bottom))' }}
     >
       <div className="flex w-full max-w-sm items-start gap-3 rounded-lg border border-cyan/40 bg-surface p-4 shadow-e3">
         <RefreshCw aria-hidden className="mt-0.5 size-[17px] shrink-0 text-cyan" />
