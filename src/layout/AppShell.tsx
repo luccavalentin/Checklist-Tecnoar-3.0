@@ -12,6 +12,7 @@ import { MenuConta } from './MenuConta'
 import { PainelNotificacoes, useNaoLidas } from './PainelNotificacoes'
 import { IndicadorOffline } from './StatusApp'
 import { EnviosPendentes } from './EnviosPendentes'
+import { ConviteNotificacoes, useNotificacoesDoAparelho } from '@/notificacoes/NotificacoesDoAparelho'
 import '@/busca/fonteNavegacao'
 
 const CHAVE_MENU_RECOLHIDO = 'tecnoar.menu.recolhido'
@@ -36,6 +37,7 @@ export function AppShell() {
   const [ajudaAberta, setAjudaAberta] = useState(false)
 
   const naoLidas = useNaoLidas(usuario?.id)
+  useNotificacoesDoAparelho(usuario?.id, naoLidas.data)
   const temaSincronizado = useRef(false)
 
   // Na primeira carga do perfil, a preferência salva no servidor prevalece.
@@ -169,6 +171,8 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
+
+      {usuario && <ConviteNotificacoes usuarioId={usuario.id} />}
 
       <BuscaGlobal aberto={buscaAberta} aoFechar={() => setBuscaAberta(false)} />
       {usuario && (

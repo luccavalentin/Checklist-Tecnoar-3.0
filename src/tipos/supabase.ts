@@ -3460,6 +3460,39 @@ export type Database = {
           },
         ]
       }
+      push_inscricoes: {
+        Row: {
+          agente: string | null
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          updated_at: string
+          usuario_id: string
+        }
+        Insert: {
+          agente?: string | null
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          updated_at?: string
+          usuario_id: string
+        }
+        Update: {
+          agente?: string | null
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          updated_at?: string
+          usuario_id?: string
+        }
+        Relationships: []
+      }
       notificacoes: {
         Row: {
           created_at: string

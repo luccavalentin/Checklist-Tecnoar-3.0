@@ -13,7 +13,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['favicon-64.png', 'apple-touch-icon.png', 'brand/*.svg'],
+      includeAssets: ['favicon-64.png', 'apple-touch-icon.png', 'brand/*.svg', 'badge-96.png', 'notificacao-192.png'],
       manifest: {
         id: '/',
         name: 'Tecnoar — Sistema Operacional',
@@ -36,6 +36,10 @@ export default defineConfig({
         ],
       },
       workbox: {
+        /* Push e clique em notificação moram em arquivo próprio: o service
+           worker é gerado a cada build, e editar o gerado seria perder a
+           edição no build seguinte. */
+        importScripts: ['sw-notificacoes.js'],
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         globIgnores: ['**/*.map'],
