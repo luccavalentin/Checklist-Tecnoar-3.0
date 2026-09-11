@@ -16,8 +16,9 @@ export default defineConfig({
       includeAssets: ['favicon-64.png', 'apple-touch-icon.png', 'brand/*.svg', 'badge-96.png', 'notificacao-192.png'],
       manifest: {
         id: '/',
-        name: 'Tecnoar — Sistema Operacional',
-        short_name: 'Tecnoar',
+        name: 'Tecnoar Checklist',
+        /* É o nome que fica embaixo do ícone depois de instalar. */
+        short_name: 'Tecnoar Checklist',
         description:
           'Sistema operacional Tecnoar Freios: recepção, ordens de serviço, pátio, checklists técnicos e laboratório de peças.',
         lang: 'pt-BR',
