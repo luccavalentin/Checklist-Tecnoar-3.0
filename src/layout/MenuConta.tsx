@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronDown, LogOut, Monitor, Moon, Settings2, Sun } from 'lucide-react'
+import { ChevronDown, Download, LogOut, Monitor, Moon, Settings2, Sun } from 'lucide-react'
 import { cn, emSegundoPlano, iniciais } from '@/lib/utils'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/auth/AuthProvider'
@@ -8,10 +8,12 @@ import { useTema } from '@/tema/TemaProvider'
 import { Segmentado } from '@/componentes/ui/Campo'
 import { Confirmacao } from '@/componentes/ui/Sobreposicoes'
 import type { TemaInterface } from '@/tipos/db'
+import { useInstalacao } from './ConviteInstalacao'
 
 export function MenuConta() {
   const { usuario, sair } = useAuth()
   const { tema, definirTema } = useTema()
+  const instalacao = useInstalacao()
   const navegar = useNavigate()
   const [aberto, setAberto] = useState(false)
   const [confirmandoSaida, setConfirmandoSaida] = useState(false)
@@ -120,6 +122,23 @@ export function MenuConta() {
               <Settings2 aria-hidden className="size-4 text-ink-3" />
               Configurações
             </button>
+            {instalacao.disponivel && (
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setAberto(false)
+                  instalacao.instalar()
+                }}
+                className={cn(
+                  'flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-[13.5px] text-ink-2',
+                  'transition-colors hover:bg-surface-2 hover:text-ink',
+                )}
+              >
+                <Download aria-hidden className="size-4 text-ink-3" />
+                Instalar aplicativo
+              </button>
+            )}
             <button
               type="button"
               role="menuitem"
