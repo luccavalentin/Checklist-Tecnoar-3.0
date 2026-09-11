@@ -66,7 +66,7 @@ export const SECOES = [
         titulo: 'Android — Chrome',
         passos: [
           'Abra o endereço do sistema no Chrome.',
-          'Aparece a faixa **Instalar o Tecnoar** na parte de baixo da tela. Toque em **Instalar**.',
+          'Aparece a faixa **Instalar o Tecnoar Checklist** na parte de baixo da tela. Toque em **Instalar**.',
           'Se a faixa não aparecer, toque nos três pontos (⋮) do Chrome e escolha **Instalar aplicativo** ou **Adicionar à tela inicial**.',
           'Confirme. O ícone da Tecnoar aparece junto dos seus outros aplicativos.',
         ],

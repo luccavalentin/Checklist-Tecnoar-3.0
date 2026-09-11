@@ -157,7 +157,7 @@ export function ConviteInstalacao() {
       </span>
 
       <div className="min-w-0 flex-1">
-        <p className="text-[13px] font-semibold text-ink">Instalar o Tecnoar</p>
+        <p className="text-[13px] font-semibold text-ink">Instalar o Tecnoar Checklist</p>
         {evento ? (
           <p className="text-[11.5px] leading-snug text-balance text-ink-3">
             Abre em tela cheia e a câmera das evidências funciona melhor.
