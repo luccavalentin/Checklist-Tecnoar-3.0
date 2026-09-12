@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
 import {
   AlertTriangle,
@@ -186,23 +186,41 @@ export function ModoTV({ aoSair }: { aoSair: () => void }) {
   return createPortal(
     <div className="topo-seguro fixed inset-0 z-[80] flex flex-col overflow-hidden bg-[#050b16] text-slate-100">
       {/* cabeçalho */}
-      <header className="relative flex shrink-0 items-center justify-between gap-6 border-b border-white/10 bg-[#071225]/95 px-8 py-4 shadow-[0_20px_60px_rgb(0_0_0_/_0.25)]">
-        <div className="flex items-center gap-6">
-          {config.mostrarLogo && <LogoNegativo altura={52} />}
-          {config.mostrarLogo && <span aria-hidden className="h-11 w-px bg-white/12" />}
-          <div className="flex flex-col gap-1">
-            <span className="font-display text-[11px] font-bold tracking-[0.18em] text-cyan uppercase">Painel do Pátio</span>
-            <span className="font-display text-2xl font-bold tracking-tight text-white">Operação em tempo real</span>
+      {/* Feito para a TV, mas também é aberto no celular: lá o cabeçalho
+          encolhe, os botões viram só ícone e nada fica fora da tela — sem
+          isso, "Sair do Modo TV" sumia à direita e não havia como sair. */}
+      <header className="relative flex shrink-0 items-center justify-between gap-3 border-b border-white/10 bg-[#071225]/95 px-4 py-3 shadow-[0_20px_60px_rgb(0_0_0_/_0.25)] sm:gap-6 sm:px-8 sm:py-4">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-6">
+          {config.mostrarLogo && (
+            <>
+              <span className="shrink-0 sm:hidden">
+                <LogoNegativo altura={30} />
+              </span>
+              <span className="hidden shrink-0 sm:block">
+                <LogoNegativo altura={52} />
+              </span>
+              <span aria-hidden className="hidden h-11 w-px bg-white/12 sm:block" />
+            </>
+          )}
+          <div className="flex min-w-0 flex-col gap-0.5 sm:gap-1">
+            <span className="font-display text-[10px] font-bold tracking-[0.16em] text-cyan uppercase sm:text-[11px] sm:tracking-[0.18em]">
+              Painel do Pátio
+            </span>
+            <span className="truncate font-display text-[15px] font-bold tracking-tight text-white sm:text-2xl">
+              Operação em tempo real
+            </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-6">
-          <span className="flex items-center gap-2.5 rounded-full border border-emerald-300/30 bg-emerald-400/10 px-4 py-2">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-6">
+          <span className="flex items-center gap-2 rounded-full border border-emerald-300/30 bg-emerald-400/10 p-2 sm:gap-2.5 sm:px-4 sm:py-2">
             <span aria-hidden className="pulso-ativo size-2.5 rounded-full bg-ok" />
-            <span className="font-display text-[11px] font-bold tracking-[0.14em] text-emerald-200 uppercase">Ao vivo</span>
+            <span className="sr-only font-display text-[11px] font-bold tracking-[0.14em] text-emerald-200 uppercase sm:not-sr-only">
+              Ao vivo
+            </span>
           </span>
           {config.mostrarRelogio && (
-            <div className="flex flex-col items-end">
+            <div className="hidden flex-col items-end sm:flex">
               <span className="num text-3xl leading-none font-medium text-white">
                 {relogio.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
               </span>
@@ -214,58 +232,74 @@ export function ModoTV({ aoSair }: { aoSair: () => void }) {
           <button
             type="button"
             onClick={() => setConfigurando(true)}
-            className="flex items-center gap-2.5 rounded-lg border border-white/12 bg-white/5 px-4 py-3 font-display text-xs font-bold tracking-[0.1em] text-slate-200 uppercase transition-colors hover:bg-white/10"
+            aria-label="Configurar"
+            className="flex size-10 items-center justify-center gap-2.5 rounded-lg border border-white/12 bg-white/5 font-display text-xs font-bold tracking-[0.1em] text-slate-200 uppercase transition-colors hover:bg-white/10 sm:size-auto sm:px-4 sm:py-3"
           >
             <Settings2 aria-hidden className="size-4" />
-            Configurar
+            <span className="hidden sm:inline">Configurar</span>
           </button>
           <button
             type="button"
             onClick={aoSair}
-            className="flex items-center gap-2.5 rounded-lg border border-white/12 bg-white/5 px-5 py-3 font-display text-xs font-bold tracking-[0.1em] text-slate-200 uppercase transition-colors hover:bg-white/10"
+            aria-label="Sair do Modo TV"
+            className="flex size-10 items-center justify-center gap-2.5 rounded-lg border border-white/12 bg-white/5 font-display text-xs font-bold tracking-[0.1em] text-slate-200 uppercase transition-colors hover:bg-white/10 sm:size-auto sm:px-5 sm:py-3"
           >
             <X aria-hidden className="size-5" />
-            Sair do Modo TV
+            <span className="hidden sm:inline">Sair do Modo TV</span>
           </button>
         </div>
       </header>
 
       {/* indicadores */}
       {config.mostrarKpis && (
+        /* Na TV, uma linha só; no celular, três por linha. As linhas entre as
+           células vêm do `gap-px` sobre o fundo claro — assim a grade fecha
+           certo em qualquer quantidade de colunas, sem borda sobrando. */
         <div
-          className="grid shrink-0 border-b border-white/10 bg-[#071225]/70"
-          style={{ gridTemplateColumns: `repeat(${Math.max(KPIS.length, 1)}, minmax(0, 1fr))` }}
+          className="grid shrink-0 grid-cols-3 gap-px border-b border-white/10 bg-white/10 lg:grid-cols-[repeat(var(--colunas-kpi),minmax(0,1fr))]"
+          style={{ '--colunas-kpi': Math.max(KPIS.length, 1) } as CSSProperties}
         >
           {KPIS.map((k) => (
-            <div key={k.rotulo} className="relative flex min-w-0 flex-col gap-2 border-r border-white/10 px-6 py-4 last:border-r-0">
-              <span className="font-display text-[10px] font-bold tracking-[0.16em] text-slate-400 uppercase">{k.rotulo}</span>
-              <div className="flex items-baseline gap-2">
-                <span className={cn('num text-5xl leading-none font-medium', k.cor)}>{k.valor}</span>
-                <span className="text-sm text-slate-400">{k.unidade}</span>
+            <div key={k.rotulo} className="relative flex min-w-0 flex-col gap-1.5 bg-[#071225] px-3 py-3 sm:gap-2 sm:px-6 sm:py-4">
+              <span className="line-clamp-2 min-h-[2lh] font-display text-[9px] leading-tight font-bold tracking-[0.12em] text-slate-400 uppercase sm:min-h-0 sm:text-[10px] sm:tracking-[0.16em]">
+                {k.rotulo}
+              </span>
+              <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                <span className={cn('num text-3xl leading-none font-medium sm:text-5xl', k.cor)}>{k.valor}</span>
+                <span className="truncate text-[11px] text-slate-400 sm:text-sm">{k.unidade}</span>
               </div>
-              <span aria-hidden className={cn('absolute inset-x-6 bottom-0 h-[2px]', k.id === 'sla_vencido' && k.valor > 0 ? 'bg-crit' : k.id === 'aguardando_peca' && k.valor > 0 ? 'bg-accent' : k.id === 'aguardando_aprovacao' && k.valor > 0 ? 'bg-warn' : 'bg-white/10')} />
+              <span aria-hidden className={cn('absolute inset-x-3 bottom-0 h-[2px] sm:inset-x-6', k.id === 'sla_vencido' && k.valor > 0 ? 'bg-crit' : k.id === 'aguardando_peca' && k.valor > 0 ? 'bg-accent' : k.id === 'aguardando_aprovacao' && k.valor > 0 ? 'bg-warn' : 'bg-white/10')} />
             </div>
           ))}
         </div>
       )}
 
       {/* quadro */}
-      <div className={cn('min-h-0 flex-1 p-6', modoCompacto && 'p-4')}>
+      {/* No celular as colunas não cabem lado a lado: cada uma ganha largura
+          legível e o quadro rola na horizontal. Na TV, todas dividem a tela. */}
+      <div className={cn('min-h-0 flex-1 overflow-x-auto p-4 sm:p-6 lg:overflow-visible', modoCompacto && 'p-3 sm:p-4')}>
         {patio.isSuccess && (patio.data?.length ?? 0) === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center gap-3">
-            <span className="font-display text-4xl font-semibold text-white">Pátio vazio</span>
-            <span className="text-lg text-slate-400">Nenhum veículo em atendimento no momento.</span>
+          <div className="flex h-full flex-col items-center justify-center gap-3 px-4 text-center">
+            <span className="font-display text-3xl font-semibold text-white sm:text-4xl">Pátio vazio</span>
+            <span className="text-base text-slate-400 sm:text-lg">Nenhum veículo em atendimento no momento.</span>
           </div>
         ) : modoAlertas && alertas.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center gap-4">
+          <div className="flex h-full flex-col items-center justify-center gap-4 px-4 text-center">
             <span className="flex size-16 items-center justify-center rounded-xl border border-emerald-300/25 bg-emerald-400/10 text-emerald-200">
               <Check aria-hidden className="size-8" />
             </span>
-            <span className="font-display text-4xl font-semibold text-white">Sem alertas agora</span>
-            <span className="text-lg text-slate-400">O pátio está em modo foco, mas nenhum veículo exige atenção.</span>
+            <span className="font-display text-3xl font-semibold text-white sm:text-4xl">Sem alertas agora</span>
+            <span className="text-base text-slate-400 sm:text-lg">O pátio está em modo foco, mas nenhum veículo exige atenção.</span>
           </div>
         ) : (
-          <div className={cn('grid h-full gap-5', modoCompacto && 'gap-3')} style={{ gridTemplateColumns: `repeat(${Math.max(estagiosVisiveis.length, 1)}, minmax(0, 1fr))` }}>
+          <div
+            className={cn(
+              'grid h-full gap-4 sm:gap-5',
+              'grid-cols-[repeat(var(--colunas-quadro),minmax(15rem,1fr))] lg:grid-cols-[repeat(var(--colunas-quadro),minmax(0,1fr))]',
+              modoCompacto && 'gap-3',
+            )}
+            style={{ '--colunas-quadro': Math.max(estagiosVisiveis.length, 1) } as CSSProperties}
+          >
             {estagiosVisiveis.map((e) => {
               const todos = porEstagio.get(e.id) ?? []
               const inicio = pagina * config.cardsPorColuna
@@ -348,21 +382,21 @@ export function ModoTV({ aoSair }: { aoSair: () => void }) {
 
       {/* rodapé com alertas e paginação */}
       {(config.mostrarAlertas || totalPaginas > 1) && (
-        <footer className="flex shrink-0 items-center gap-6 border-t border-white/10 bg-[#071225]/95 px-8 py-4">
+        <footer className="area-segura flex shrink-0 items-center gap-3 border-t border-white/10 bg-[#071225]/95 px-4 pt-3 sm:gap-6 sm:px-8 sm:pt-4">
           {config.mostrarAlertas && (
             <>
-              <span className="flex shrink-0 items-center gap-2.5 rounded-lg border border-crit/35 bg-crit/10 px-4 py-2">
-                <AlertTriangle aria-hidden className="size-5 text-crit" />
-                <span className="font-display text-[11px] font-bold tracking-[0.14em] text-crit uppercase">Alertas</span>
+              <span className="flex shrink-0 items-center gap-2 rounded-lg border border-crit/35 bg-crit/10 px-2.5 py-2 sm:gap-2.5 sm:px-4">
+                <AlertTriangle aria-hidden className="size-4 text-crit sm:size-5" />
+                <span className="font-display text-[10px] font-bold tracking-[0.14em] text-crit uppercase sm:text-[11px]">Alertas</span>
               </span>
 
-              <div className="flex flex-1 items-center gap-8 overflow-hidden">
+              <div className="flex min-w-0 flex-1 items-center gap-5 overflow-hidden sm:gap-8">
                 {alertas.length === 0 ? (
-                  <span className="text-lg text-slate-400">Nenhum alerta no momento.</span>
+                  <span className="truncate text-sm text-slate-400 sm:text-lg">Nenhum alerta no momento.</span>
                 ) : (
                   <>
                     {alertas.slice(0, 4).map((a) => (
-                      <span key={a.os_id} className="flex shrink-0 items-center gap-2.5 text-lg whitespace-nowrap">
+                      <span key={a.os_id} className="flex shrink-0 items-center gap-2.5 text-sm whitespace-nowrap sm:text-lg">
                         <span className={cn('num font-semibold', a.critico ? 'text-crit' : 'text-warn')}>{a.placa}</span>
                         <span className="text-slate-400">{a.texto}</span>
                       </span>

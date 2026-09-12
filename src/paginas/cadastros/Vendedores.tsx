@@ -220,6 +220,67 @@ function VendedorRow({
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   CARTÃO — a mesma linha, para celular e tablet
+   ═══════════════════════════════════════════════════════════════ */
+function VendedorCartao({
+  vendedor,
+  onEdit,
+  onSituacao,
+  onExcluir,
+}: {
+  vendedor: Vendedor
+  onEdit?: () => void
+  onSituacao?: () => void
+  onExcluir?: () => void
+}) {
+  const ativo = vendedor.situacao === 'ativo'
+  return (
+    <article
+      onClick={onEdit}
+      className={cn('flex flex-col gap-2.5 px-4 py-3.5', onEdit && 'cursor-pointer active:bg-accent/[0.04]')}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-[14px] font-semibold text-ink">{vendedor.descricao}</p>
+          {vendedor.email && <p className="truncate text-[12px] text-ink-3">{vendedor.email}</p>}
+        </div>
+        <span
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold"
+          style={{
+            backgroundColor: ativo ? 'var(--c-ok-soft)' : 'var(--c-surface-2)',
+            color: ativo ? 'var(--c-ok)' : 'var(--c-ink-3)',
+          }}
+        >
+          <span className={cn('h-1.5 w-1.5 rounded-full', ativo ? 'bg-ok' : 'bg-ink-3')} />
+          {ativo ? 'Ativo' : 'Inativo'}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-ink-2">
+        <span className="font-mono text-[11px] text-ink-3">#{String(vendedor.codigo).padStart(6, '0')}</span>
+        {vendedor.documento && <span className="font-mono text-[11.5px]">{mascaraDocumento(vendedor.documento)}</span>}
+        {vendedor.telefone && <span className="font-mono text-ink">{vendedor.telefone}</span>}
+      </div>
+
+      {(onSituacao || onExcluir) && (
+        <div className="flex justify-end gap-1">
+          {onSituacao && (
+            <Botao tamanho="sm" variante="fantasma" onClick={(e) => { e.stopPropagation(); onSituacao() }}>
+              {ativo ? 'Inativar' : 'Ativar'}
+            </Botao>
+          )}
+          {onExcluir && (
+            <Botao tamanho="sm" variante="fantasma" onClick={(e) => { e.stopPropagation(); onExcluir() }}>
+              Excluir
+            </Botao>
+          )}
+        </div>
+      )}
+    </article>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════
    MAIN
    ═══════════════════════════════════════════════════════════════ */
 export function Vendedores() {
@@ -503,7 +564,19 @@ export function Vendedores() {
 
       {/* Tabela */}
       <div className="rounded-xl border border-line bg-surface overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Celular e tablet: cartões. A tabela só a partir de `lg`. */}
+        <div className="flex flex-col divide-y divide-line/60 lg:hidden">
+          {lista.linhas.map((v) => (
+            <VendedorCartao
+              key={v.id}
+              vendedor={v}
+              onEdit={podeEditar ? () => setEditando(v) : undefined}
+              onSituacao={podeInativar ? () => setAlvo(v) : undefined}
+              onExcluir={podeInativar ? () => exclusao.pedir(v.id) : undefined}
+            />
+          ))}
+        </div>
+        <div className="hidden overflow-x-auto lg:block">
           <table className="w-full min-w-[800px]">
             <thead>
               <tr className="border-b border-line bg-surface-2/60">

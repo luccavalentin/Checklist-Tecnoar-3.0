@@ -320,7 +320,7 @@ export function Performance() {
 
       <Painel>
         <div className="flex flex-wrap items-end gap-4">
-          <Campo rotulo="Período" className="min-w-[320px]">
+          <Campo rotulo="Período" className="min-w-0 sm:min-w-[320px]">
             {() => (
               <Segmentado
                 valor={preset}

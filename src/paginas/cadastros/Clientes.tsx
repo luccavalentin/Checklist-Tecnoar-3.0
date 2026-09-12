@@ -602,6 +602,85 @@ function ClienteRow({
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   CARTÃO — a mesma linha, para celular e tablet
+   A tabela tem 1100px: no celular virava rolagem lateral e o nome do cliente
+   dividia a tela com colunas que ninguém lia ali.
+   ═══════════════════════════════════════════════════════════════ */
+function ClienteCartao({
+  cliente,
+  onEdit,
+  onSituacao,
+  onExcluir,
+}: {
+  cliente: ClienteListado
+  onEdit?: () => void
+  onSituacao?: () => void
+  onExcluir?: () => void
+}) {
+  const tags = cliente.cliente_tags?.map((ct) => ct.tag).filter(Boolean) as TagTipo[]
+  const fantasia =
+    cliente.nome_fantasia && cliente.nome_fantasia.trim() !== cliente.nome_razao.trim() ? cliente.nome_fantasia : null
+
+  return (
+    <article
+      onClick={onEdit}
+      className={cn('flex flex-col gap-2.5 px-4 py-3.5', onEdit && 'cursor-pointer active:bg-accent/[0.04]')}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-[14px] font-semibold text-ink">{cliente.nome_razao}</p>
+          {fantasia && <p className="truncate text-[12px] text-ink-3">{fantasia}</p>}
+        </div>
+        <StatusBadge status={cliente.situacao} origem={cliente.origem} />
+      </div>
+
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] text-ink-2">
+        <span className="font-mono text-[11px] text-ink-3">#{String(cliente.codigo).padStart(4, '0')}</span>
+        <TipoBadge tipo={cliente.tipo_pessoa} />
+        {cliente.documento && <span className="font-mono text-[11.5px]">{mascaraDocumento(cliente.documento)}</span>}
+        {cliente.uf && (
+          <span className="inline-flex items-center rounded border border-line bg-surface-2 px-1.5 py-0.5 text-[10.5px] font-bold text-ink">
+            {cliente.uf}
+          </span>
+        )}
+      </div>
+
+      {(cliente.celular || cliente.email) && (
+        <div className="flex min-w-0 flex-wrap gap-x-3 gap-y-0.5 text-[12px]">
+          {cliente.celular && <span className="font-mono text-ink">{cliente.celular}</span>}
+          {cliente.email && <span className="min-w-0 truncate text-ink-3">{cliente.email}</span>}
+        </div>
+      )}
+
+      {(tags.length > 0 || onSituacao || onExcluir) && (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex min-w-0 flex-wrap gap-1">
+            {tags.slice(0, 3).map((tag) => <TagBadge key={tag.id} tag={tag} />)}
+            {tags.length > 3 && (
+              <span className="inline-flex items-center rounded border border-line bg-surface-2 px-1.5 py-0.5 text-[9px] font-medium text-ink-3">
+                +{tags.length - 3}
+              </span>
+            )}
+          </div>
+          <div className="ml-auto flex gap-1">
+            {onSituacao && (
+              <Botao tamanho="sm" variante="fantasma" onClick={(e) => { e.stopPropagation(); onSituacao() }}>
+                {cliente.situacao === 'ativo' ? 'Inativar' : 'Ativar'}
+              </Botao>
+            )}
+            {onExcluir && (
+              <Botao tamanho="sm" variante="fantasma" onClick={(e) => { e.stopPropagation(); onExcluir() }}>
+                Excluir
+              </Botao>
+            )}
+          </div>
+        </div>
+      )}
+    </article>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════
    MAIN
    ═══════════════════════════════════════════════════════════════ */
 export function Clientes() {
@@ -904,7 +983,19 @@ export function Clientes() {
 
       {/* Tabela */}
       <div className="rounded-xl border border-line bg-surface overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Celular e tablet: cartões. A tabela só a partir de `lg`. */}
+        <div className="flex flex-col divide-y divide-line/60 lg:hidden">
+          {lista.linhas.map((cliente) => (
+            <ClienteCartao
+              key={cliente.id}
+              cliente={cliente}
+              onEdit={podeEditar ? () => setEditando(cliente.id) : undefined}
+              onSituacao={podeInativar ? () => setAlvo(cliente) : undefined}
+              onExcluir={podeInativar ? () => exclusao.pedir(cliente.id) : undefined}
+            />
+          ))}
+        </div>
+        <div className="hidden overflow-x-auto lg:block">
           <table className="w-full min-w-[1100px]">
             <thead>
               <tr className="border-b border-line bg-surface-2/60">

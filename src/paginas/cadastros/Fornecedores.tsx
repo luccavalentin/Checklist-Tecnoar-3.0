@@ -582,6 +582,78 @@ function FornecedorRow({
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   CARTÃO — a mesma linha, para celular e tablet
+   ═══════════════════════════════════════════════════════════════ */
+function FornecedorCartao({
+  fornecedor,
+  onEdit,
+  onSituacao,
+  onExcluir,
+}: {
+  fornecedor: Fornecedor
+  onEdit?: () => void
+  onSituacao?: () => void
+  onExcluir?: () => void
+}) {
+  const local = fornecedor.municipio ? `${fornecedor.municipio}${fornecedor.uf ? ` · ${fornecedor.uf}` : ''}` : null
+  return (
+    <article
+      onClick={onEdit}
+      className={cn('flex flex-col gap-2.5 px-4 py-3.5', onEdit && 'cursor-pointer active:bg-accent/[0.04]')}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-[14px] font-semibold text-ink">{fornecedor.descricao}</p>
+          {(fornecedor.nome_fantasia || local) && (
+            <p className="truncate text-[12px] text-ink-3">
+              {[fornecedor.nome_fantasia, local].filter(Boolean).join(' — ')}
+            </p>
+          )}
+        </div>
+        <StatusBadge status={fornecedor.situacao} origem={fornecedor.origem} />
+      </div>
+
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] text-ink-2">
+        <span className="font-mono text-[11px] text-ink-3">#{String(fornecedor.codigo).padStart(6, '0')}</span>
+        <span
+          className={cn(
+            'inline-flex items-center rounded-md px-2 py-0.5 text-[9px] font-bold uppercase',
+            fornecedor.tipo_pessoa === 'fisica'
+              ? 'border border-cyan/20 bg-cyan/10 text-cyan'
+              : 'border border-purple/20 bg-purple/10 text-purple',
+          )}
+        >
+          {fornecedor.tipo_pessoa === 'fisica' ? 'PF' : 'PJ'}
+        </span>
+        {fornecedor.documento && <span className="font-mono text-[11.5px]">{mascaraDocumento(fornecedor.documento)}</span>}
+      </div>
+
+      {(fornecedor.telefone1 || fornecedor.email) && (
+        <div className="flex min-w-0 flex-wrap gap-x-3 gap-y-0.5 text-[12px]">
+          {fornecedor.telefone1 && <span className="font-mono text-ink">{fornecedor.telefone1}</span>}
+          {fornecedor.email && <span className="min-w-0 truncate text-ink-3">{fornecedor.email}</span>}
+        </div>
+      )}
+
+      {(onSituacao || onExcluir) && (
+        <div className="flex justify-end gap-1">
+          {onSituacao && (
+            <Botao tamanho="sm" variante="fantasma" onClick={(e) => { e.stopPropagation(); onSituacao() }}>
+              {fornecedor.situacao === 'ativo' ? 'Inativar' : 'Ativar'}
+            </Botao>
+          )}
+          {onExcluir && (
+            <Botao tamanho="sm" variante="fantasma" onClick={(e) => { e.stopPropagation(); onExcluir() }}>
+              Excluir
+            </Botao>
+          )}
+        </div>
+      )}
+    </article>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════════
    MODAL DE FORMULÁRIO
    ═══════════════════════════════════════════════════════════════ */
 function ModalFormulario({
@@ -1131,7 +1203,19 @@ export function Fornecedores() {
         />
 
         <div className="aresta border border-line bg-surface">
-          <div className="overflow-x-auto">
+          {/* Celular e tablet: cartões. A tabela só a partir de `lg`. */}
+          <div className="flex flex-col divide-y divide-line/60 lg:hidden">
+            {lista.linhas.map((f) => (
+              <FornecedorCartao
+                key={f.id}
+                fornecedor={f}
+                onEdit={podeEditar ? () => setEditando(f) : undefined}
+                onSituacao={podeInativar ? () => setAlvo(f) : undefined}
+                onExcluir={podeInativar ? () => exclusao.pedir(f.id) : undefined}
+              />
+            ))}
+          </div>
+          <div className="hidden overflow-x-auto lg:block">
             <table className="w-full min-w-[900px]">
               <thead>
                 <tr className="border-b border-line bg-surface-2/60">

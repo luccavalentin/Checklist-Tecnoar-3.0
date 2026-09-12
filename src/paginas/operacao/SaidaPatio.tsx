@@ -23,7 +23,7 @@ function KpiSaida({ valor, rotulo, cor, icone, indice }: {
     <div
       className={cn(
         'group relative overflow-hidden rounded-xl border border-white/5',
-        'bg-gradient-to-br from-[var(--surface)] via-[var(--surface-2)] to-[var(--surface)]',
+        'bg-gradient-to-br from-[var(--c-surface)] via-[var(--c-surface-2)] to-[var(--c-surface)]',
         'p-3 transition-all duration-300 ease-out',
         'hover:border-white/10 hover:shadow-xl hover:shadow-black/10',
         'hover:-translate-y-0.5',
@@ -31,9 +31,10 @@ function KpiSaida({ valor, rotulo, cor, icone, indice }: {
         'hover:before:opacity-100'
       )}
       style={{
-        animationDelay: `${indice * 80}ms`,
-        animation: 'fadeInUp 0.5s ease-out forwards',
-        opacity: 0,
+        /* `both` segura o estado inicial no atraso e o final depois. Sem opacidade
+           fixa no estilo, o cartão nunca fica invisível se a animação falhar. */
+        animation: 'tec-surgir 0.4s ease-out both',
+        animationDelay: `${indice * 60}ms`,
       }}
     >
       {/* Glow effect */}
@@ -45,15 +46,15 @@ function KpiSaida({ valor, rotulo, cor, icone, indice }: {
       {/* Content */}
       <div className="relative flex items-center justify-between gap-3">
         <div className="flex min-w-0 flex-col">
-          <span className="text-[9px] font-semibold uppercase tracking-wider text-[var(--ink-3)]">{rotulo}</span>
-          <span className="font-mono text-xl font-bold tracking-tight text-[var(--ink)] transition-transform duration-200 group-hover:scale-105">
+          <span className="text-[9px] font-semibold uppercase tracking-wider text-[var(--c-ink-3)]">{rotulo}</span>
+          <span className="truncate font-mono text-lg font-bold tracking-tight text-[var(--c-ink)] transition-transform duration-200 group-hover:scale-105 min-[400px]:text-xl">
             {valor}
           </span>
         </div>
 
         {/* Icon container */}
         <div
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all duration-300 group-hover:scale-105"
+          className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-all duration-300 group-hover:scale-105 min-[400px]:flex"
           style={{
             background: `linear-gradient(135deg, ${cor}20, ${cor}8)`,
             boxShadow: `0 0 16px ${cor}25`,
@@ -66,7 +67,7 @@ function KpiSaida({ valor, rotulo, cor, icone, indice }: {
       </div>
 
       {/* Bottom progress bar */}
-      <div className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-[var(--line)]/20">
+      <div className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-[var(--c-line)]/20">
         <div
           className="h-full rounded-full transition-all duration-500 group-hover:w-full"
           style={{
