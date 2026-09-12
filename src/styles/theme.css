@@ -338,6 +338,20 @@
   }
 }
 
+/* Cartões de indicador entrando em sequência (Recepção, Checklists…).
+   Começa translúcido, nunca invisível: se o navegador pausar a animação
+   (aba em segundo plano, economia de bateria), o número continua legível. */
+@keyframes tec-surgir {
+  from {
+    opacity: 0.4;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes tec-toast {
   from {
     opacity: 0;

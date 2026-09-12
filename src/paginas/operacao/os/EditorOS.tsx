@@ -776,6 +776,20 @@ export function EditorOS({ osId, aoVoltar }: { osId: string; aoVoltar: () => voi
 
 /* ------------------------------------------------------------ tabela itens */
 
+interface CampoItem {
+  campo: 'quantidade' | 'valor_unitario' | 'desconto'
+  rotulo: string
+  curto: string
+  passo: string
+  largura: string
+}
+
+const CAMPOS_ITEM: CampoItem[] = [
+  { campo: 'quantidade', rotulo: 'Quantidade', curto: 'Qtd.', passo: '0.001', largura: 'w-20' },
+  { campo: 'valor_unitario', rotulo: 'Valor unitário', curto: 'Unitário', passo: '0.01', largura: 'w-28' },
+  { campo: 'desconto', rotulo: 'Desconto', curto: 'Desconto', passo: '0.01', largura: 'w-24' },
+]
+
 function TabelaItens({
   titulo,
   itens,
@@ -801,6 +815,70 @@ function TabelaItens({
   adicionar?: React.ReactNode
   produto?: boolean
 }) {
+  /* Os controles do item existem em dois leiautes — cartão no celular, linha
+     na tabela do desktop — e são montados aqui uma vez só. */
+  const campoNumero = (i: OSServico | OSProduto, c: CampoItem, classe: string) => (
+    <input
+      type="number"
+      inputMode="decimal"
+      step={c.passo}
+      min="0"
+      aria-label={`${c.rotulo} de ${i.descricao}`}
+      disabled={!podeEditar}
+      defaultValue={i[c.campo]}
+      onBlur={(e) => {
+        const v = Number(e.target.value)
+        if (v !== i[c.campo]) aoAtualizar(i.id, { [c.campo]: v } as Partial<Record<CampoItem['campo'], number>>)
+      }}
+      className={cn('num rounded border border-line-strong bg-inset px-2 text-right disabled:opacity-60', classe)}
+    />
+  )
+
+  const seletorEstado = (i: OSServico | OSProduto, classe: string) => (
+    <select
+      aria-label={`Estado de ${i.descricao}`}
+      disabled={!podeEditar}
+      value={(i as OSProduto).estado}
+      onChange={(e) => aoMudarEstado?.(i.id, e.target.value as EstadoProdutoOS)}
+      className={cn('w-full rounded border border-line-strong bg-inset px-1.5 disabled:opacity-60', classe)}
+    >
+      {ESTADOS_PRODUTO.map((e) => (
+        <option key={e.valor} value={e.valor}>{e.rotulo}</option>
+      ))}
+    </select>
+  )
+
+  const botoesAprovacao = (i: OSServico | OSProduto, tamanho: string) =>
+    podeAprovar ? (
+      <div className="flex gap-1">
+        {(['aprovado', 'recusado', 'pendente'] as SituacaoAprovacao[]).map((a) => (
+          <button
+            key={a}
+            type="button"
+            aria-pressed={i.aprovacao === a}
+            aria-label={`${ROTULO_APROVACAO[a]}: ${i.descricao}`}
+            title={ROTULO_APROVACAO[a]}
+            onClick={() => aoAprovar(i.id, a)}
+            className={cn(
+              'flex items-center justify-center rounded border transition-colors',
+              tamanho,
+              i.aprovacao === a
+                ? a === 'aprovado'
+                  ? 'border-ok bg-ok-soft text-ok-ink'
+                  : a === 'recusado'
+                    ? 'border-crit bg-crit-soft text-crit-ink'
+                    : 'border-warn bg-warn-soft text-warn-ink'
+                : 'border-line-strong text-ink-3 hover:text-ink',
+            )}
+          >
+            {a === 'aprovado' ? <Check className="size-3.5" /> : a === 'recusado' ? <X className="size-3.5" /> : '—'}
+          </button>
+        ))}
+      </div>
+    ) : (
+      <Selo tom={TOM_APROVACAO[i.aprovacao]} ponto>{ROTULO_APROVACAO[i.aprovacao]}</Selo>
+    )
+
   return (
     <Painel semPadding>
       <CabecalhoPainel
@@ -824,129 +902,86 @@ function TabelaItens({
             />
           </div>
         ) : (
-          <table className="w-full border-collapse">
-            <thead>
-              <tr>
-                <th className="lbl h-10 border-b border-line-strong bg-surface-2 px-3 text-left">Código</th>
-                <th className="lbl h-10 border-b border-line-strong bg-surface-2 px-3 text-left">Descrição</th>
-                <th className="lbl h-10 w-24 border-b border-line-strong bg-surface-2 px-3 text-right">Qtd.</th>
-                <th className="lbl h-10 w-32 border-b border-line-strong bg-surface-2 px-3 text-right">Unitário</th>
-                <th className="lbl h-10 w-28 border-b border-line-strong bg-surface-2 px-3 text-right">Desc.</th>
-                <th className="lbl h-10 w-32 border-b border-line-strong bg-surface-2 px-3 text-right">Total</th>
-                {produto && <th className="lbl h-10 w-36 border-b border-line-strong bg-surface-2 px-3 text-left">Estado</th>}
-                <th className="lbl h-10 w-44 border-b border-line-strong bg-surface-2 px-3 text-left">Aprovação</th>
-                <th className="h-10 w-12 border-b border-line-strong bg-surface-2" />
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            {/* Celular e tablet: um cartão por item. A tabela tem ~900px e, no
+                celular, obrigava a arrastar a tela para lançar quantidade ou
+                aprovar — aqui cada item cabe inteiro, com alvos para o dedo. */}
+            <ul className="flex flex-col divide-y divide-line lg:hidden">
               {itens.map((i) => (
-                <tr key={i.id} className={cn('border-b border-line last:border-b-0', i.aprovacao === 'recusado' && 'opacity-55')}>
-                  <td className="num px-3 py-2 text-[12.5px] text-ink-3">{i.codigo ?? '—'}</td>
-                  <td className="px-3 py-2 text-[13px] text-ink">{i.descricao}</td>
-                  <td className="px-3 py-2 text-right">
-                    <input
-                      type="number"
-                      step="0.001"
-                      min="0"
-                      aria-label={`Quantidade de ${i.descricao}`}
-                      disabled={!podeEditar}
-                      defaultValue={i.quantidade}
-                      onBlur={(e) => {
-                        const v = Number(e.target.value)
-                        if (v !== i.quantidade) aoAtualizar(i.id, { quantidade: v })
-                      }}
-                      className="num h-8 w-20 rounded border border-line-strong bg-inset px-2 text-right text-[12.5px] disabled:opacity-60"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      aria-label={`Valor unitário de ${i.descricao}`}
-                      disabled={!podeEditar}
-                      defaultValue={i.valor_unitario}
-                      onBlur={(e) => {
-                        const v = Number(e.target.value)
-                        if (v !== i.valor_unitario) aoAtualizar(i.id, { valor_unitario: v })
-                      }}
-                      className="num h-8 w-28 rounded border border-line-strong bg-inset px-2 text-right text-[12.5px] disabled:opacity-60"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      aria-label={`Desconto de ${i.descricao}`}
-                      disabled={!podeEditar}
-                      defaultValue={i.desconto}
-                      onBlur={(e) => {
-                        const v = Number(e.target.value)
-                        if (v !== i.desconto) aoAtualizar(i.id, { desconto: v })
-                      }}
-                      className="num h-8 w-24 rounded border border-line-strong bg-inset px-2 text-right text-[12.5px] disabled:opacity-60"
-                    />
-                  </td>
-                  <td className="num px-3 py-2 text-right text-[13px] font-medium text-ink">{moeda(i.valor_total)}</td>
-
-                  {produto && (
-                    <td className="px-3 py-2">
-                      <select
-                        aria-label={`Estado de ${i.descricao}`}
-                        disabled={!podeEditar}
-                        value={(i as OSProduto).estado}
-                        onChange={(e) => aoMudarEstado?.(i.id, e.target.value as EstadoProdutoOS)}
-                        className="h-8 w-full rounded border border-line-strong bg-inset px-1.5 text-[12px] disabled:opacity-60"
-                      >
-                        {ESTADOS_PRODUTO.map((e) => (
-                          <option key={e.valor} value={e.valor}>{e.rotulo}</option>
-                        ))}
-                      </select>
-                    </td>
-                  )}
-
-                  <td className="px-3 py-2">
-                    {podeAprovar ? (
-                      <div className="flex gap-1">
-                        {(['aprovado', 'recusado', 'pendente'] as SituacaoAprovacao[]).map((a) => (
-                          <button
-                            key={a}
-                            type="button"
-                            aria-pressed={i.aprovacao === a}
-                            title={ROTULO_APROVACAO[a]}
-                            onClick={() => aoAprovar(i.id, a)}
-                            className={cn(
-                              'flex size-7 items-center justify-center rounded border transition-colors',
-                              i.aprovacao === a
-                                ? a === 'aprovado'
-                                  ? 'border-ok bg-ok-soft text-ok-ink'
-                                  : a === 'recusado'
-                                    ? 'border-crit bg-crit-soft text-crit-ink'
-                                    : 'border-warn bg-warn-soft text-warn-ink'
-                                : 'border-line-strong text-ink-3 hover:text-ink',
-                            )}
-                          >
-                            {a === 'aprovado' ? <Check className="size-3.5" /> : a === 'recusado' ? <X className="size-3.5" /> : '—'}
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
-                      <Selo tom={TOM_APROVACAO[i.aprovacao]} ponto>{ROTULO_APROVACAO[i.aprovacao]}</Selo>
-                    )}
-                  </td>
-
-                  <td className="px-2 py-2 text-right">
+                <li key={i.id} className={cn('flex flex-col gap-3 p-4', i.aprovacao === 'recusado' && 'opacity-55')}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[13.5px] leading-snug font-medium text-ink">{i.descricao}</p>
+                      <p className="num mt-0.5 text-[11.5px] text-ink-3">{i.codigo ?? 'Sem código'}</p>
+                    </div>
                     {podeEditar && (
                       <BotaoIcone rotulo={`Remover ${i.descricao}`} tamanho="sm" onClick={() => aoRemover(i.id)}>
                         <Trash2 />
                       </BotaoIcone>
                     )}
-                  </td>
-                </tr>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    {CAMPOS_ITEM.map((c) => (
+                      <label key={c.campo} className="flex min-w-0 flex-col gap-1">
+                        <span className="lbl">{c.curto}</span>
+                        {campoNumero(i, c, 'h-10 w-full text-[14px]')}
+                      </label>
+                    ))}
+                  </div>
+
+                  {produto && <label className="flex flex-col gap-1"><span className="lbl">Estado</span>{seletorEstado(i, 'h-10 text-[14px]')}</label>}
+
+                  <div className="flex items-center justify-between gap-3 border-t border-line pt-3">
+                    {botoesAprovacao(i, 'size-10')}
+                    <div className="flex flex-col items-end">
+                      <span className="lbl">Total</span>
+                      <span className="num text-[15px] font-semibold text-ink">{moeda(i.valor_total)}</span>
+                    </div>
+                  </div>
+                </li>
               ))}
-            </tbody>
-          </table>
+            </ul>
+
+            <table className="hidden w-full border-collapse lg:table">
+              <thead>
+                <tr>
+                  <th className="lbl h-10 border-b border-line-strong bg-surface-2 px-3 text-left">Código</th>
+                  <th className="lbl h-10 border-b border-line-strong bg-surface-2 px-3 text-left">Descrição</th>
+                  <th className="lbl h-10 w-24 border-b border-line-strong bg-surface-2 px-3 text-right">Qtd.</th>
+                  <th className="lbl h-10 w-32 border-b border-line-strong bg-surface-2 px-3 text-right">Unitário</th>
+                  <th className="lbl h-10 w-28 border-b border-line-strong bg-surface-2 px-3 text-right">Desc.</th>
+                  <th className="lbl h-10 w-32 border-b border-line-strong bg-surface-2 px-3 text-right">Total</th>
+                  {produto && <th className="lbl h-10 w-36 border-b border-line-strong bg-surface-2 px-3 text-left">Estado</th>}
+                  <th className="lbl h-10 w-44 border-b border-line-strong bg-surface-2 px-3 text-left">Aprovação</th>
+                  <th className="h-10 w-12 border-b border-line-strong bg-surface-2" />
+                </tr>
+              </thead>
+              <tbody>
+                {itens.map((i) => (
+                  <tr key={i.id} className={cn('border-b border-line last:border-b-0', i.aprovacao === 'recusado' && 'opacity-55')}>
+                    <td className="num px-3 py-2 text-[12.5px] text-ink-3">{i.codigo ?? '—'}</td>
+                    <td className="px-3 py-2 text-[13px] text-ink">{i.descricao}</td>
+                    {CAMPOS_ITEM.map((c) => (
+                      <td key={c.campo} className="px-3 py-2 text-right">
+                        {campoNumero(i, c, cn('h-8 text-[12.5px]', c.largura))}
+                      </td>
+                    ))}
+                    <td className="num px-3 py-2 text-right text-[13px] font-medium text-ink">{moeda(i.valor_total)}</td>
+                    {produto && <td className="px-3 py-2">{seletorEstado(i, 'h-8 text-[12px]')}</td>}
+                    <td className="px-3 py-2">{botoesAprovacao(i, 'size-7')}</td>
+                    <td className="px-2 py-2 text-right">
+                      {podeEditar && (
+                        <BotaoIcone rotulo={`Remover ${i.descricao}`} tamanho="sm" onClick={() => aoRemover(i.id)}>
+                          <Trash2 />
+                        </BotaoIcone>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
       </div>
     </Painel>

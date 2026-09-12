@@ -334,7 +334,9 @@ function PainelEstoque() {
               carregando={sincronizar.isPending}
               onClick={() => sincronizar.mutate()}
             >
-              Sincronizar produtos e estoque
+              {/* O rótulo inteiro não cabe numa tela de 320px. */}
+              <span className="sm:hidden">Sincronizar</span>
+              <span className="hidden sm:inline">Sincronizar produtos e estoque</span>
             </Botao>
           </div>
         </Painel>
