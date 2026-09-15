@@ -80,7 +80,15 @@ async function anthropic(p: Pedido): Promise<Resultado> {
   const r = await pedir('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-api-key': p.chave, 'anthropic-version': '2023-06-01' },
-    body: JSON.stringify({ model: p.modelo, max_tokens: p.maxTokens, system: p.sistema, messages }),
+    body: JSON.stringify({
+      model: p.modelo,
+      max_tokens: p.maxTokens,
+      // O prompt do sistema é o mesmo em toda conversa (mudam só as
+      // mensagens); marcado como cache, a Anthropic reaproveita o
+      // processamento entre chamadas e a resposta chega bem mais rápido.
+      system: [{ type: 'text', text: p.sistema, cache_control: { type: 'ephemeral' } }],
+      messages,
+    }),
   })
   if ('erro' in r) return { ok: false, erro: r.erro }
   if (!r.ok) return { ok: false, erro: String(r.json?.error?.message ?? `O provedor respondeu HTTP ${r.status}.`) }
@@ -129,7 +137,10 @@ async function gemini(p: Pedido): Promise<Resultado> {
     body: JSON.stringify({
       contents,
       systemInstruction: { parts: [{ text: p.sistema }] },
-      generationConfig: { maxOutputTokens: p.maxTokens },
+      // Sem orçamento de "pensamento": nos modelos 2.5 essa etapa invisível
+      // antes de escrever é a maior parte do tempo de espera numa triagem
+      // que precisa ser rápida. Ignorado sem erro pelos modelos que não têm essa opção.
+      generationConfig: { maxOutputTokens: p.maxTokens, thinkingConfig: { thinkingBudget: 0 } },
     }),
   })
   if ('erro' in r) return { ok: false, erro: r.erro }

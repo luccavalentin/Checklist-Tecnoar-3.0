@@ -192,9 +192,11 @@ Deno.serve(async (req: Request) => {
       return resposta({ erro: tecnico ? 'A Tecno IA técnica é para o mecânico e a central.' : 'O atendimento pela IA é para clientes do app.' }, 403)
     }
 
+    // Menos histórico = menos texto para o modelo processar antes de responder.
+    // Numa triagem, o que importa é o que já foi dito agora há pouco.
     const historico = (Array.isArray(corpo.mensagens) ? corpo.mensagens : [])
       .filter((m: any) => (m?.papel === 'usuario' || m?.papel === 'assistente') && so(m?.texto))
-      .slice(-16)
+      .slice(-10)
     const ultima = historico[historico.length - 1]
     const imagem = corpo.imagem && typeof corpo.imagem === 'object' ? corpo.imagem : null
     if ((!ultima || ultima.papel !== 'usuario') && !imagem) return resposta({ erro: 'Escreva sua mensagem.' }, 400)
@@ -231,7 +233,7 @@ Deno.serve(async (req: Request) => {
 
     const turnos: Turno[] = historico.map((m: any) => ({
       papel: m.papel,
-      partes: [{ kind: 'texto', texto: String(m.texto).slice(0, 4000) }],
+      partes: [{ kind: 'texto', texto: String(m.texto).slice(0, 1500) }],
     }))
     if (!turnos.length || turnos[turnos.length - 1].papel !== 'usuario') {
       turnos.push({ papel: 'usuario', partes: [{ kind: 'texto', texto: 'Veja a foto que enviei.' }] })
@@ -249,7 +251,7 @@ Deno.serve(async (req: Request) => {
     while (turnos.length && turnos[0].papel !== 'usuario') turnos.shift()
 
     const r = await chamar({
-      provedor, modelo, chave, turnos, maxTokens: tecnico ? 1400 : 900,
+      provedor, modelo, chave, turnos, maxTokens: tecnico ? 1200 : 700,
       sistema: tecnico
         ? sistemaMecanico(so(cred.instrucoes) || null)
         : sistemaAtendimento(so(cred.instrucoes) || null, so(cred.telefone_central) || null),
