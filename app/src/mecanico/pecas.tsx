@@ -25,7 +25,7 @@ export function Placa({ placa, tamanho = 'md', className }: { placa: string | nu
       aria-label={`Placa ${formatarPlacaExibicao(placa)}`}
     >
       <span aria-hidden className={cn('bg-[#1f4fa8]', tamanho === 'sm' ? 'h-[3px]' : 'h-1')} />
-      <span className={cn('num font-bold tracking-[0.08em] text-[#0b1c33]', t)}>{formatarPlacaExibicao(placa)}</span>
+      <span className={cn('num placa-num font-bold text-[#0b1c33]', t)}>{formatarPlacaExibicao(placa)}</span>
     </span>
   )
 }

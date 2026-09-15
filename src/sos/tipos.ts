@@ -420,6 +420,31 @@ export interface VeiculoParaOS {
   os_aberta: number | null
 }
 
+/**
+ * Pedido de OS aberta no app do mecânico. Cliente: `cliente_id` OU
+ * nome + celular (+ CPF/CNPJ) para cadastrar na hora. Veículo: `veiculo_id`
+ * OU placa (+ descrição).
+ */
+export interface NovaOSApp {
+  cliente_id?: string
+  cliente_nome?: string
+  telefone?: string | null
+  documento?: string | null
+  veiculo_id?: string
+  placa?: string
+  veiculo_descricao?: string | null
+  km?: string | null
+  problema: string
+}
+
+export interface OSAbertaApp {
+  id: string
+  numero: number
+  cliente_id: string
+  veiculo_id: string
+  cliente_novo: boolean
+}
+
 /** OS aberta do mesmo cliente/veículo, para ligar ao chamado em vez de abrir outra. */
 export interface OSParaVincular {
   id: string

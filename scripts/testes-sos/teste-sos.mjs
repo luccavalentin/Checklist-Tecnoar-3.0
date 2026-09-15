@@ -967,4 +967,82 @@ await etapa('mecânico finaliza e abre outro, a caminho, com cliente novo', asyn
   return { status: c.status, distancia_km: c.distancia_km, eta_min: c.eta_min }
 })
 
+// ── OS aberta no app com cliente escolhido ou cadastrado na hora (sos_os_abrir)
+async function falhaCom(uid, sql, params, trecho) {
+  try {
+    await um(uid, sql, params)
+  } catch (e) {
+    if (!e.message.includes(trecho)) throw new Error(`erro diferente do esperado: ${e.message}`)
+    return e.message
+  }
+  throw new Error(`deveria falhar com "${trecho}"`)
+}
+const abrirOS = (uid, p) => um(uid, `select public.sos_os_abrir($1::jsonb)`, [JSON.stringify(p)])
+
+await etapa('OS no app: mecânico sem permissão de criar OS é recusado', () =>
+  falhaCom(ids.mec1, `select public.sos_os_abrir($1::jsonb)`, [JSON.stringify({
+    cliente_nome: 'Qualquer Um', telefone: '(11) 91111-2222', placa: 'SEM1P23', problema: 'Teste',
+  })], 'Seu perfil não permite abrir OS'))
+
+const osClienteNovo = await etapa('OS no app: cliente novo cadastrado na hora na tabela do Checklist', async () => {
+  const antes = await um(null, `select count(*)::int from public.notificacoes where titulo = 'Cliente cadastrado em campo'`)
+  const r = await abrirOS(ids.admin, {
+    cliente_nome: 'Frota Rio Verde', telefone: '(19) 98888-7777', placa: 'RIO4V56', veiculo_descricao: 'Mercedes Actros',
+    km: '412.300', problema: 'Freio travando na roda traseira',
+  })
+  const cli = await um(null, `select to_jsonb(c) from public.clientes c where c.id = '${r.cliente_id}'`)
+  const os = await um(null, `select to_jsonb(o) from public.ordens_servico o where o.id = '${r.id}'`)
+  const vei = await um(null, `select placa from public.veiculos where id = '${r.veiculo_id}'`)
+  const principal = await um(null, `select principal from public.os_mecanicos where os_id = '${r.id}'`)
+  const depois = await um(null, `select count(*)::int from public.notificacoes where titulo = 'Cliente cadastrado em campo'`)
+  if (
+    !r.cliente_novo || cli.nome_razao !== 'Frota Rio Verde' || cli.origem !== 'manual' || cli.celular !== '(19) 98888-7777' ||
+    os.cliente_id !== r.cliente_id || os.veiculo_id !== r.veiculo_id || os.km !== 412300 || vei !== 'RIO4V56' ||
+    principal !== true || depois <= antes
+  ) {
+    throw new Error(JSON.stringify({ r, cli, os, vei, principal, antes, depois }).slice(0, 500))
+  }
+  return r
+})
+
+await etapa('OS no app: mesmo celular reaproveita o cliente em vez de duplicar', async () => {
+  const r = await abrirOS(ids.admin, {
+    cliente_nome: 'Frota Rio Verde Ltda', telefone: '19 98888 7777', placa: 'RIO7X89', problema: 'Revisão do segundo caminhão',
+  })
+  const iguais = await um(null, `select count(*)::int from public.clientes where regexp_replace(celular, '\\D', '', 'g') = '19988887777'`)
+  if (r.cliente_novo || r.cliente_id !== osClienteNovo.cliente_id || iguais !== 1) throw new Error(JSON.stringify({ r, iguais }))
+  return { cliente_novo: r.cliente_novo, cadastros_com_o_celular: iguais }
+})
+
+await etapa('OS no app: cliente e veículo escolhidos da busca', async () => {
+  const r = await abrirOS(ids.admin, {
+    cliente_id: '40000000-0000-0000-0000-000000000001', veiculo_id: '50000000-0000-0000-0000-000000000001', problema: 'Troca de lonas',
+  })
+  if (r.cliente_novo || r.veiculo_id !== '50000000-0000-0000-0000-000000000001') throw new Error(JSON.stringify(r))
+  return { numero: r.numero }
+})
+
+await etapa('OS no app: veículo de outro cliente é recusado', () =>
+  falhaCom(ids.admin, `select public.sos_os_abrir($1::jsonb)`, [JSON.stringify({
+    cliente_id: osClienteNovo.cliente_id, veiculo_id: '50000000-0000-0000-0000-000000000001', problema: 'Teste',
+  })], 'pertence a outro cliente'))
+
+await etapa('OS no app: placa cadastrada em nome de outro cliente é recusada', () =>
+  falhaCom(ids.admin, `select public.sos_os_abrir($1::jsonb)`, [JSON.stringify({
+    cliente_id: osClienteNovo.cliente_id, placa: 'ABC-1D23', problema: 'Teste',
+  })], 'outro cliente'))
+
+await etapa('OS no app: sem veículo, sem nome ou com documento inválido é recusado', async () => {
+  const semPlaca = await falhaCom(ids.admin, `select public.sos_os_abrir($1::jsonb)`, [JSON.stringify({
+    cliente_id: osClienteNovo.cliente_id, problema: 'Teste',
+  })], 'placa')
+  const semNome = await falhaCom(ids.admin, `select public.sos_os_abrir($1::jsonb)`, [JSON.stringify({
+    telefone: '(11) 93333-4444', placa: 'NOM1E23', problema: 'Teste',
+  })], 'Informe o cliente')
+  const doc = await falhaCom(ids.admin, `select public.sos_os_abrir($1::jsonb)`, [JSON.stringify({
+    cliente_nome: 'Documento Errado', telefone: '(11) 93333-4444', documento: '123.456', placa: 'DOC1E23', problema: 'Teste',
+  })], 'CPF com 11')
+  return [semPlaca, semNome, doc].length + ' recusas'
+})
+
 console.log(`\nTUDO CERTO — ${passos} etapas.`)

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   AlertTriangle,
@@ -12,7 +12,6 @@ import {
   MapPin,
   Package,
   Plus,
-  Power,
   RefreshCw,
   Star,
   Wrench,
@@ -33,7 +32,7 @@ import { FaixaFila } from './FilaPendente'
 import { aplicarNoChamado, useFila } from './filaOffline'
 import { IconeOcorrencia, Placa } from './pecas'
 import { modeloVeiculo } from './PecasAtendimento'
-import { BotaoM, EsqueletoM, FolhaM, NumeroM, RotuloM, SecaoM, SeloM, TelaM } from './ui'
+import { BotaoM, EsqueletoM, FolhaM, RotuloM, SecaoM, SeloM, TelaM } from './ui'
 
 /**
  * Início do mecânico — extremamente operacional.
@@ -73,17 +72,17 @@ export function PainelMecanico() {
     <>
       <header className="mx-auto flex max-w-xl flex-col gap-3 px-4 pt-[calc(env(safe-area-inset-top)+0.85rem)]">
         <div className="flex items-center justify-between gap-3">
-          <LogoSOS altura={54} className="dark:hidden" />
-          <LogoSOS negativo altura={54} className="hidden dark:block" />
+          <LogoSOS altura={38} className="dark:hidden" />
+          <LogoSOS negativo altura={38} className="hidden dark:block" />
           <Link to="/perfil" aria-label="Seu perfil" className="rounded-full ring-2 ring-line active:scale-95">
             <Avatar nome={perfil.nome} url={perfil.avatar_url} tamanho="sm" />
           </Link>
         </div>
         <div>
-          <p className="text-[13px] font-semibold text-ink-3 first-letter:uppercase">
+          <p className="text-[13px] font-medium text-ink-3 first-letter:uppercase">
             {new Date(agora).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
           </p>
-          <h1 className="font-display text-[24px] leading-[1.08] font-bold tracking-normal text-ink">Olá, {nome}</h1>
+          <h1 className="font-display text-[30px] leading-[1.05] font-semibold tracking-tight text-ink">Olá, {nome}</h1>
         </div>
       </header>
 
@@ -95,28 +94,34 @@ export function PainelMecanico() {
             {/* Ações de campo feitas sem sinal, esperando para sair. */}
             <FaixaFila />
 
-            <ControleStatus
-              situacao={situacao}
-              carregando={carregando}
-              aceitaSos={aceitaSos}
-              chamadoId={chamadoAtual?.id ?? null}
-              mudando={definir.isPending}
-              online={online}
-              aoFicarDisponivel={ficarDisponivel}
-              aoFicarIndisponivel={() => definir.mutate({ situacao: 'indisponivel' })}
-            />
-            {!chamadoAtual && (
-              <button type="button" onClick={abrirSituacao} className="-mt-2 self-end px-2 py-1.5 text-[13px] font-semibold text-ink-3 underline-offset-4 active:underline">
-                Pausa e outras opções
-              </button>
-            )}
-
-            <NumerosDoDia h={h} emAndamento={chamadoAtual ? 1 : 0} />
+            {/* Um cartão só para o dia: o interruptor em cima, os números embaixo.
+                Cinco caixas soltas eram o que dava cara de painel de sistema. */}
+            <section className="overflow-hidden rounded-[1.5rem] border border-line bg-surface mec-sombra">
+              <ControleStatus
+                situacao={situacao}
+                carregando={carregando}
+                aceitaSos={aceitaSos}
+                chamadoId={chamadoAtual?.id ?? null}
+                mudando={definir.isPending}
+                online={online}
+                aoFicarDisponivel={ficarDisponivel}
+                aoFicarIndisponivel={() => definir.mutate({ situacao: 'indisponivel' })}
+              />
+              <NumerosDoDia h={h} emAndamento={chamadoAtual ? 1 : 0} />
+              {!chamadoAtual && (
+                <button
+                  type="button"
+                  onClick={abrirSituacao}
+                  className="flex min-h-11 w-full items-center justify-between border-t border-line px-4 text-[13.5px] font-medium text-ink-2 active:bg-surface-2"
+                >
+                  Pausa e outras opções
+                  <ChevronRight className="size-4 text-ink-3" />
+                </button>
+              )}
+            </section>
 
             {/* Além de aceitar da fila, o mecânico abre o próprio chamado. */}
             <AbrirChamado atual={chamadoAtual} />
-
-            <BannerCampo />
 
             {chamadoAtual && <CartaoChamadoAtual chamado={chamadoAtual} />}
 
@@ -148,17 +153,6 @@ export function PainelMecanico() {
   )
 }
 
-function BannerCampo() {
-  return (
-    <section className="mec-hero-foto flex items-end p-3.5">
-      <div className="max-w-[15rem]">
-        <p className="text-[10.5px] font-black tracking-[0.16em] text-white/68 uppercase">Tecnoar em campo</p>
-        <p className="mt-1 font-display text-[18px] leading-[1.04] font-bold tracking-normal text-white">Rota, OS e peças em um fluxo único.</p>
-      </div>
-    </section>
-  )
-}
-
 /* ── status: o controle grande ──────────────────────────────────────────── */
 
 function ControleStatus({
@@ -181,7 +175,7 @@ function ControleStatus({
   aoFicarIndisponivel: () => void
 }) {
   const navegar = useNavigate()
-  if (carregando) return <EsqueletoM className="h-[4.5rem] rounded-[1.25rem]" />
+  if (carregando) return <EsqueletoM className="m-4 h-12 rounded-2xl" />
 
   // Em atendimento: o status é do chamado, não da mão do mecânico.
   if (chamadoId || situacao === 'em_atendimento') {
@@ -189,15 +183,14 @@ function ControleStatus({
       <button
         type="button"
         onClick={() => chamadoId && navegar(`/chamado/${chamadoId}`)}
-        className="flex min-h-[3.55rem] w-fit max-w-full items-center gap-3 rounded-2xl border border-cyan/24 bg-cyan-soft px-3.5 py-2.5 text-left active:scale-[0.99]"
+        className="flex min-h-[4.25rem] w-full items-center gap-3 bg-cyan-soft/60 px-4 py-3 text-left active:bg-cyan-soft"
       >
         <span className="relative flex size-3 shrink-0" aria-hidden>
           <span className="mec-pulso absolute inset-0 rounded-full bg-cyan" />
           <span className="relative size-3 rounded-full bg-cyan" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-display text-[10.5px] font-extrabold tracking-[0.14em] text-cyan-ink uppercase">Status</span>
-          <span className="block font-display text-[16px] leading-tight font-bold text-ink">Em atendimento</span>
+          <span className="block font-display text-[17px] leading-tight font-semibold text-ink">Em atendimento</span>
           <span className="block truncate text-[12.5px] text-ink-2">Chamado ativo em campo</span>
         </span>
       </button>
@@ -207,7 +200,7 @@ function ControleStatus({
   const disponivel = situacao === 'disponivel'
   const recebendo = disponivel && aceitaSos
   const pausa = situacao === 'pausa'
-  const titulo = disponivel ? 'DISPONÍVEL' : pausa ? 'EM PAUSA' : 'INDISPONÍVEL'
+  const titulo = disponivel ? 'Disponível' : pausa ? 'Em pausa' : 'Indisponível'
   let sub: string
   if (!online) sub = 'Sem internet'
   else if (disponivel && !aceitaSos) sub = 'SOS desligado'
@@ -228,45 +221,29 @@ function ControleStatus({
       aria-label={`Status: ${titulo}. Tocar para ${recebendo ? 'ficar indisponível' : 'ficar disponível'}`}
       onClick={alternar}
       disabled={mudando || !online}
-      className={cn(
-        'flex min-h-[3.65rem] w-fit max-w-full items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left shadow-[0_1px_2px_rgb(8_24_48/0.05)] transition-colors active:scale-[0.99] disabled:cursor-not-allowed',
-        recebendo
-          ? 'border border-[#00afef]/34 bg-[#002061] text-white mec-sombra-verde'
-          : disponivel || pausa
-            ? 'border border-warn/32 bg-warn-soft'
-            : 'border border-crit/32 bg-crit-soft',
-      )}
+      className="flex min-h-[4.5rem] w-full items-center gap-3.5 px-4 py-3.5 text-left transition-colors active:bg-surface-2 disabled:cursor-not-allowed"
     >
+      <span className="relative flex size-2.5 shrink-0" aria-hidden>
+        {recebendo && <span className="mec-pulso absolute inset-0 rounded-full bg-[#00afef]" />}
+        <span className={cn('relative size-2.5 rounded-full', recebendo ? 'bg-[#00afef]' : disponivel || pausa ? 'bg-warn' : 'bg-ink-3')} />
+      </span>
       <span className="min-w-0 flex-1">
-        <span className={cn('flex items-center gap-2 font-display text-[10.5px] font-extrabold tracking-[0.14em] uppercase', recebendo ? 'text-white/82' : 'text-ink-3')}>
-          <span className="relative flex size-2" aria-hidden>
-            {recebendo && <span className="mec-pulso absolute inset-0 rounded-full bg-[#00afef]" />}
-            <span className={cn('relative size-2 rounded-full', recebendo ? 'bg-[#00afef]' : disponivel || pausa ? 'bg-warn' : 'bg-crit')} />
-          </span>
-          Status
-        </span>
-        <span
-          className={cn(
-            'mt-0.5 block font-display text-[16px] leading-[1.05] font-bold tracking-normal',
-            recebendo ? 'text-white' : disponivel || pausa ? 'text-warn-ink' : 'text-crit-ink',
-          )}
-        >
-          {titulo}
-        </span>
-        <span className={cn('mt-0.5 block truncate text-[12px] leading-snug font-medium', recebendo ? 'text-white/78' : 'text-ink-2')}>{sub}</span>
+        <span className="block font-display text-[18px] leading-tight font-semibold tracking-tight text-ink">{titulo}</span>
+        <span className="mt-0.5 block truncate text-[13px] leading-snug text-ink-3">{sub}</span>
       </span>
 
+      {/* Interruptor no desenho do sistema: trilho fino, botão branco. */}
       <span
         aria-hidden
-        className={cn('relative h-8 w-14 shrink-0 rounded-full transition-colors', recebendo ? 'bg-white/24' : 'bg-line-strong')}
+        className={cn('relative h-[1.9rem] w-[3.15rem] shrink-0 rounded-full transition-colors duration-200', recebendo ? 'bg-[#00afef]' : 'bg-line-strong')}
       >
         <span
           className={cn(
-            'absolute top-1 flex size-6 items-center justify-center rounded-full bg-white shadow transition-all',
-            recebendo ? 'left-[calc(100%-1.75rem)] text-[#002061]' : 'left-1 text-ink-3',
+            'absolute top-[3px] flex size-6 items-center justify-center rounded-full bg-white shadow-[0_1px_3px_rgb(8_24_48/0.25)] transition-all duration-200',
+            recebendo ? 'left-[calc(100%-1.65rem)]' : 'left-[3px]',
           )}
         >
-          {mudando ? <Loader2 className="size-4 animate-spin" /> : <Power className="size-4" strokeWidth={2.5} />}
+          {mudando && <Loader2 className="size-3.5 animate-spin text-ink-3" />}
         </span>
       </span>
     </button>
@@ -278,16 +255,27 @@ function ControleStatus({
 function NumerosDoDia({ h, emAndamento }: { h: HomeMecanico | undefined; emAndamento: number }) {
   const nota = h?.hoje.nota_media
   return (
-    <div className="grid grid-cols-2 gap-2 min-[360px]:grid-cols-4">
-      <NumeroM rotulo="Chamados hoje" valor={h ? h.hoje.atendimentos : '–'} />
-      <NumeroM rotulo="Em andamento" valor={h ? emAndamento : '–'} tom={emAndamento ? 'ciano' : 'neutro'} />
-      <NumeroM rotulo="Finalizados hoje" valor={h ? h.hoje.concluidos : '–'} tom="ok" />
-      <NumeroM
+    <dl className="grid grid-cols-4 divide-x divide-line border-t border-line">
+      <Estatistica rotulo="Hoje" valor={h ? h.hoje.atendimentos : '–'} />
+      <Estatistica rotulo="Em curso" valor={h ? emAndamento : '–'} destaque={!!emAndamento} />
+      <Estatistica rotulo="Finalizados" valor={h ? h.hoje.concluidos : '–'} />
+      <Estatistica
         rotulo="Avaliação"
         valor={nota != null ? Number(nota).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '–'}
-        icone={nota != null ? Star : undefined}
-        tom="ambar"
+        icone={nota != null}
       />
+    </dl>
+  )
+}
+
+function Estatistica({ rotulo, valor, destaque, icone }: { rotulo: string; valor: ReactNode; destaque?: boolean; icone?: boolean }) {
+  return (
+    <div className="flex min-w-0 flex-col items-center gap-0.5 px-1 py-3">
+      <dd className={cn('num flex items-center gap-1 text-[21px] leading-none font-semibold', destaque ? 'text-cyan-ink' : 'text-ink')}>
+        {valor}
+        {icone && <Star className="size-3.5 fill-[#ff9a3d] text-[#ff9a3d]" />}
+      </dd>
+      <dt className="truncate text-[11.5px] text-ink-3">{rotulo}</dt>
     </div>
   )
 }
@@ -423,32 +411,31 @@ function CartaoFila({ chamado: c, agora, aoAbrir }: { chamado: HomeMecanico['agu
 
 function Atalhos() {
   const itens: Array<{ rotulo: string; icone: LucideIcon; para: string }> = [
-    { rotulo: 'Chamados', icone: ClipboardList, para: '/chamados' },
+    { rotulo: 'Histórico de chamados', icone: ClipboardList, para: '/chamados' },
     // Todas as OS do mecânico; a do chamado atual está no próprio atendimento.
-    { rotulo: 'OS', icone: FileText, para: '/os' },
-    { rotulo: 'Produtos', icone: Package, para: '/catalogo/produtos' },
+    { rotulo: 'Ordens de serviço', icone: FileText, para: '/os' },
+    { rotulo: 'Produtos e estoque', icone: Package, para: '/catalogo/produtos' },
     { rotulo: 'Serviços', icone: Wrench, para: '/catalogo/servicos' },
     { rotulo: 'Tecno IA', icone: Brain, para: '/tecno-ia' },
   ]
   return (
     <SecaoM titulo="Atalhos">
-      {/* Celular: 3 + 2 (os dois de baixo mais largos); a partir de 400 px, 5 lado a lado. */}
-      <nav aria-label="Atalhos" className="grid grid-cols-6 gap-2 min-[400px]:grid-cols-5">
-        {itens.map((i, n) => {
+      <nav aria-label="Atalhos" className="overflow-hidden rounded-[1.5rem] border border-line bg-surface mec-sombra">
+        {itens.map((i) => {
           const Icone = i.icone
           return (
             <Link
               key={i.rotulo}
               to={i.para}
-              className={cn(
-                'flex min-h-[5.25rem] min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border border-line bg-surface px-1 text-center mec-sombra active:bg-surface-2 min-[400px]:col-span-1',
-                n < 3 ? 'col-span-2' : 'col-span-3',
-              )}
+              className="group flex min-h-[3.4rem] items-center gap-3.5 px-4 active:bg-surface-2 [&:not(:last-child)>span:last-child]:border-b [&:not(:last-child)>span:last-child]:border-line"
             >
-              <span className="flex size-10 items-center justify-center rounded-xl bg-accent-soft text-accent-ink">
-                <Icone className="size-5" strokeWidth={2.3} />
+              <span className="flex size-8 shrink-0 items-center justify-center rounded-[0.7rem] bg-accent-soft text-accent-ink">
+                <Icone className="size-[18px]" />
               </span>
-              <span className="w-full truncate text-[12.5px] leading-tight font-bold text-ink min-[400px]:text-[11.5px]">{i.rotulo}</span>
+              <span className="flex min-h-[3.4rem] min-w-0 flex-1 items-center justify-between gap-2">
+                <span className="truncate text-[15.5px] font-medium text-ink">{i.rotulo}</span>
+                <ChevronRight className="size-4 shrink-0 text-ink-3" />
+              </span>
             </Link>
           )
         })}
@@ -475,10 +462,12 @@ function AvisoNotificacoes({ usuarioId }: { usuarioId: string | null }) {
   }
 
   return (
-    <section className="flex items-center gap-3 rounded-[1.25rem] border border-warn/40 bg-warn-soft p-3.5">
-      <BellRing className="size-6 shrink-0 text-warn-ink" />
+    <section className="flex items-center gap-3 rounded-[1.5rem] border border-line bg-surface p-3.5 mec-sombra">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-warn-soft text-warn-ink">
+        <BellRing className="size-5" />
+      </span>
       <div className="min-w-0 flex-1">
-        <p className="font-display text-[15px] leading-tight font-bold text-ink">
+        <p className="font-display text-[15px] leading-tight font-semibold text-ink">
           {permissao === 'denied' ? 'Notificações bloqueadas' : 'Receba SOS com o app fechado'}
         </p>
         <p className="text-[13px] leading-snug text-ink-2">
