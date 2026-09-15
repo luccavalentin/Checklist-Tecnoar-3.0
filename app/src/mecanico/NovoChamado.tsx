@@ -177,8 +177,8 @@ function useGpsPreciso() {
     setRefinando(true)
     setErro(null)
     const r = posicaoPrecisa({
-      alvoM: 8,
-      aceitavelM: 15,
+      alvoM: 5,
+      aceitavelM: 10,
       bomBastanteMs: 15_000,
       tempoMaxMs: 45_000,
       aoMelhorar: (l) => {
