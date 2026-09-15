@@ -80,34 +80,36 @@ export function Entrar({ perfil = 'cliente' }: { perfil?: 'cliente' | 'mecanico'
           : 'Assistência automotiva com resposta rápida e acompanhamento em tempo real.'
       }
       topo={
-        !mecanico && telefone ? (
-          <a href={telefone} aria-label="Emergência 24 horas: ligar para a Tecnoar sem cadastro" className="sos-emergencia">
-            <span className="sos-emergencia-orb">
-              <IconeSirene className="size-9" />
-            </span>
-            <span className="flex flex-col text-left leading-tight">
-              <span className="text-[11px] font-semibold tracking-[0.16em] text-white/75 uppercase">Emergência 24h</span>
-              <span className="font-display text-[17px] font-semibold text-white">Ligar agora</span>
-            </span>
-          </a>
+        !mecanico && (telefone || whatsapp) ? (
+          <div className="flex max-w-full items-center justify-center gap-3">
+            {telefone && (
+              <a href={telefone} aria-label="Emergência 24 horas: ligar para a Tecnoar sem cadastro" className="sos-emergencia min-w-0">
+                <span className="sos-emergencia-orb">
+                  <IconeSirene className="size-9" />
+                </span>
+                <span className="flex min-w-0 flex-col text-left leading-tight">
+                  <span className="truncate text-[11px] font-semibold tracking-[0.12em] text-white/75 uppercase">Emergência 24h</span>
+                  <span className="truncate font-display text-[17px] font-semibold text-white">Ligar agora</span>
+                </span>
+              </a>
+            )}
+            {whatsapp && (
+              <a
+                href={whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Falar com a Tecnoar no WhatsApp"
+                title="WhatsApp"
+                className="flex size-[4.4rem] shrink-0 items-center justify-center rounded-full border border-white/18 bg-[#25D366] text-white shadow-[0_16px_34px_-18px_rgb(37_211_102/0.95)] transition-transform active:scale-95"
+              >
+                <IconeWhatsApp className="size-9" />
+              </a>
+            )}
+          </div>
         ) : undefined
       }
       rodape={
         <>
-          {!mecanico && whatsapp && (
-            <a
-              href={whatsapp}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Falar com a Tecnoar no WhatsApp"
-              className="mx-auto flex min-h-12 w-fit items-center gap-2.5 rounded-full bg-[#25D366] py-2 pr-5 pl-2.5 text-[14.5px] font-semibold text-white shadow-[0_12px_26px_-16px_rgb(37_211_102/0.9)] transition-transform active:scale-95"
-            >
-              <span className="flex size-8 items-center justify-center rounded-full bg-white/20">
-                <IconeWhatsApp className="size-5" />
-              </span>
-              Falar no WhatsApp
-            </a>
-          )}
           <Link
             to={mecanico ? '/entrar' : '/mecanico/entrar'}
             replace
@@ -119,7 +121,7 @@ export function Entrar({ perfil = 'cliente' }: { perfil?: 'cliente' | 'mecanico'
         </>
       }
     >
-      <form onSubmit={(e) => void entrar(e)} className="flex flex-col gap-4">
+      <form onSubmit={(e) => void entrar(e)} className="flex flex-col gap-3">
         <CampoApp
           rotulo="E-mail"
           type="email"
@@ -154,8 +156,8 @@ export function Entrar({ perfil = 'cliente' }: { perfil?: 'cliente' | 'mecanico'
         >
           {mecanico ? 'Entrar no app do mecânico' : 'Entrar'}
         </BotaoApp>
-        <div className="flex items-center justify-between text-[14.5px]">
-          <Link to="/esqueci-senha" className="inline-flex min-h-11 items-center font-semibold text-ink-2">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 text-[14.5px]">
+          <Link to="/esqueci-senha" className="inline-flex min-h-11 shrink-0 items-center font-semibold text-ink-2">
             Esqueci a senha
           </Link>
           {mecanico ? (
