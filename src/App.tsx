@@ -9,9 +9,6 @@ import { CabecalhoPagina } from '@/componentes/ui/Painel'
 
 /* Carregamento sob demanda: cada tela entra no pacote só quando é aberta. */
 const Login = lazy(() => import('@/paginas/auth/Login').then((m) => ({ default: m.Login })))
-const SolicitarAcesso = lazy(() =>
-  import('@/paginas/auth/SolicitarAcesso').then((m) => ({ default: m.SolicitarAcesso })),
-)
 const EsqueciSenha = lazy(() => import('@/paginas/auth/EsqueciSenha').then((m) => ({ default: m.EsqueciSenha })))
 const NovaSenha = lazy(() => import('@/paginas/auth/NovaSenha').then((m) => ({ default: m.NovaSenha })))
 const AcessoPendente = lazy(() =>
@@ -171,7 +168,10 @@ export function App() {
         }
       >
         <Route path="/entrar" element={<Login />} />
-        <Route path="/solicitar-acesso" element={<SolicitarAcesso />} />
+        {/* Contas do Checklist são criadas pelo administrador, em Usuários. O
+            autocadastro saiu da tela de entrada; link antigo cai no login em
+            vez de abrir um formulário que ninguém mais deveria usar. */}
+        <Route path="/solicitar-acesso" element={<Navigate to="/entrar" replace />} />
         <Route path="/esqueci-a-senha" element={<EsqueciSenha />} />
         <Route path="/nova-senha" element={<NovaSenha />} />
         <Route path="/politica-de-privacidade" element={<PoliticaPrivacidade />} />
