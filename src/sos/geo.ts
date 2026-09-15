@@ -54,16 +54,41 @@ function leitura(p: GeolocationPosition): LeituraGPS {
   }
 }
 
-/** Uma leitura só, com alta precisão (pedido de SOS, "cheguei"). */
+/**
+ * Última leitura BOA (±50 m ou melhor) vinda de qualquer uso do GPS no app —
+ * o rastreio, o mapa do SOS, o "cheguei". Um pedido rápido de posição usa
+ * esta se for recente, em vez de aceitar a primeira leitura de antena.
+ */
+let ultimaBoa: LeituraGPS | null = null
+
+function guardarSeBoa(l: LeituraGPS) {
+  if (l.precisao != null && l.precisao <= 50) ultimaBoa = { ...l, em: Date.now() }
+}
+
+/** Leitura em cache, de antes do pedido. Relógio do GPS muito fora do aparelho não conta. */
+function leituraAntiga(l: LeituraGPS, inicio: number): boolean {
+  return Math.abs(Date.now() - l.em) < 86_400_000 && l.em < inicio - 1500
+}
+
+/**
+ * Posição para uma ação rápida (ficar disponível, aceitar, "cheguei").
+ * Antes aceitava a primeira resposta do celular — quase sempre de antena ou
+ * Wi-Fi, errando centenas de metros. Agora: leitura boa recente se houver;
+ * senão o GPS fica ligado até `timeoutMs` e devolve a MELHOR leitura
+ * (sai antes ao chegar a ±20 m, ou com ±50 m depois de alguns segundos).
+ */
 export function posicaoAtual(opcoes: { timeoutMs?: number; maxIdadeMs?: number } = {}): Promise<LeituraGPS> {
-  return new Promise((resolve, reject) => {
-    if (!('geolocation' in navigator)) return reject('sem_suporte' satisfies ErroGPS)
-    navigator.geolocation.getCurrentPosition(
-      (p) => resolve(leitura(p)),
-      (e) => reject(converterErro(e)),
-      { enableHighAccuracy: true, timeout: opcoes.timeoutMs ?? 15000, maximumAge: opcoes.maxIdadeMs ?? 0 },
-    )
-  })
+  const tempoMax = opcoes.timeoutMs ?? 15000
+  const maxIdade = opcoes.maxIdadeMs ?? 0
+  if (ultimaBoa && maxIdade > 0 && Date.now() - ultimaBoa.em <= maxIdade && (ultimaBoa.precisao ?? Infinity) <= 30) {
+    return Promise.resolve(ultimaBoa)
+  }
+  return posicaoPrecisa({
+    alvoM: 20,
+    aceitavelM: 50,
+    bomBastanteMs: Math.min(3500, tempoMax / 2),
+    tempoMaxMs: tempoMax,
+  }).promessa
 }
 
 /**
@@ -112,7 +137,8 @@ export function posicaoPrecisa(
       (p) => {
         const l = leitura(p)
         // Leitura em cache de antes do pedido: pode ser de outro lugar.
-        if (l.em < inicio - 1500) return
+        if (leituraAntiga(l, inicio)) return
+        guardarSeBoa(l)
         if (melhor && (l.precisao ?? Infinity) >= (melhor.precisao ?? Infinity)) return
         melhor = l
         opcoes.aoMelhorar?.(l)
@@ -157,15 +183,23 @@ export function acompanharPosicao(
     (p) => {
       const l = leitura(p)
       const agora = Date.now()
+      guardarSeBoa(l)
       if (ultima) {
         const tempo = agora - ultima.em
         const metros = distanciaKm(ultima, l) * 1000
+        const pUltima = ultima.precisao ?? Infinity
+        const pNova = l.precisao ?? Infinity
         // Leitura de antena depois de uma de GPS: o ponto "pula" centenas de
         // metros sem o carro sair do lugar. Só aceita se a boa já envelheceu.
-        const pior = l.precisao != null && l.precisao > 60 && ultima.precisao != null && l.precisao > ultima.precisao * 2
-        if (pior && tempo < 60_000) return
-        if (tempo < minIntervalo) return
-        if (metros < minMetros && tempo < maxIntervalo) return
+        const pior = pNova > 60 && pNova > pUltima * 2
+        if (pior && tempo < 120_000) return
+        // O GPS "firmou" (a primeira foi de antena): manda já, sem esperar.
+        const firmou = pUltima > 30 && pNova <= pUltima / 2
+        if (!firmou) {
+          if (tempo < minIntervalo) return
+          // Deslocamento menor que o erro da leitura é ruído, não movimento.
+          if (metros < Math.max(minMetros, Math.min(pNova, 100)) && tempo < maxIntervalo) return
+        }
       }
       ultima = { ...l, em: agora }
       aoMudar(l)
