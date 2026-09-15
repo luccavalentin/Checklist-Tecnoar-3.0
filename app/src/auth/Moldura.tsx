@@ -42,6 +42,7 @@ export function MolduraAcesso({
   subtitulo,
   children,
   rodape,
+  topo,
   selo = 'SOS Tecnoar',
   mecanico = false,
 }: {
@@ -49,6 +50,8 @@ export function MolduraAcesso({
   subtitulo?: ReactNode
   children: ReactNode
   rodape?: ReactNode
+  /** Ação de destaque acima do formulário (o SOS na entrada do cliente). */
+  topo?: ReactNode
   selo?: ReactNode
   mecanico?: boolean
 }) {
@@ -69,6 +72,8 @@ export function MolduraAcesso({
             {mecanico ? 'Área do mecânico' : 'Você sempre em movimento'}
           </p>
         </div>
+
+        {topo && <div className="-mt-2 mb-6 flex justify-center">{topo}</div>}
 
         <section className="sos-access-card rounded-[1.55rem] p-5">
           <div className="flex flex-col gap-1.5">
