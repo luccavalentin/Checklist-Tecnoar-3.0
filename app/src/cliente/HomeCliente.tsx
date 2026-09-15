@@ -36,9 +36,17 @@ export function HomeCliente() {
   return (
     <>
       <header className="cli-home-top z-30 pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))]">
-        <div className="mx-auto flex h-16 max-w-xl items-center justify-between gap-3 px-4 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]">
-          <LogoSOS negativo altura={40} />
-          <div className="flex items-center gap-1">
+        {/* Uma linha só: marca, pessoa no centro, ações. O nome no meio da
+            barra identifica sem gastar uma faixa inteira da tela. */}
+        <div className="mx-auto grid h-[4.25rem] max-w-xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]">
+          <div className="justify-self-start">
+            <LogoSOS negativo altura={34} />
+          </div>
+          <div className="flex min-w-0 max-w-[11rem] flex-col items-center text-center">
+            <span className="text-[11px] leading-tight font-medium tracking-[0.04em] text-white/55">{saudacao()}</span>
+            <h1 className="w-full truncate font-display text-[18px] leading-tight font-semibold tracking-tight text-white">{nome || 'Bem-vindo'}</h1>
+          </div>
+          <div className="flex items-center gap-0.5 justify-self-end">
             <button
               type="button"
               onClick={() => navegar('/notificacoes')}
@@ -57,13 +65,9 @@ export function HomeCliente() {
             </button>
           </div>
         </div>
-        <div className="mx-auto flex max-w-xl flex-col gap-0.5 px-4 pt-2 pb-8 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]">
-          <p className="text-[14px] text-white/60">{saudacao()}</p>
-          <h1 className="font-display text-[30px] leading-[1.05] font-semibold tracking-tight text-white">{nome || 'Bem-vindo'}</h1>
-        </div>
       </header>
 
-      <main className="entrada-suave mx-auto -mt-3 flex w-full max-w-xl flex-col gap-5 px-4 pr-[max(1rem,env(safe-area-inset-right))] pb-[calc(6.5rem+env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
+      <main className="entrada-suave mx-auto mt-4 flex w-full max-w-xl flex-col gap-5 px-4 pr-[max(1rem,env(safe-area-inset-right))] pb-[calc(6.5rem+env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
         {home.isError && <ErroCarga erro={home.error} aoTentar={() => void home.refetch()} />}
         {semVinculo(d) && <Faixa tom="info">Seu pedido de socorro já funciona. O histórico da Tecnoar aparece assim que a conta for ligada ao seu cadastro.</Faixa>}
 

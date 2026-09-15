@@ -438,26 +438,23 @@ body {
     position: relative;
     overflow: hidden;
     color: #fff;
-    background:
-      linear-gradient(135deg, rgb(13 28 51 / 0.98) 0%, rgb(0 32 97 / 0.98) 100%);
-    border-bottom: 1px solid rgb(0 175 239 / 0.18);
-    border-bottom-right-radius: 1.55rem;
-    border-bottom-left-radius: 1.55rem;
-    box-shadow: 0 20px 42px -32px rgb(0 32 97 / 0.82);
+    background: linear-gradient(180deg, #0d1c33 0%, #0f2448 100%);
+    border-bottom-right-radius: 1.1rem;
+    border-bottom-left-radius: 1.1rem;
+    box-shadow: 0 14px 30px -24px rgb(8 24 48 / 0.7);
   }
 
+  /* Fio de marca na base: laranja no centro, some nas pontas. */
   .cli-home-top::after {
     content: '';
     position: absolute;
-    right: -3rem;
-    bottom: -1rem;
-    width: 12rem;
-    height: 1.5px;
+    left: 28%;
+    right: 28%;
+    bottom: 0;
+    height: 2px;
     pointer-events: none;
-    background: #00afef;
-    transform: rotate(-34deg);
-    box-shadow: 0 0.9rem 0 #ff6600;
-    opacity: 0.55;
+    background: linear-gradient(90deg, transparent, #ff6600 50%, transparent);
+    opacity: 0.7;
   }
 
   .cli-home-top > * {
