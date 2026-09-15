@@ -10,6 +10,7 @@ import { linkTelefone } from '@/sos/rotulos'
 import type { DetalheChamado, ItemCatalogo, ItemSOS } from '@/sos/tipos'
 import { useInfoCentral, useOnline } from './dados'
 import { CHAVES_OS, invalidarDepoisDeLancar } from './os/dados'
+import { FichaProduto } from './FichaProduto'
 import { BotaoM, EsqueletoM, RotuloM, SeloM } from './ui'
 
 export type TipoCatalogo = 'produto' | 'servico'
@@ -43,6 +44,7 @@ export function Catalogo({
   podeAdicionar,
   aoEscolher,
   lancados,
+  toqueLanca = false,
   avisoConsulta = 'Consulta de preço e estoque. Para lançar, abra o atendimento quando estiver no local.',
 }: {
   tipo: TipoCatalogo
@@ -51,6 +53,8 @@ export function Catalogo({
   aoEscolher?: (item: ItemCatalogo) => void
   /** Quantidade já lançada no destino, por id do cadastro (selo "Na OS · 2"). */
   lancados?: Map<string, number>
+  /** Tela de lançar (ex.: adicionar peça na OS): o toque na linha lança; a ficha fica no link. */
+  toqueLanca?: boolean
   /** Texto do modo consulta (sem destino para lançar); vazio esconde. */
   avisoConsulta?: string
 }) {
@@ -62,6 +66,7 @@ export function Catalogo({
   const [busca, setBusca] = useState('')
   const [termo, setTermo] = useState('')
   const [emVoo, setEmVoo] = useState<string | null>(null)
+  const [ficha, setFicha] = useState<ItemCatalogo | null>(null)
   const campo = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -248,6 +253,8 @@ export function Catalogo({
                   aoEscolher={aoEscolher && online ? () => aoEscolher(i) : undefined}
                   aoAdicionar={() => adicionar.mutate(i)}
                   aoAlterar={(item, q) => (q <= 0 ? remover.mutate(item.id) : alterar.mutate({ id: item.id, quantidade: q }))}
+                  aoVerFicha={i.tipo === 'produto' ? () => setFicha(i) : undefined}
+                  toqueLanca={toqueLanca}
                 />
               ))}
             </ul>
@@ -283,6 +290,26 @@ export function Catalogo({
           </ul>
         </section>
       )}
+
+      <FichaProduto
+        produtoId={ficha?.id ?? null}
+        aoFechar={() => setFicha(null)}
+        acao={
+          aoEscolher && online && ficha ? (
+            <BotaoM
+              largo
+              icone={Plus}
+              onClick={() => {
+                const item = ficha
+                setFicha(null)
+                aoEscolher(item)
+              }}
+            >
+              Lançar este produto
+            </BotaoM>
+          ) : undefined
+        }
+      />
     </div>
   )
 }
@@ -304,6 +331,8 @@ function LinhaCatalogo({
   aoEscolher,
   aoAdicionar,
   aoAlterar,
+  aoVerFicha,
+  toqueLanca,
 }: {
   item: ItemCatalogo
   noAtendimento: ItemSOS | null
@@ -314,6 +343,8 @@ function LinhaCatalogo({
   aoEscolher?: () => void
   aoAdicionar: () => void
   aoAlterar: (item: ItemSOS, quantidade: number) => void
+  aoVerFicha?: () => void
+  toqueLanca?: boolean
 }) {
   const produto = i.tipo === 'produto'
   const disponivel = i.disponivel != null ? Number(i.disponivel) : null
@@ -329,6 +360,18 @@ function LinhaCatalogo({
         <div className="min-w-0 flex-1">
           <p className="line-clamp-2 text-[16px] leading-snug font-bold text-ink">{i.descricao}</p>
           <p className="num mt-0.5 truncate text-[12.5px] text-ink-3">Código: {i.codigo ?? '—'}</p>
+          {aoVerFicha && (editavel || (aoEscolher && toqueLanca)) && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                aoVerFicha()
+              }}
+              className="mt-1 inline-flex min-h-8 items-center gap-1 text-[13px] font-semibold text-cyan-ink"
+            >
+              <Info className="size-3.5" /> Ver ficha do produto
+            </button>
+          )}
           {jaLancado != null && (
             <SeloM tom="ciano" className="mt-1.5">
               Na OS · {quantidadeBR(jaLancado)}
@@ -343,10 +386,18 @@ function LinhaCatalogo({
           {estoqueEm && <p className="num mt-0.5 text-[11.5px] whitespace-nowrap text-ink-3">{estoqueEm}</p>}
         </div>
         {aoEscolher ? (
-          <span aria-hidden className="flex min-h-11 shrink-0 items-center gap-1 rounded-2xl bg-accent px-3.5 font-display text-[14px] font-extrabold tracking-[0.02em] text-white uppercase">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              aoEscolher()
+            }}
+            aria-label={`Lançar ${i.descricao}`}
+            className="flex min-h-11 shrink-0 items-center gap-1 rounded-2xl bg-accent px-3.5 font-display text-[14px] font-extrabold tracking-[0.02em] text-white uppercase active:bg-accent-hover"
+          >
             <Plus className="size-4" strokeWidth={3} />
             Lançar
-          </span>
+          </button>
         ) : (
           editavel &&
           (noAtendimento ? (
@@ -367,17 +418,28 @@ function LinhaCatalogo({
     </>
   )
 
+  // Só consulta: a linha inteira abre a ficha do produto.
+  if (!aoEscolher && !editavel && aoVerFicha)
+    return (
+      <li>
+        <button type="button" onClick={aoVerFicha} aria-label={`Ver ficha de ${i.descricao}`} className="flex w-full flex-col gap-2.5 px-3.5 py-3.5 text-left transition-colors active:bg-surface-2">
+          {corpo}
+        </button>
+      </li>
+    )
   if (aoEscolher)
     return (
       <li>
-        <button
-          type="button"
-          onClick={aoEscolher}
-          aria-label={`Lançar ${i.descricao}`}
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={aoVerFicha && !toqueLanca ? `Ver ficha de ${i.descricao}` : `Lançar ${i.descricao}`}
+          onClick={toqueLanca ? aoEscolher : (aoVerFicha ?? aoEscolher)}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (toqueLanca ? aoEscolher : (aoVerFicha ?? aoEscolher))()}
           className="flex w-full flex-col gap-2.5 px-3.5 py-3.5 text-left transition-colors active:bg-surface-2"
         >
           {corpo}
-        </button>
+        </div>
       </li>
     )
   return <li className="flex flex-col gap-2.5 px-3.5 py-3.5">{corpo}</li>
