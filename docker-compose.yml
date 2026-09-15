@@ -20,6 +20,14 @@ services:
       - "traefik.http.routers.checklist.rule=Host(`checklist.tecnoarsistemas.com.br`)"
       - "traefik.http.routers.checklist.entrypoints=websecure"
       - "traefik.http.routers.checklist.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.checklist.service=checklist"
+      # App SOS Tecnoar: mesmo container, outro domínio (o nginx separa pelo
+      # Host). Roteador próprio = certificado próprio: se o DNS do SOS falhar,
+      # o do Checklist não é afetado.
+      - "traefik.http.routers.sos.rule=Host(`sos.tecnoarsistemas.com.br`)"
+      - "traefik.http.routers.sos.entrypoints=websecure"
+      - "traefik.http.routers.sos.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.sos.service=checklist"
       - "traefik.http.services.checklist.loadbalancer.server.port=8080"
     logging:
       driver: json-file

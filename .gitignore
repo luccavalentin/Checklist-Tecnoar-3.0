@@ -12,3 +12,6 @@ node_modules/.tmp
 # manual do usuario
 scripts/manual/.sessao.json
 docs/manual/*.png
+
+# Capturas e artefatos gerados por scripts de teste/manual
+output/

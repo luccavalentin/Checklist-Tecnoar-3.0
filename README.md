@@ -1,7 +1,9 @@
 # Sistema Operacional Tecnoar
 
 Sistema de gestão da oficina Tecnoar Freios: recepção, ordens de serviço, pátio,
-checklists técnicos e laboratório de peças.
+checklists técnicos e laboratório de peças — e o **SOS Tecnoar** (socorro
+mecânico): central no Checklist (`/sos`) e app PWA de cliente e mecânico em
+`app/`, servido em `sos.tecnoarsistemas.com.br`.
 
 ## Documentação
 
@@ -9,6 +11,8 @@ checklists técnicos e laboratório de peças.
   dados, segurança e RLS, fluxos, integrações, implantação e diagnóstico.
 - **[MANUAL-DO-USUARIO.md](MANUAL-DO-USUARIO.md)** — uso no dia a dia da oficina.
 - **[deploy/README.md](deploy/README.md)** — infraestrutura da VPS.
+- **[docs/AUDITORIA-2026-09-13.md](docs/AUDITORIA-2026-09-13.md)** — escala,
+  manutenção e legibilidade: o que foi corrigido e o que falta, por prioridade.
 
 > **Regra do projeto:** nada de dado fictício. Sem dado real → estado vazio.
 > Erro → estado de erro com nova tentativa. Resultado zero → zero.
@@ -18,13 +22,20 @@ checklists técnicos e laboratório de peças.
 
 ```bash
 npm install
-npm run dev
+npm run dev        # Checklist em http://localhost:5173
+npm run dev:app    # App SOS em http://localhost:5174
 ```
 
-Build de produção e verificação de tipos:
+Build de produção e verificação de tipos (gera `dist/` e `dist/app/`):
 
 ```bash
 npm run build
+```
+
+Testes do banco do SOS (PostgreSQL local em memória, sem tocar a produção):
+
+```bash
+npm run test:sos
 ```
 
 ## Configuração
@@ -69,9 +80,14 @@ src/
   tema/          tema claro/escuro
   tipos/         tipos gerados do banco
 design/          artboards da direção visual e vetores da marca
+  sos/           camada do SOS (API, tipos, mapa, tempo real) usada pelo app e pela central
+app/             App SOS (cliente e mecânico), build próprio (vite.app.config.ts)
 supabase/
-  functions/     código das Edge Functions (omie, omie-envio) e o
-                 dicionário de campos Tecnoar ↔ Omie
+  functions/          código de todas as Edge Functions publicadas e o
+                      dicionário de campos Tecnoar ↔ Omie
+  migrations/         migrações (a partir de 02/09) — mudança nova entra aqui
+  historico-producao/ cópia de tudo que já rodou em produção (recria o banco)
+scripts/testes-sos/   testes do banco do SOS
 ```
 
 ### Adicionando um módulo
@@ -109,7 +125,10 @@ impede o erro clássico de gravar preço de venda numa coluna chamada custo.
 
 ### Banco de dados
 
-Migrações aplicadas via Supabase. Após qualquer mudança de schema, regerar
+Toda mudança de schema é uma **migração nova** em `supabase/migrations/`
+(nunca reaplicar um arquivo antigo: funções redefinidas depois voltariam à
+versão velha). O que já rodou em produção está em
+`supabase/historico-producao/`. Após mudar o schema, regerar
 `src/tipos/supabase.ts` a partir dos tipos do projeto.
 
 Tabelas da fundação: `usuarios`, `perfis_acesso`, `notificacoes`,

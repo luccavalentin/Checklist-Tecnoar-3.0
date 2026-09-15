@@ -330,13 +330,35 @@ export async function abrirPdf(definicao: TDocumentDefinitions): Promise<void> {
   pdfMake.createPdf(definicao).open()
 }
 
+/**
+ * O arquivo em memória — para compartilhar pelo celular (WhatsApp, e-mail)
+ * com a folha de compartilhar do sistema, em vez de só baixar.
+ * A 0.3 devolve Promise; a 0.2 usava callback. Aceitamos as duas.
+ */
+export async function gerarPdfBlob(definicao: TDocumentDefinitions): Promise<Blob> {
+  const pdfMake = await carregarMotor()
+  const doc = pdfMake.createPdf(definicao)
+  return new Promise<Blob>((ok, falha) => {
+    try {
+      const r = doc.getBlob((b: Blob) => ok(b))
+      if (r && typeof (r as Promise<Blob>).then === 'function') (r as Promise<Blob>).then(ok, falha)
+    } catch (e) {
+      falha(e)
+    }
+  })
+}
+
 interface MotorPdf {
   vfs?: Record<string, string>
   fonts?: Record<string, Record<string, string>>
   addVirtualFileSystem?: (vfs: Record<string, string>) => void
   addFonts?: (f: Record<string, Record<string, string>>) => void
   setFonts?: (f: Record<string, Record<string, string>>) => void
-  createPdf: (d: TDocumentDefinitions) => { download: (n: string) => void; open: () => void }
+  createPdf: (d: TDocumentDefinitions) => {
+    download: (n: string) => void
+    open: () => void
+    getBlob: (cb?: (b: Blob) => void) => Promise<Blob> | void
+  }
 }
 
 /** Nome de arquivo previsível e ordenável: sem acento, sem espaço. */

@@ -71,10 +71,22 @@ const FollowUp = lazy(() => import('@/paginas/relacionamento/FollowUp').then((m)
 const Estoque = lazy(() => import('@/paginas/comercial/Estoque').then((m) => ({ default: m.Estoque })))
 const Financeiro = lazy(() => import('@/paginas/financeiro/Financeiro').then((m) => ({ default: m.Financeiro })))
 const Garantias = lazy(() => import('@/paginas/operacao/Garantias').then((m) => ({ default: m.Garantias })))
+const CentralSOS = lazy(() => import('@/paginas/sos/CentralSOS').then((m) => ({ default: m.CentralSOS })))
 
 /** Telas já implantadas. O restante do menu resolve para ModuloPendente. */
 const TELAS: Record<string, ComponentType> = {
   '/visao-geral': VisaoGeral,
+  // Cada área do SOS tem endereço próprio (menu e links); a mesma tela
+  // escolhe o que mostrar pelo caminho.
+  '/sos': CentralSOS,
+  '/sos/chamados': CentralSOS,
+  '/sos/mecanicos': CentralSOS,
+  '/sos/clientes': CentralSOS,
+  '/sos/contratos': CentralSOS,
+  '/sos/agendamentos': CentralSOS,
+  '/sos/catalogo': CentralSOS,
+  '/sos/relatorios': CentralSOS,
+  '/sos/configuracoes': CentralSOS,
   '/cadastros/clientes': Clientes,
   '/cadastros/fornecedores': Fornecedores,
   '/cadastros/vendedores': Vendedores,

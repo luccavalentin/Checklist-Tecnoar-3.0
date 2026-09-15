@@ -1,6 +1,24 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
+const ENTIDADES_HTML: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
+
+/**
+ * Texto seguro para HTML montado à mão (relatórios de imprimir/exportar).
+ * Nome de cliente vem até do cadastro público do app SOS: sem isto, um nome
+ * com `<script>` rodaria no navegador de quem exporta, com a sessão dele.
+ */
+export function escaparHtml(v: unknown): string {
+  return String(v ?? '').replace(/[&<>"']/g, (c) => ENTIDADES_HTML[c])
+}
+
+/** Cópia do registro com todos os campos de texto escapados para HTML. */
+export function escaparCampos<T extends object>(registro: T): T {
+  const copia: Record<string, unknown> = { ...(registro as Record<string, unknown>) }
+  for (const [k, v] of Object.entries(copia)) if (typeof v === 'string') copia[k] = escaparHtml(v)
+  return copia as T
+}
+
 export function cn(...entradas: ClassValue[]) {
   return twMerge(clsx(entradas))
 }

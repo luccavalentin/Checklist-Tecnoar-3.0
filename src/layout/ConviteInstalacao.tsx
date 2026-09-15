@@ -28,7 +28,28 @@ import { Modal } from '@/componentes/ui/Sobreposicoes'
  *   menu da conta (`useInstalacao`).
  */
 
-const CHAVE_ADIADO = 'tecnoar.instalacao.adiada'
+/**
+ * O mesmo convite serve ao Checklist e ao app SOS Tecnoar (outro PWA, em
+ * /app/): muda só o nome, o ícone mostrado, onde guardar o "agora não" e o
+ * endereço que o guia manda copiar. O padrão é o do Checklist.
+ */
+interface MarcaInstalacao {
+  nome: string
+  icone: string
+  chaveAdiado: string
+  endereco: () => string
+}
+
+let marca: MarcaInstalacao = {
+  nome: 'Tecnoar',
+  icone: '/apple-touch-icon.png',
+  chaveAdiado: 'tecnoar.instalacao.adiada',
+  endereco: () => window.location.origin,
+}
+
+export function configurarInstalacao(p: Partial<MarcaInstalacao>) {
+  marca = { ...marca, ...p }
+}
 const DIAS_DE_PAUSA = 30
 const LARGURA_DESKTOP = 1024
 
@@ -77,7 +98,7 @@ if (typeof window !== 'undefined') {
 
 function adiadoRecentemente(): boolean {
   try {
-    const quando = localStorage.getItem(CHAVE_ADIADO)
+    const quando = localStorage.getItem(marca.chaveAdiado)
     if (!quando) return false
     const dias = (Date.now() - Number(quando)) / 86_400_000
     return dias < DIAS_DE_PAUSA
@@ -284,7 +305,7 @@ function IconeDoApp({ className = 'size-11' }: { className?: string }) {
   /* O mesmo ícone que vai para a tela do iPhone: mostra o que vai aparecer. */
   return (
     <img
-      src="/apple-touch-icon.png"
+      src={marca.icone}
       alt=""
       className={`${className} shrink-0 rounded-[22%] shadow-e1 ring-1 ring-black/5`}
     />
@@ -313,7 +334,7 @@ export function ConviteInstalacao() {
 
   function dispensar() {
     try {
-      localStorage.setItem(CHAVE_ADIADO, String(Date.now()))
+      localStorage.setItem(marca.chaveAdiado, String(Date.now()))
     } catch {
       /* Sem armazenamento o convite volta na próxima visita. Aceitável. */
     }
@@ -364,7 +385,7 @@ function ConviteAndroid({ aoInstalar, aoDispensar }: { aoInstalar: () => void; a
     <div role="dialog" aria-label="Instalar aplicativo" className={`${CARTAO} flex items-center gap-3 p-3`} style={POSICAO}>
       <IconeDoApp />
       <div className="min-w-0 flex-1">
-        <p className="font-display text-[14px] font-semibold text-ink">Instale o app Tecnoar</p>
+        <p className="font-display text-[14px] font-semibold text-ink">Instale o app {marca.nome}</p>
         <p className="text-[12px] leading-snug text-ink-3">Ícone na tela e abre em tela cheia.</p>
       </div>
       <Botao tamanho="sm" variante="primario" iconeInicio={<Download aria-hidden />} onClick={aoInstalar}>
@@ -447,7 +468,7 @@ function GuiaInstalacaoIOS({ aberto, aoFechar }: { aberto: boolean; aoFechar: ()
   if (!aberto) return null
 
   const cenario = cenarioAtual()
-  const endereco = window.location.origin
+  const endereco = marca.endereco()
 
   async function copiarEndereco() {
     try {

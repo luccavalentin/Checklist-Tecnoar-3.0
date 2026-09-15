@@ -98,6 +98,10 @@ export function Metrica({
 }: MetricaProps) {
   const Elemento = onClick ? 'button' : 'div'
   const grande = tamanho === 'destaque'
+  /* Valor comprido ("R$ 48.250,40") ao lado do rótulo esmaga o rótulo quando a
+     grade tem 3 ou mais colunas. Nesses casos, a partir de `lg`, o número desce
+     para baixo do rótulo; no celular o cartão continua deitado. */
+  const longo = typeof valor === 'string' && valor.length > 8
 
   return (
     <Elemento
@@ -109,6 +113,7 @@ export function Metrica({
            indicadores empilhados na vertical custariam cinco telas de rolagem
            antes do conteúdo. */
         'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1',
+        longo && 'lg:grid-cols-1',
         grande ? 'min-h-[92px]' : 'min-h-[84px]',
         'transition-[border-color,box-shadow,transform] duration-150',
         ativo
@@ -146,6 +151,7 @@ export function Metrica({
         <span
           className={cn(
             'num col-start-2 row-span-2 row-start-1 self-center text-right leading-none font-semibold',
+            longo && 'lg:col-start-1 lg:row-span-1 lg:row-start-auto lg:py-1 lg:text-left',
             grande ? 'text-[27px] sm:text-[32px]' : 'text-[23px] sm:text-[26px]',
             alerta ? NUMERO[tom] : 'text-ink',
           )}

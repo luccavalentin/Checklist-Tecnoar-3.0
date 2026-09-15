@@ -19,9 +19,15 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
  *   antes é desfeita. Sem isso sobraria um login órfão: existe no Auth, não
  *   existe no sistema, e o e-mail fica bloqueado para uma nova tentativa.
  *
- * Senha inicial: é o próprio e-mail da pessoa, por decisão de operação — a
- * oficina entrega a conta pronta sem depender de e-mail chegar. A pessoa troca
- * depois em "Esqueci minha senha" ou no primeiro acesso.
+ * - Quem não é administrador não mexe em administrador: não redefine a senha
+ *   de um admin nem cria conta com perfil de sistema (o "Administrador").
+ *   Sem essa trava, a permissão "usuários: editar" bastava para tomar a
+ *   conta de um admin.
+ *
+ * Senha inicial: aleatória, mostrada uma vez na tela para a gestão entregar
+ * pessoalmente (a oficina continua entregando a conta pronta, sem depender de
+ * e-mail chegar). Antes era o próprio e-mail — quem soubesse o e-mail de um
+ * colega entrava na conta dele. A pessoa troca no primeiro acesso.
  */
 
 const URL_SB = Deno.env.get('SUPABASE_URL')!
@@ -47,12 +53,14 @@ function so(v: unknown): string {
 }
 
 /**
- * O Supabase exige no mínimo 6 caracteres. E-mail curto demais para servir de
- * senha é raro, mas quando acontece a conta simplesmente não seria criada —
- * então completamos até o mínimo em vez de falhar.
+ * Senha temporária aleatória, fácil de ditar: sem letras que se confundem
+ * (0/O, 1/l/I), em três blocos — ex.: `Tec-7kq4-M9wz`.
  */
-function senhaInicial(email: string): string {
-  return email.length >= 6 ? email : `${email}@tecnoar`
+function senhaTemporaria(): string {
+  const alfabeto = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  const bytes = crypto.getRandomValues(new Uint8Array(8))
+  const c = Array.from(bytes, (b) => alfabeto[b % alfabeto.length]).join('')
+  return `Tec-${c.slice(0, 4)}-${c.slice(4)}`
 }
 
 Deno.serve(async (req: Request) => {
@@ -90,6 +98,10 @@ Deno.serve(async (req: Request) => {
 
   const admin = createClient(URL_SB, CHAVE_SERVICO, { auth: { persistSession: false } })
 
+  // Quem chama é administrador? (Só administrador mexe em administrador.)
+  const { data: quemChama } = await admin.from('usuarios').select('is_admin').eq('id', sessao.user.id).maybeSingle()
+  const chamaEhAdmin = quemChama?.is_admin === true
+
   /* ------------------------------------------------------------- criar */
   if (acao === 'criar') {
     const email = so(corpo.email).toLowerCase()
@@ -101,7 +113,14 @@ Deno.serve(async (req: Request) => {
       return resposta({ erro: 'Informe nome e sobrenome.' }, 400)
     }
 
-    const senha = senhaInicial(email)
+    // Perfil de sistema (o "Administrador") só por quem já é administrador.
+    const perfilId = so(corpo.perfil_id)
+    if (perfilId && !chamaEhAdmin) {
+      const { data: perfil } = await admin.from('perfis_acesso').select('is_system').eq('id', perfilId).maybeSingle()
+      if (perfil?.is_system) return resposta({ erro: 'Só um administrador pode criar conta com este perfil.' }, 403)
+    }
+
+    const senha = senhaTemporaria()
 
     const { data: criado, error: erroAuth } = await admin.auth.admin.createUser({
       email,
@@ -173,14 +192,22 @@ Deno.serve(async (req: Request) => {
 
     const { data: alvo, error: erroLer } = await admin
       .from('usuarios')
-      .select('email')
+      .select('email, is_admin, perfil_id')
       .eq('id', usuarioId)
       .maybeSingle()
 
     if (erroLer) return resposta({ erro: erroLer.message }, 400)
     if (!alvo?.email) return resposta({ erro: 'Usuário não encontrado.' }, 404)
+    let perfilDeSistema = false
+    if (alvo.perfil_id) {
+      const { data: perfil } = await admin.from('perfis_acesso').select('is_system').eq('id', alvo.perfil_id).maybeSingle()
+      perfilDeSistema = perfil?.is_system === true
+    }
+    if ((alvo.is_admin || perfilDeSistema) && !chamaEhAdmin) {
+      return resposta({ erro: 'Só um administrador pode redefinir a senha de um administrador.' }, 403)
+    }
 
-    const senha = senhaInicial(String(alvo.email).toLowerCase())
+    const senha = senhaTemporaria()
 
     const { error } = await admin.auth.admin.updateUserById(usuarioId, { password: senha })
     if (error) return resposta({ erro: error.message }, 400)
