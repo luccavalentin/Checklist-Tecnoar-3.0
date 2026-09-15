@@ -276,7 +276,8 @@ body {
   .sos-login-brand {
     display: flex;
     flex: 1 1 auto;
-    min-height: 17rem;
+    min-height: 0;
+    padding-block: 0.5rem 0.9rem;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -286,6 +287,81 @@ body {
 
   .sos-login-brand img {
     filter: drop-shadow(0 18px 30px rgb(0 0 0 / 0.45));
+  }
+
+  /* A tela de entrada cabe na altura do celular, sem rolar: o logo encolhe
+     com a altura disponível e, em tela baixa, o texto de apoio sai. */
+  .sos-login-brand .sos-login-logo {
+    height: clamp(4.25rem, 15dvh, 8.25rem) !important;
+  }
+
+  .sos-login-topo {
+    margin-bottom: 1rem;
+  }
+
+  .sos-login-cartao {
+    padding: 1.15rem 1.15rem 0.6rem;
+  }
+
+  .sos-login-rodape {
+    margin-top: auto;
+    padding-top: 0.9rem;
+  }
+
+  @media (max-height: 800px) {
+    .sos-login-sub {
+      display: none;
+    }
+    .sos-login-lema {
+      margin-top: 0.4rem;
+      font-size: 12px;
+    }
+    .sos-login-topo {
+      margin-bottom: 0.75rem;
+    }
+    .sos-login-form {
+      margin-top: 0.75rem;
+      gap: 0.6rem;
+    }
+    .sos-login-frame {
+      padding-top: calc(0.75rem + env(safe-area-inset-top) + var(--faixa-rede, 0px));
+      padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    }
+  }
+
+  @media (max-height: 690px) {
+    .sos-login-lema {
+      display: none;
+    }
+    .sos-login-brand {
+      padding-block: 0.25rem 0.5rem;
+    }
+    .sos-login-topo {
+      margin-bottom: 0.5rem;
+    }
+    .sos-login-topo .sos-emergencia-orb {
+      width: 3.1rem;
+      height: 3.1rem;
+    }
+    .sos-login-topo a[title='WhatsApp'] {
+      width: 3.9rem;
+      height: 3.9rem;
+    }
+    .sos-login-rodape {
+      padding-top: 0.5rem;
+    }
+    .sos-login-cartao {
+      padding-top: 0.9rem;
+    }
+  }
+
+  @media (max-height: 650px) {
+    .sos-login-brand .sos-login-logo {
+      height: 3.25rem !important;
+    }
+    .sos-login-cartao h1 {
+      font-size: 19px;
+    }
   }
 
   .sos-access-card {
@@ -391,15 +467,12 @@ body {
 
   @media (min-width: 1024px) {
     .cli-palco {
-      background:
-        linear-gradient(#0D1C33, #0D1C33) top / 100% 15rem no-repeat,
-        #e9eef5;
+      /* Degradê, sem corte seco: a faixa reta parecia fundo quebrado. */
+      background: linear-gradient(180deg, #0D1C33 0, #0D1C33 6rem, #e9eef5 26rem) fixed;
     }
 
     .dark .cli-palco {
-      background:
-        linear-gradient(#002061, #002061) top / 100% 15rem no-repeat,
-        #02070f;
+      background: linear-gradient(180deg, #002061 0, #0a1a3a 10rem, #02070f 30rem) fixed;
     }
 
     .cli-coluna {
@@ -897,6 +970,58 @@ html.dark .mec-sombra {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
 }
 
+/* ── entrada: cronômetro digital ──────────────────────────────────────────── */
+.sos-cronometro {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.3rem 0.8rem 0.3rem 0.6rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgb(0 175 239 / 0.3);
+  background: linear-gradient(180deg, rgb(6 18 38 / 0.72), rgb(2 8 18 / 0.72));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 0 0 1px rgb(0 0 0 / 0.25),
+    0 10px 24px -16px rgb(0 175 239 / 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.sos-cronometro-ponto {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: #00afef;
+  box-shadow: 0 0 8px #00afef;
+  animation: sos-cronometro-pisca 1s steps(1, end) infinite;
+}
+.sos-cronometro-digitos {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: #eaf7ff;
+  text-shadow: 0 0 12px rgb(0 175 239 / 0.55);
+  line-height: 1;
+}
+.sos-cronometro-sep {
+  margin-inline: 0.08em;
+  color: #00afef;
+  animation: sos-cronometro-pisca 1s steps(1, end) infinite;
+}
+.sos-cronometro-seg {
+  color: #7fd6f7;
+  font-size: 0.86em;
+}
+@keyframes sos-cronometro-pisca {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
 /* ── entrada do cliente: botão de emergência piscando ─────────────────────── */
 .sos-emergencia {
   display: flex;
@@ -917,8 +1042,8 @@ html.dark .mec-sombra {
 .sos-emergencia-orb {
   position: relative;
   display: flex;
-  width: 3.9rem;
-  height: 3.9rem;
+  width: 3.6rem;
+  height: 3.6rem;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
@@ -981,3 +1106,51 @@ html.dark .mec-sombra {
   }
 }
 
+
+/* ── status do mecânico: online azul Tecnoar, fora do ar vermelho, os dois piscando ── */
+.mec-status-online {
+  background: linear-gradient(135deg, #00afef 0%, #0092d4 100%);
+  animation: mec-status-azul 1.6s ease-in-out infinite;
+}
+.mec-status-offline {
+  background: linear-gradient(135deg, #ef3b3b 0%, #c81e1e 100%);
+  animation: mec-status-vermelho 1.1s ease-in-out infinite;
+}
+@keyframes mec-status-azul {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgb(0 175 239 / 0.55),
+      0 14px 30px -16px rgb(0 175 239 / 0.95);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow:
+      0 0 0 10px rgb(0 175 239 / 0),
+      0 14px 30px -16px rgb(0 175 239 / 0.95);
+    filter: brightness(1.12);
+  }
+}
+@keyframes mec-status-vermelho {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgb(239 59 59 / 0.6),
+      0 14px 30px -16px rgb(200 30 30 / 0.95);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow:
+      0 0 0 10px rgb(239 59 59 / 0),
+      0 14px 30px -16px rgb(200 30 30 / 0.95);
+    filter: brightness(1.18);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mec-status-online,
+  .mec-status-offline,
+  .sos-cronometro-ponto,
+  .sos-cronometro-sep {
+    animation: none;
+  }
+}

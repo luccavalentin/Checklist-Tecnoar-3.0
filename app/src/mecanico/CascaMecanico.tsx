@@ -82,7 +82,7 @@ export function CascaMecanico() {
           <Outlet />
 
           {/* Espaço extra no fim da página para a pílula de atendimento não cobrir conteúdo. */}
-          {mostrarPilula && <div aria-hidden className="h-20" />}
+          {(mostrarPilula || mostrarAvisoSom) && <div aria-hidden className={mostrarPilula ? 'h-20' : 'h-14'} />}
 
           {mostrarPilula && chamadoAtual ? <PilulaAtendimento chamado={chamadoAtual} /> : mostrarAvisoSom ? <AvisoSom /> : null}
 
@@ -189,9 +189,11 @@ function AvisoSom() {
       onClick={() => void destravarAudio().then((ok) => ok && tocarAlerta({ tipo: 'aviso' }))}
       aria-label="Ativar som dos chamados"
       title="Ativar som dos chamados"
-      className="entrada-suave fixed top-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px)+0.9rem)] right-[max(4.5rem,env(safe-area-inset-right))] z-40 flex size-10 items-center justify-center rounded-full border border-white/16 bg-[#002061]/88 text-white shadow-[0_10px_24px_-16px_rgb(0_32_97/0.9)] backdrop-blur-md active:scale-95"
+      // Acima da barra de abas, centralizado: no topo cobria títulos e botões das telas.
+      className="entrada-suave fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+5rem)] z-40 mx-auto flex h-10 w-fit items-center gap-2 rounded-full border border-white/16 bg-[#002061]/92 px-4 text-[13px] font-semibold text-white shadow-[0_10px_24px_-16px_rgb(0_32_97/0.9)] backdrop-blur-md active:scale-95"
     >
       <Volume2 className="size-[18px] text-[#00afef]" />
+      Toque para ativar o som dos chamados
     </button>
   )
 }

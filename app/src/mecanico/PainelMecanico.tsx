@@ -184,7 +184,7 @@ function ControleStatus({
       <button
         type="button"
         onClick={() => chamadoId && navegar(`/chamado/${chamadoId}`)}
-        className="mx-auto flex min-h-[3.65rem] w-fit max-w-full items-center gap-3 rounded-2xl border border-[#00afef]/34 bg-[#0077c8] px-4 py-2.5 text-left text-white shadow-[0_14px_30px_-18px_rgb(0_119_200/0.9)] active:scale-[0.99]"
+        className="mx-auto flex min-h-[3.65rem] w-fit max-w-full items-center gap-3 rounded-2xl mec-status-online border border-[#7fd6f7]/50 px-4 py-2.5 text-left text-white active:scale-[0.99]"
       >
         <span className="relative flex size-3 shrink-0" aria-hidden>
           <span className="mec-pulso absolute inset-0 rounded-full bg-white" />
@@ -225,17 +225,15 @@ function ControleStatus({
       disabled={mudando || !online}
       className={cn(
         'mx-auto flex min-h-[3.65rem] w-fit max-w-full items-center gap-3.5 rounded-2xl border px-4 py-2.5 text-left text-white transition-colors active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70',
-        // Azul da marca: mais forte quando está recebendo SOS.
-        recebendo
-          ? 'border-[#00afef]/50 bg-[#0077c8] shadow-[0_14px_30px_-16px_rgb(0_119_200/0.95)]'
-          : 'border-[#0077c8]/40 bg-[#1f5f9e] shadow-[0_12px_26px_-18px_rgb(31_95_158/0.9)]',
+        // Online (recebendo SOS): azul Tecnoar piscando. Fora do ar: vermelho piscando.
+        recebendo ? 'mec-status-online border-[#7fd6f7]/50' : 'mec-status-offline border-[#ff8a8a]/40',
       )}
     >
       <span className="min-w-0">
         <span className="flex items-center gap-2 font-display text-[10.5px] font-extrabold tracking-[0.14em] text-white/80 uppercase">
           <span className="relative flex size-2" aria-hidden>
-            {recebendo && <span className="mec-pulso absolute inset-0 rounded-full bg-white" />}
-            <span className={cn('relative size-2 rounded-full', recebendo ? 'bg-white' : pausa || disponivel ? 'bg-[#ffd27a]' : 'bg-white/45')} />
+            <span className="mec-pulso absolute inset-0 rounded-full bg-white" />
+            <span className="relative size-2 rounded-full bg-white" />
           </span>
           Status
         </span>
@@ -247,7 +245,7 @@ function ControleStatus({
         <span
           className={cn(
             'absolute top-1 flex size-6 items-center justify-center rounded-full bg-white shadow transition-all',
-            recebendo ? 'left-[calc(100%-1.75rem)] text-[#0077c8]' : 'left-1 text-[#1f5f9e]',
+            recebendo ? 'left-[calc(100%-1.75rem)] text-[#0096d6]' : 'left-1 text-[#d92d2d]',
           )}
         >
           {mudando ? <Loader2 className="size-4 animate-spin" /> : <Power className="size-4" strokeWidth={2.5} />}
