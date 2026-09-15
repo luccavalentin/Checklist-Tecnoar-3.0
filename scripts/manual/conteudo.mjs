@@ -30,14 +30,13 @@ export const SECOES = [
           'Esqueceu a senha? Use **Esqueci minha senha** na própria tela — o sistema envia um link para o seu e-mail.',
         ],
         tela: '01-login',
-        legenda: 'Tela de entrada. O botão Solicitar acesso serve para quem ainda não tem conta.',
+        legenda: 'Tela de entrada do sistema.',
       },
       {
         tipo: 'texto',
         titulo: 'Ainda não tem conta',
         paragrafos: [
-          'Clique em **Solicitar acesso** e preencha seus dados. A conta fica aguardando liberação até que um administrador aprove e defina o que você pode acessar.',
-          'Enquanto isso, ao entrar você verá um aviso de acesso pendente. É normal, não é erro.',
+          'As contas são criadas pelo administrador do sistema. Peça a ele o seu acesso: você recebe o e-mail de entrada e define o que pode acessar conforme o seu perfil.',
         ],
       },
       {

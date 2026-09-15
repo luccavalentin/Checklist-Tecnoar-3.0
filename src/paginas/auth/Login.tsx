@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ArrowRight, Eye, EyeOff, Lock, Mail, UserPlus } from 'lucide-react'
+import { ArrowRight, Eye, EyeOff, Lock, Mail } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { mensagemErroAuth } from '@/lib/utils'
 import { Botao } from '@/componentes/ui/Botao'
@@ -117,22 +117,6 @@ export function Login() {
           Entrar
         </Botao>
       </form>
-
-      <div className="flex items-center gap-3.5">
-        <span className="h-px flex-1 bg-line" />
-        <span className="lbl">ou</span>
-        <span className="h-px flex-1 bg-line" />
-      </div>
-
-      <Botao
-        variante="neutro"
-        tamanho="lg"
-        larguraTotal
-        iconeInicio={<UserPlus />}
-        onClick={() => navegar('/solicitar-acesso')}
-      >
-        Solicitar acesso
-      </Botao>
     </MolduraAuth>
   )
 }
