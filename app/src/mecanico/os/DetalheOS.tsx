@@ -580,7 +580,7 @@ function TelaAdicionar({ d, tipo, aoFechar }: { d: DetalheOSApp; tipo: TipoItem;
         sub="Toque no item para lançar na OS"
       />
       <TelaM>
-        <Catalogo tipo={tipo} podeAdicionar={false} aoEscolher={setEscolhido} lancados={lancados} />
+        <Catalogo tipo={tipo} podeAdicionar={false} aoEscolher={setEscolhido} lancados={lancados} toqueLanca />
       </TelaM>
       <FolhaLancar item={escolhido} aoFechar={fechar} destinos={destinos} />
     </div>

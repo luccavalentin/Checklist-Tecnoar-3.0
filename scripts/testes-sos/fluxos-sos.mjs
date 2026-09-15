@@ -53,7 +53,7 @@ async function abrir(browser, persona, caminho, respostas = {}) {
   const bloqueadas = []
   await context.route(/supabase\.co/, async (route) => {
     const u = new URL(route.request().url())
-    if (u.pathname.startsWith('/rest/v1/') || u.pathname.startsWith('/auth/v1/user')) return route.fallback()
+    if (u.pathname.startsWith('/rest/v1/') || u.pathname.startsWith('/auth/v1/user') || u.pathname.startsWith('/functions/v1/omie-produto')) return route.fallback()
     bloqueadas.push(`${route.request().method()} ${u.pathname}`)
     return route.abort()
   })
@@ -285,6 +285,18 @@ fluxo('os-lanca-peca', 'Mecânico lança peça do estoque na OS', async (browser
   const c = t.chamou('sos_os_adicionar_item')[0]?.corpo
   esperar(c, 'sos_os_adicionar_item não foi chamada')
   esperar(c.p_os === IDS.os && c.p_tipo === 'produto' && c.p_ref === 'p1', `item: ${JSON.stringify(c)}`)
+  return t
+})
+
+fluxo('catalogo-ficha-produto', 'Mecânico toca no produto e vê a ficha real, conferida com a Omie', async (browser) => {
+  const t = await abrir(browser, 'mecanico', '/catalogo/produtos')
+  await t.page.getByRole('button', { name: /ver ficha de válvula relé wabco/i }).click()
+  const folha = t.page.getByRole('dialog')
+  await folha.getByText(/sincronizado com a omie/i).waitFor()
+  await folha.getByText('Distribuidora Freios SP').waitFor()
+  await folha.getByText('8708.30.90').waitFor()
+  const c = t.chamou('sos_produto_detalhe')[0]?.corpo
+  esperar(c?.p_id === 'p1', `ficha: ${JSON.stringify(c)}`)
   return t
 })
 

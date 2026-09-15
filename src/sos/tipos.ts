@@ -322,6 +322,54 @@ export interface ItemCatalogo {
   estoque_em: string | null
 }
 
+/** Ficha completa do produto (cadastro do sistema, espelho da Omie). */
+export interface ProdutoDetalhe {
+  id: string
+  codigo: string | null
+  descricao: string
+  descricao_detalhada: string | null
+  referencia: string | null
+  ean: string | null
+  ncm: string | null
+  marca: string | null
+  modelo: string | null
+  familia: string | null
+  unidade: string | null
+  tipo_item: string | null
+  localizacao: string | null
+  local_estoque_omie: string | null
+  fornecedor: string | null
+  observacoes: string | null
+  peso_liquido: number | null
+  peso_bruto: number | null
+  preco_venda: number | null
+  /** Só para quem pode editar produtos. */
+  custo_medio: number | null
+  preco_custo: number | null
+  saldo: number | null
+  fisico: number | null
+  reservado: number | null
+  pendente: number | null
+  estoque_minimo: number | null
+  comprometido: number | null
+  disponivel: number | null
+  situacao: string
+  bloqueado: boolean
+  origem: string | null
+  omie_id: string | null
+  sincronizado_em: string | null
+}
+
+/** Conferência do produto na Omie feita na hora (função `omie-produto`). */
+export interface ProdutoAoVivo {
+  ok: boolean
+  omie: boolean
+  atualizado?: boolean
+  imagens?: string[]
+  garantia_dias?: number | null
+  aviso?: string | null
+}
+
 /** Retorno de lançar peça: o disponível antes e se faltou estoque. */
 export interface ResultadoEstoque {
   disponivel_antes: number

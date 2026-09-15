@@ -32,6 +32,8 @@ import type {
   IndicadoresSOS,
   InfoPublicaSOS,
   ItemCatalogo,
+  ProdutoAoVivo,
+  ProdutoDetalhe,
   ItemHistorico,
   ItemSOS,
   LembreteSOS,
@@ -266,6 +268,16 @@ export const sosMarcarMensagensLidas = (chamadoId: string) =>
  */
 export const sosCatalogo = (termo: string, tipo?: 'produto' | 'servico' | null, pagina = 0, porPagina = 30) =>
   rpc<ItemCatalogo[]>('sos_catalogo', { p_termo: termo, p_tipo: tipo ?? null, p_limite: porPagina, p_offset: pagina * porPagina })
+
+/** Ficha do produto com o que está no cadastro agora. */
+export const sosProdutoDetalhe = (id: string) => rpc<ProdutoDetalhe>('sos_produto_detalhe', { p_id: id })
+
+/** Confere o produto na Omie na hora e atualiza o cadastro (fotos voltam só aqui). */
+export async function sosProdutoAoVivo(id: string): Promise<ProdutoAoVivo> {
+  const { data, error } = await supabase.functions.invoke('omie-produto', { body: { produto_id: id } })
+  if (error) return { ok: false, omie: false, aviso: 'Não foi possível conferir na Omie agora.' }
+  return data as ProdutoAoVivo
+}
 
 /** Lança no chamado. Produto: devolve também o estoque (se faltou, a central é avisada). */
 export const sosAdicionarItem = (chamadoId: string, tipo: 'produto' | 'servico', refId: string, quantidade = 1) =>

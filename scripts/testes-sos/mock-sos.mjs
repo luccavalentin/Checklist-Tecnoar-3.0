@@ -316,6 +316,14 @@ export function rpcResposta(nome, persona) {
         chamado: null,
         pode_editar: true,
       }
+    case 'sos_produto_detalhe':
+      return {
+        id: 'p1', codigo: 'WAB-9730', descricao: 'Válvula relé Wabco', descricao_detalhada: 'Válvula relé para sistema de freio a ar.', referencia: '9730110010',
+        ean: null, ncm: '8708.30.90', marca: 'Wabco', modelo: null, familia: 'Freios', unidade: 'UN', tipo_item: '00', localizacao: 'A3-12',
+        local_estoque_omie: '3015809768', fornecedor: 'Distribuidora Freios SP', observacoes: null, peso_liquido: 1.2, peso_bruto: 1.4,
+        preco_venda: 890.5, custo_medio: null, preco_custo: null, saldo: 6, fisico: 6, reservado: 1, pendente: 2, estoque_minimo: 2,
+        comprometido: 1, disponivel: 4, situacao: 'ativo', bloqueado: false, origem: 'omie', omie_id: '8431203831', sincronizado_em: iso(-5),
+      }
     case 'sos_catalogo':
       return [
         { tipo: 'produto', id: 'p1', codigo: 'WAB-9730', descricao: 'Válvula relé Wabco', unidade: 'UN', preco: 890.5, saldo: 6, reservado: 1, comprometido: 1, disponivel: 4, estoque_em: iso(-600) },
@@ -482,6 +490,9 @@ export async function configurar(context, persona = 'anonimo', tema = 'escuro') 
       return route.fulfill(json([{ lat: '-23.55052', lon: '-46.63331', display_name: 'Marginal Tietê, São Paulo/SP' }]))
     }
     if (url.hostname.includes('router.project-osrm.org')) return route.fulfill(json({ routes: [] }))
+    if (url.pathname.includes('/functions/v1/omie-produto')) {
+      return route.fulfill(json({ ok: true, omie: true, atualizado: false, imagens: [], garantia_dias: 90, aviso: null }))
+    }
     if (url.pathname.includes('/auth/v1/user')) {
       const p = persona === 'anonimo' ? null : papel(persona)
       return route.fulfill(json(p ? { id: p.usuario_id, email: p.email || `${p.papel}@sos.local`, role: 'authenticated', aud: 'authenticated' } : null, p ? 200 : 401))
