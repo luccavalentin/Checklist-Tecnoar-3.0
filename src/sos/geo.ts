@@ -62,7 +62,7 @@ function leitura(p: GeolocationPosition): LeituraGPS {
 let ultimaBoa: LeituraGPS | null = null
 
 function guardarSeBoa(l: LeituraGPS) {
-  if (l.precisao != null && l.precisao <= 50) ultimaBoa = { ...l, em: Date.now() }
+  if (l.precisao != null && l.precisao <= 25) ultimaBoa = { ...l, em: Date.now() }
 }
 
 /** Leitura em cache, de antes do pedido. Relógio do GPS muito fora do aparelho não conta. */
@@ -80,13 +80,13 @@ function leituraAntiga(l: LeituraGPS, inicio: number): boolean {
 export function posicaoAtual(opcoes: { timeoutMs?: number; maxIdadeMs?: number } = {}): Promise<LeituraGPS> {
   const tempoMax = opcoes.timeoutMs ?? 15000
   const maxIdade = opcoes.maxIdadeMs ?? 0
-  if (ultimaBoa && maxIdade > 0 && Date.now() - ultimaBoa.em <= maxIdade && (ultimaBoa.precisao ?? Infinity) <= 30) {
+  if (ultimaBoa && maxIdade > 0 && Date.now() - ultimaBoa.em <= maxIdade && (ultimaBoa.precisao ?? Infinity) <= 20) {
     return Promise.resolve(ultimaBoa)
   }
   return posicaoPrecisa({
-    alvoM: 20,
-    aceitavelM: 50,
-    bomBastanteMs: Math.min(3500, tempoMax / 2),
+    alvoM: 10,
+    aceitavelM: 25,
+    bomBastanteMs: Math.min(4500, tempoMax / 2),
     tempoMaxMs: tempoMax,
   }).promessa
 }
@@ -110,10 +110,10 @@ export function posicaoPrecisa(
     aoMelhorar?: (l: LeituraGPS) => void
   } = {},
 ): { promessa: Promise<LeituraGPS>; cancelar: () => void } {
-  const alvo = opcoes.alvoM ?? 10
-  const aceitavel = opcoes.aceitavelM ?? 25
-  const bomBastante = opcoes.bomBastanteMs ?? 8000
-  const tempoMax = opcoes.tempoMaxMs ?? 25000
+  const alvo = opcoes.alvoM ?? 6
+  const aceitavel = opcoes.aceitavelM ?? 15
+  const bomBastante = opcoes.bomBastanteMs ?? 10000
+  const tempoMax = opcoes.tempoMaxMs ?? 30000
   let cancelar = () => {}
   const promessa = new Promise<LeituraGPS>((resolve, reject) => {
     if (!('geolocation' in navigator)) return reject('sem_suporte' satisfies ErroGPS)
@@ -191,7 +191,7 @@ export function acompanharPosicao(
         const pNova = l.precisao ?? Infinity
         // Leitura de antena depois de uma de GPS: o ponto "pula" centenas de
         // metros sem o carro sair do lugar. Só aceita se a boa já envelheceu.
-        const pior = pNova > 60 && pNova > pUltima * 2
+        const pior = pNova > 35 && pNova > pUltima * 1.5
         if (pior && tempo < 120_000) return
         // O GPS "firmou" (a primeira foi de antena): manda já, sem esperar.
         const firmou = pUltima > 30 && pNova <= pUltima / 2

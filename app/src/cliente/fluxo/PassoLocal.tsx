@@ -73,10 +73,10 @@ export function PassoLocal({
     // Só leitura nova, com o GPS de verdade: a primeira (antena) aparece na
     // hora e é trocada pelas melhores até chegar a ±10 m.
     const { promessa, cancelar } = posicaoPrecisa({
-      alvoM: 10,
-      aceitavelM: 15,
-      bomBastanteMs: 12000,
-      tempoMaxMs: 45000,
+      alvoM: 5,
+      aceitavelM: 10,
+      bomBastanteMs: 15000,
+      tempoMaxMs: 50000,
       aoMelhorar: mostrarLeitura,
     })
     cancelarGps.current = cancelar
@@ -87,7 +87,7 @@ export function PassoLocal({
       cancelarGps.current = acompanharPosicao(
         (l) => {
           const atual = gpsAtual.current?.precisao ?? Infinity
-          if ((l.precisao ?? Infinity) <= Math.max(atual, 15)) mostrarLeitura(l)
+          if ((l.precisao ?? Infinity) <= Math.max(atual, 10)) mostrarLeitura(l)
         },
         undefined,
         { minMetros: 3, minIntervaloMs: 1500, maxIntervaloMs: 8000 },
