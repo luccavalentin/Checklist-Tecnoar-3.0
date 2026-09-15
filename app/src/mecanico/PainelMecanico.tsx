@@ -12,6 +12,7 @@ import {
   MapPin,
   Package,
   Plus,
+  Power,
   RefreshCw,
   Star,
   Wrench,
@@ -94,19 +95,19 @@ export function PainelMecanico() {
             {/* Ações de campo feitas sem sinal, esperando para sair. */}
             <FaixaFila />
 
-            {/* Um cartão só para o dia: o interruptor em cima, os números embaixo.
-                Cinco caixas soltas eram o que dava cara de painel de sistema. */}
+            {/* O status é o controle principal: azul, no centro da tela. */}
+            <ControleStatus
+              situacao={situacao}
+              carregando={carregando}
+              aceitaSos={aceitaSos}
+              chamadoId={chamadoAtual?.id ?? null}
+              mudando={definir.isPending}
+              online={online}
+              aoFicarDisponivel={ficarDisponivel}
+              aoFicarIndisponivel={() => definir.mutate({ situacao: 'indisponivel' })}
+            />
+
             <section className="overflow-hidden rounded-[1.5rem] border border-line bg-surface mec-sombra">
-              <ControleStatus
-                situacao={situacao}
-                carregando={carregando}
-                aceitaSos={aceitaSos}
-                chamadoId={chamadoAtual?.id ?? null}
-                mudando={definir.isPending}
-                online={online}
-                aoFicarDisponivel={ficarDisponivel}
-                aoFicarIndisponivel={() => definir.mutate({ situacao: 'indisponivel' })}
-              />
               <NumerosDoDia h={h} emAndamento={chamadoAtual ? 1 : 0} />
               {!chamadoAtual && (
                 <button
@@ -175,7 +176,7 @@ function ControleStatus({
   aoFicarIndisponivel: () => void
 }) {
   const navegar = useNavigate()
-  if (carregando) return <EsqueletoM className="m-4 h-12 rounded-2xl" />
+  if (carregando) return <EsqueletoM className="mx-auto h-[4.5rem] w-64 rounded-2xl" />
 
   // Em atendimento: o status é do chamado, não da mão do mecânico.
   if (chamadoId || situacao === 'em_atendimento') {
@@ -183,15 +184,16 @@ function ControleStatus({
       <button
         type="button"
         onClick={() => chamadoId && navegar(`/chamado/${chamadoId}`)}
-        className="flex min-h-[4.25rem] w-full items-center gap-3 bg-cyan-soft/60 px-4 py-3 text-left active:bg-cyan-soft"
+        className="mx-auto flex min-h-[3.65rem] w-fit max-w-full items-center gap-3 rounded-2xl border border-[#00afef]/34 bg-[#0077c8] px-4 py-2.5 text-left text-white shadow-[0_14px_30px_-18px_rgb(0_119_200/0.9)] active:scale-[0.99]"
       >
         <span className="relative flex size-3 shrink-0" aria-hidden>
-          <span className="mec-pulso absolute inset-0 rounded-full bg-cyan" />
-          <span className="relative size-3 rounded-full bg-cyan" />
+          <span className="mec-pulso absolute inset-0 rounded-full bg-white" />
+          <span className="relative size-3 rounded-full bg-white" />
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-display text-[17px] leading-tight font-semibold text-ink">Em atendimento</span>
-          <span className="block truncate text-[12.5px] text-ink-2">Chamado ativo em campo</span>
+        <span className="min-w-0">
+          <span className="block font-display text-[10.5px] font-extrabold tracking-[0.14em] text-white/80 uppercase">Status</span>
+          <span className="block font-display text-[16px] leading-tight font-bold text-white">EM ATENDIMENTO</span>
+          <span className="block truncate text-[12px] text-white/80">Chamado ativo em campo</span>
         </span>
       </button>
     )
@@ -200,7 +202,7 @@ function ControleStatus({
   const disponivel = situacao === 'disponivel'
   const recebendo = disponivel && aceitaSos
   const pausa = situacao === 'pausa'
-  const titulo = disponivel ? 'Disponível' : pausa ? 'Em pausa' : 'Indisponível'
+  const titulo = disponivel ? 'DISPONÍVEL' : pausa ? 'EM PAUSA' : 'INDISPONÍVEL'
   let sub: string
   if (!online) sub = 'Sem internet'
   else if (disponivel && !aceitaSos) sub = 'SOS desligado'
@@ -221,29 +223,34 @@ function ControleStatus({
       aria-label={`Status: ${titulo}. Tocar para ${recebendo ? 'ficar indisponível' : 'ficar disponível'}`}
       onClick={alternar}
       disabled={mudando || !online}
-      className="flex min-h-[4.5rem] w-full items-center gap-3.5 px-4 py-3.5 text-left transition-colors active:bg-surface-2 disabled:cursor-not-allowed"
+      className={cn(
+        'mx-auto flex min-h-[3.65rem] w-fit max-w-full items-center gap-3.5 rounded-2xl border px-4 py-2.5 text-left text-white transition-colors active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70',
+        // Azul da marca: mais forte quando está recebendo SOS.
+        recebendo
+          ? 'border-[#00afef]/50 bg-[#0077c8] shadow-[0_14px_30px_-16px_rgb(0_119_200/0.95)]'
+          : 'border-[#0077c8]/40 bg-[#1f5f9e] shadow-[0_12px_26px_-18px_rgb(31_95_158/0.9)]',
+      )}
     >
-      <span className="relative flex size-2.5 shrink-0" aria-hidden>
-        {recebendo && <span className="mec-pulso absolute inset-0 rounded-full bg-[#00afef]" />}
-        <span className={cn('relative size-2.5 rounded-full', recebendo ? 'bg-[#00afef]' : disponivel || pausa ? 'bg-warn' : 'bg-ink-3')} />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block font-display text-[18px] leading-tight font-semibold tracking-tight text-ink">{titulo}</span>
-        <span className="mt-0.5 block truncate text-[13px] leading-snug text-ink-3">{sub}</span>
+      <span className="min-w-0">
+        <span className="flex items-center gap-2 font-display text-[10.5px] font-extrabold tracking-[0.14em] text-white/80 uppercase">
+          <span className="relative flex size-2" aria-hidden>
+            {recebendo && <span className="mec-pulso absolute inset-0 rounded-full bg-white" />}
+            <span className={cn('relative size-2 rounded-full', recebendo ? 'bg-white' : pausa || disponivel ? 'bg-[#ffd27a]' : 'bg-white/45')} />
+          </span>
+          Status
+        </span>
+        <span className="mt-0.5 block font-display text-[16px] leading-[1.05] font-bold tracking-normal text-white">{titulo}</span>
+        <span className="mt-0.5 block truncate text-[12px] leading-snug font-medium text-white/80">{sub}</span>
       </span>
 
-      {/* Interruptor no desenho do sistema: trilho fino, botão branco. */}
-      <span
-        aria-hidden
-        className={cn('relative h-[1.9rem] w-[3.15rem] shrink-0 rounded-full transition-colors duration-200', recebendo ? 'bg-[#00afef]' : 'bg-line-strong')}
-      >
+      <span aria-hidden className={cn('relative h-8 w-14 shrink-0 rounded-full transition-colors', recebendo ? 'bg-white/35' : 'bg-white/18')}>
         <span
           className={cn(
-            'absolute top-[3px] flex size-6 items-center justify-center rounded-full bg-white shadow-[0_1px_3px_rgb(8_24_48/0.25)] transition-all duration-200',
-            recebendo ? 'left-[calc(100%-1.65rem)]' : 'left-[3px]',
+            'absolute top-1 flex size-6 items-center justify-center rounded-full bg-white shadow transition-all',
+            recebendo ? 'left-[calc(100%-1.75rem)] text-[#0077c8]' : 'left-1 text-[#1f5f9e]',
           )}
         >
-          {mudando && <Loader2 className="size-3.5 animate-spin text-ink-3" />}
+          {mudando ? <Loader2 className="size-4 animate-spin" /> : <Power className="size-4" strokeWidth={2.5} />}
         </span>
       </span>
     </button>
@@ -255,7 +262,7 @@ function ControleStatus({
 function NumerosDoDia({ h, emAndamento }: { h: HomeMecanico | undefined; emAndamento: number }) {
   const nota = h?.hoje.nota_media
   return (
-    <dl className="grid grid-cols-4 divide-x divide-line border-t border-line">
+    <dl className="grid grid-cols-4 divide-x divide-line">
       <Estatistica rotulo="Hoje" valor={h ? h.hoje.atendimentos : '–'} />
       <Estatistica rotulo="Em curso" valor={h ? emAndamento : '–'} destaque={!!emAndamento} />
       <Estatistica rotulo="Finalizados" valor={h ? h.hoje.concluidos : '–'} />

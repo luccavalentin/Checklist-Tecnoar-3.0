@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNod
 import { Circle } from 'react-leaflet'
 import { Crosshair, Loader2, LocateFixed, MapPin, Move, Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { buscarLugar, enderecoDoPonto, formatarCoordenadas, mensagemErroGPS, posicaoPrecisa, type ErroGPS, type LeituraGPS, type Ponto } from '@/sos/geo'
+import { acompanharPosicao, buscarLugar, ehApple, enderecoDoPonto, formatarCoordenadas, mensagemErroGPS, posicaoPrecisa, type ErroGPS, type LeituraGPS, type Ponto } from '@/sos/geo'
 import { BotaoMapa, CapturaMapa, MapaSOS, centralizarMapa, type MapaLeaflet, type MarcadorMapa } from '@/sos/Mapa'
 import { BotaoApp, Faixa } from '../../comum/ui'
 import { useOnline } from '../../comum/Pwa'
@@ -53,6 +53,17 @@ export function PassoLocal({
   // GPS ainda refinando (a leitura vai melhorando na tela até ±10 m).
   const [refinando, setRefinando] = useState(false)
   const cancelarGps = useRef<() => void>(() => {})
+  const gpsAtual = useRef<LeituraGPS | null>(null)
+
+  const mostrarLeitura = useCallback((l: LeituraGPS) => {
+    gpsAtual.current = l
+    setGps(l)
+    setBuscandoGps(false)
+    if (!manterCentro.current) {
+      setCentro({ lat: l.lat, lng: l.lng })
+      setAjustando(false)
+    }
+  }, [])
 
   const pedirGps = useCallback(async () => {
     cancelarGps.current()
@@ -66,18 +77,21 @@ export function PassoLocal({
       aceitavelM: 15,
       bomBastanteMs: 12000,
       tempoMaxMs: 45000,
-      aoMelhorar: (l) => {
-        setGps(l)
-        setBuscandoGps(false)
-        if (!manterCentro.current) {
-          setCentro({ lat: l.lat, lng: l.lng })
-          setAjustando(false)
-        }
-      },
+      aoMelhorar: mostrarLeitura,
     })
     cancelarGps.current = cancelar
     try {
       await promessa
+      // O GPS segue ligado enquanto a tela está aberta: a leitura continua
+      // melhorando (e acompanha se a pessoa andar até o veículo).
+      cancelarGps.current = acompanharPosicao(
+        (l) => {
+          const atual = gpsAtual.current?.precisao ?? Infinity
+          if ((l.precisao ?? Infinity) <= Math.max(atual, 15)) mostrarLeitura(l)
+        },
+        undefined,
+        { minMetros: 3, minIntervaloMs: 1500, maxIntervaloMs: 8000 },
+      )
     } catch (e) {
       setErroGps(typeof e === 'string' ? (e as ErroGPS) : 'indisponivel')
       // Sem GPS, o pino no mapa é o caminho: já abre no modo de ajuste.
@@ -86,7 +100,7 @@ export function PassoLocal({
       setBuscandoGps(false)
       setRefinando(false)
     }
-  }, [])
+  }, [mostrarLeitura])
 
   useEffect(() => {
     void pedirGps()
@@ -271,7 +285,14 @@ function Precisao({ metros, refinando }: { metros: number; refinando: boolean })
           <Loader2 className="size-3 animate-spin" /> Refinando pelo GPS…
         </span>
       )}
-      {!refinando && m > 60 && <span className="text-ink-3">Sinal fraco: confira o ponto ou ajuste no mapa.</span>}
+      {!refinando && m > 60 && m < 500 && <span className="text-ink-3">Sinal fraco: confira o ponto ou ajuste no mapa.</span>}
+      {!refinando && m >= 500 && (
+        <span className="basis-full text-ink-2">
+          {ehApple()
+            ? 'A “Localização exata” parece desligada. No iPhone: Ajustes › Privacidade › Serviços de Localização › Safari (ou SOS Tecnoar) › ative Localização Exata. Ou ajuste o ponto no mapa.'
+            : 'O celular está usando só a localização aproximada. Ative a localização precisa nas permissões do navegador e deixe o GPS ligado. Ou ajuste o ponto no mapa.'}
+        </span>
+      )}
     </p>
   )
 }
