@@ -574,7 +574,7 @@ async function sosIa<T>(acao: string, corpo: Record<string, unknown> = {}): Prom
     const ctx = (error as { context?: Response }).context
     if (ctx && typeof ctx.json === 'function') {
       const j = await ctx.json().catch(() => null)
-      if (j?.erro) mensagem = String(j.erro)
+      if (j?.erro) mensagem = ctx.status === 401 ? 'Sua sessão expirou. Entre de novo para usar a IA.' : String(j.erro)
     } else if (!navigator.onLine) {
       mensagem = 'Sem internet. A IA precisa de conexão.'
     }
