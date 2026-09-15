@@ -1,17 +1,11 @@
-import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlertTriangle, Check, ChevronRight, FilePlus2, FileText, Loader2, Plus, RefreshCw, Search } from 'lucide-react'
+import { AlertTriangle, ChevronRight, FilePlus2, FileText, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { moeda } from '@/lib/formatos'
-import { useToast } from '@/componentes/ui/Toast'
-import { sosOSBuscarVeiculo, sosOSCriar } from '@/sos/api'
-import { formatarPlacaExibicao } from '@/sos/rotulos'
-import type { OSResumoApp, VeiculoParaOS } from '@/sos/tipos'
-import { useOnline } from '../dados'
+import type { OSResumoApp } from '@/sos/tipos'
 import { Placa } from '../pecas'
-import { AreaM, BotaoM, CampoM, EsqueletoM, FolhaM, NumeroM, SeloM, TelaM, TopoM, VazioM } from '../ui'
-import { CHAVES_OS, rotuloProtocolo, tomStatusOS, useMinhasOS, type SituacaoOS } from './dados'
+import { BotaoM, EsqueletoM, NumeroM, SeloM, TelaM, TopoM, VazioM } from '../ui'
+import { rotuloProtocolo, tomStatusOS, useMinhasOS, type SituacaoOS } from './dados'
 
 const ABAS: Array<{ id: SituacaoOS; rotulo: string }> = [
   { id: 'abertas', rotulo: 'Abertas' },
@@ -28,7 +22,6 @@ export function ListaOS() {
   const [params, setParams] = useSearchParams()
   const aba: SituacaoOS = params.get('aba') === 'encerradas' ? 'encerradas' : 'abertas'
   const consulta = useMinhasOS(aba)
-  const [novaAberta, setNovaAberta] = useState(false)
 
   const dados = consulta.data
   const lista = dados?.lista ?? []
@@ -61,7 +54,7 @@ export function ListaOS() {
       />
       <TelaM>
         {dados?.pode_criar && (
-          <BotaoM variante="laranja" tamanho="lg" largo icone={FilePlus2} onClick={() => setNovaAberta(true)}>
+          <BotaoM variante="laranja" tamanho="lg" largo icone={FilePlus2} onClick={() => navegar('/os/nova')}>
             Nova OS
           </BotaoM>
         )}
@@ -127,7 +120,6 @@ export function ListaOS() {
         )}
       </TelaM>
 
-      <FolhaNovaOS aberta={novaAberta} aoFechar={() => setNovaAberta(false)} abertas={aba === 'abertas' ? lista : []} />
     </>
   )
 }
@@ -201,188 +193,4 @@ function CartaoOS({ os: o, aoAbrir }: { os: OSResumoApp; aoAbrir: () => void }) 
 function diaMes(iso: string): string {
   const d = new Date(iso)
   return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
-}
-
-/* ── nova OS ────────────────────────────────────────────────────────────── */
-
-const normalizarPlaca = (p: string) => p.toUpperCase().replace(/[^A-Z0-9]/g, '')
-
-/**
- * Abrir OS pelo app: só para quem tem a permissão de criar OS no Checklist.
- * Veículo pela placa (o cliente vem junto) e o problema relatado; o
- * mecânico entra escalado e a OS já nasce no sistema Tecnoar.
- */
-function FolhaNovaOS({ aberta, aoFechar, abertas }: { aberta: boolean; aoFechar: () => void; abertas: OSResumoApp[] }) {
-  const qc = useQueryClient()
-  const toast = useToast()
-  const navegar = useNavigate()
-  const online = useOnline()
-  const [placa, setPlaca] = useState('')
-  const [termo, setTermo] = useState('')
-  const [veiculo, setVeiculo] = useState<VeiculoParaOS | null>(null)
-  const [problema, setProblema] = useState('')
-
-  useEffect(() => {
-    if (aberta) return
-    setPlaca('')
-    setTermo('')
-    setVeiculo(null)
-    setProblema('')
-  }, [aberta])
-
-  useEffect(() => {
-    const id = window.setTimeout(() => setTermo(normalizarPlaca(placa)), 300)
-    return () => window.clearTimeout(id)
-  }, [placa])
-
-  const busca = useQuery({
-    queryKey: ['sos', 'os-veiculo', termo],
-    queryFn: () => sosOSBuscarVeiculo(termo),
-    enabled: aberta && termo.length >= 3,
-    staleTime: 30_000,
-  })
-
-  const criar = useMutation({
-    mutationFn: (p: { veiculo: VeiculoParaOS; problema: string }) => sosOSCriar(p.veiculo.id, p.problema),
-    onSuccess: (id, p) => {
-      void qc.invalidateQueries({ queryKey: CHAVES_OS.raiz })
-      toast.ok('OS aberta no sistema Tecnoar', `${formatarPlacaExibicao(p.veiculo.placa)} · ${p.veiculo.cliente}`)
-      aoFechar()
-      navegar(`/os/${id}`)
-    },
-    onError: (e) => toast.erro('Não foi possível abrir a OS', (e as Error).message),
-  })
-
-  const resultados = busca.data ?? []
-  const osExistente = veiculo?.os_aberta != null ? (abertas.find((o) => o.numero === veiculo.os_aberta) ?? null) : null
-  const pronto = !!veiculo && problema.trim().length >= 3
-
-  return (
-    <FolhaM
-      aberta={aberta}
-      aoFechar={criar.isPending ? () => {} : aoFechar}
-      titulo="Nova OS"
-      descricao="Busque o veículo pela placa e diga o problema."
-      rodape={
-        <>
-          {!online && <p className="text-center text-[13px] font-medium text-warn-ink">Sem internet: abrir OS precisa de sinal.</p>}
-          <BotaoM
-            variante="laranja"
-            tamanho="xl"
-            largo
-            icone={Plus}
-            carregando={criar.isPending}
-            disabled={!online || !pronto}
-            onClick={() => veiculo && criar.mutate({ veiculo, problema: problema.trim() })}
-          >
-            {veiculo?.os_aberta != null ? 'Abrir outra OS' : 'Abrir OS'}
-          </BotaoM>
-        </>
-      }
-    >
-      <div className="flex flex-col gap-4 pb-1">
-        <CampoM
-          rotulo="Placa"
-          icone={Search}
-          value={placa}
-          onChange={(e) => {
-            setPlaca(e.target.value.toUpperCase().slice(0, 8))
-            setVeiculo(null)
-          }}
-          placeholder="ABC1D23"
-          autoCapitalize="characters"
-          autoCorrect="off"
-          autoComplete="off"
-          spellCheck={false}
-          enterKeyHint="search"
-          dica={termo.length < 3 ? 'Digite ao menos 3 caracteres.' : undefined}
-        />
-
-        {termo.length >= 3 && (
-          <div className="flex flex-col gap-2" aria-live="polite">
-            {busca.isError ? (
-              <div className="flex flex-col items-start gap-2 rounded-2xl bg-crit-soft px-3.5 py-3">
-                <p className="text-[13.5px] leading-snug text-crit-ink">{(busca.error as Error).message}</p>
-                <BotaoM variante="escuro" tamanho="md" icone={RefreshCw} onClick={() => void busca.refetch()}>
-                  Tentar de novo
-                </BotaoM>
-              </div>
-            ) : busca.isPending ? (
-              <p className="flex items-center gap-2 px-1 text-[13.5px] text-ink-3">
-                <Loader2 className="size-4 animate-spin" /> Buscando no cadastro…
-              </p>
-            ) : resultados.length === 0 ? (
-              <p className="rounded-2xl bg-surface-2 px-3.5 py-3 text-[13.5px] leading-snug text-ink-2">
-                Nenhum veículo com essa placa no cadastro da Tecnoar. Cadastre o veículo no sistema e volte aqui.
-              </p>
-            ) : (
-              <div role="radiogroup" aria-label="Veículo" className="flex flex-col gap-2">
-                {resultados.map((v) => {
-                  const marcado = veiculo?.id === v.id
-                  return (
-                    <button
-                      key={v.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={marcado}
-                      onClick={() => setVeiculo(v)}
-                      className={cn(
-                        'flex min-h-16 w-full items-center gap-3 rounded-2xl border-2 px-3 py-2.5 text-left transition-colors',
-                        marcado ? 'border-accent bg-accent-soft' : 'border-line bg-surface active:bg-surface-2',
-                      )}
-                    >
-                      <Placa placa={v.placa} />
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[15px] font-bold text-ink">{v.cliente}</span>
-                        <span className="block truncate text-[12.5px] text-ink-3">{v.veiculo ?? 'Veículo sem modelo'}</span>
-                        {v.os_aberta != null && <span className="block text-[12.5px] font-bold text-warn-ink">Já tem OS nº {v.os_aberta} aberta</span>}
-                      </span>
-                      <span
-                        aria-hidden
-                        className={cn('flex size-6 shrink-0 items-center justify-center rounded-full border-2', marcado ? 'border-accent bg-accent text-white' : 'border-line-strong')}
-                      >
-                        {marcado && <Check className="size-4" strokeWidth={3} />}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {veiculo?.os_aberta != null && (
-          <div className="flex flex-col gap-2 rounded-2xl bg-warn-soft px-3.5 py-3">
-            <p className="flex items-start gap-2 text-[13.5px] leading-snug font-medium text-warn-ink">
-              <AlertTriangle className="mt-0.5 size-4 shrink-0" />
-              Este veículo já tem a OS nº {veiculo.os_aberta} aberta. Prefira lançar nela em vez de abrir outra.
-            </p>
-            {osExistente && (
-              <BotaoM
-                variante="neutro"
-                tamanho="md"
-                onClick={() => {
-                  aoFechar()
-                  navegar(`/os/${osExistente.id}`)
-                }}
-              >
-                Ir para a OS nº {osExistente.numero}
-              </BotaoM>
-            )}
-          </div>
-        )}
-
-        {veiculo && (
-          <AreaM
-            rotulo="Problema relatado"
-            placeholder="O que o cliente relatou ou o que você encontrou."
-            value={problema}
-            onChange={(e) => setProblema(e.target.value)}
-            maxLength={2000}
-            rows={3}
-          />
-        )}
-      </div>
-    </FolhaM>
-  )
 }

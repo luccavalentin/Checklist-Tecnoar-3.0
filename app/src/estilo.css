@@ -375,13 +375,13 @@ body {
     position: absolute;
     right: -3rem;
     bottom: -1rem;
-    width: 10rem;
-    height: 0.28rem;
+    width: 12rem;
+    height: 1.5px;
     pointer-events: none;
     background: #00afef;
     transform: rotate(-34deg);
-    box-shadow: 0 1.35rem 0 #ff6600;
-    opacity: 0.72;
+    box-shadow: 0 0.9rem 0 #ff6600;
+    opacity: 0.55;
   }
 
   .cli-home-top > * {
@@ -773,7 +773,7 @@ a[role='button'] {
   }
 
   .mec-sombra-laranja {
-    box-shadow: 0 12px 26px -14px rgb(0 175 239 / 0.78);
+    box-shadow: 0 10px 24px -14px rgb(255 102 0 / 0.55);
   }
 
   .mec-sombra-verde {
@@ -816,3 +816,84 @@ a[role='button'] {
     animation: none;
   }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   LINGUAGEM VISUAL DO APP — traço fino, tipografia de app, nada de "sistema"
+   ════════════════════════════════════════════════════════════════════════════
+
+   Fica fora das camadas do Tailwind de propósito: estilo sem camada vence o de
+   camada, então estes tokens valem para todas as telas do SOS sem precisar
+   reescrever cada uma. O Checklist não carrega este arquivo e não é afetado.
+
+   O alcance é o documento inteiro, não #raiz: folhas, alertas e diálogos abrem
+   por portal direto no <body>, fora de #raiz — presos a ele, ficavam com o
+   visual antigo (caixa alta, fonte pesada) por cima das telas já refinadas.
+
+   - Geist no lugar de Archivo + IBM Plex: geométrica, limpa, leve nos pesos
+     intermediários. O extra-negrito condensado era a maior fonte de "painel".
+   - Escala de pesos rebaixada: quem pede font-extrabold recebe 660, não 800.
+   - Caixa alta com espaçamento largo é linguagem de ERP; em app, frase normal.
+   - Ícones com traço 1,65 e bordas de 1 px: os "traços finos" pedidos.
+   - Números com algarismos de largura igual na própria fonte do texto, em vez
+     de fonte de código. A placa segue monoespaçada, como placa de verdade. */
+
+html {
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  --font-weight-semibold: 560;
+  --font-weight-bold: 610;
+  --font-weight-extrabold: 650;
+  --font-weight-black: 690;
+  --tracking-tight: -0.022em;
+  font-family: var(--font-sans);
+  letter-spacing: -0.006em;
+  font-feature-settings: 'ss01', 'cv11';
+}
+
+html .uppercase {
+  text-transform: none;
+  letter-spacing: -0.004em;
+}
+
+html svg.lucide {
+  stroke-width: 1.65;
+}
+
+html .border-2 {
+  border-width: 1px;
+}
+
+html .num {
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.012em;
+}
+
+html .placa-num {
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+/* Superfícies: linha mais clara e sombra mais longa e difusa — o cartão
+   flutua sobre o fundo em vez de ser desenhado por uma borda. */
+/* Só no tema claro: estilo sem camada vence o `.dark .mec` do tema escuro, que
+   está dentro de @layer. Sem o :not(.dark), o fundo claro vazava para o escuro
+   e o texto claro sumia sobre ele. */
+html:not(.dark) .mec {
+  --c-canvas: #f3f5f9;
+  --c-line: #e4e9f0;
+  --c-line-strong: #cfd8e4;
+}
+
+html:not(.dark) .mec-sombra {
+  box-shadow:
+    0 0 0 0.5px rgb(8 24 48 / 0.04),
+    0 1px 2px rgb(8 24 48 / 0.04),
+    0 18px 40px -32px rgb(8 24 48 / 0.3);
+}
+
+html.dark .mec-sombra {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+}
+

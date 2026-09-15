@@ -45,6 +45,7 @@ const CatalogoMecanico = lazy(() => import('./mecanico/Consultas').then((m) => (
 const ListaOS = lazy(() => import('./mecanico/os/ListaOS').then((m) => ({ default: m.ListaOS })))
 const DetalheOS = lazy(() => import('./mecanico/os/DetalheOS').then((m) => ({ default: m.DetalheOS })))
 const NovoChamadoMecanico = lazy(() => import('./mecanico/NovoChamado').then((m) => ({ default: m.NovoChamadoMecanico })))
+const NovaOSMecanico = lazy(() => import('./mecanico/os/NovaOS').then((m) => ({ default: m.NovaOSMecanico })))
 const TecnoIAMecanico = lazy(() => import('./mecanico/TecnoIA').then((m) => ({ default: m.TelaTecnoIA })))
 
 export function AppSOS() {
@@ -157,6 +158,8 @@ function PorPapel() {
           <Route path="chamado/:id" element={<AtendimentoMecanico />} />
           {/* Chamado aberto pelo próprio mecânico (além de aceitar os da fila). */}
           <Route path="novo-chamado" element={<NovoChamadoMecanico />} />
+          {/* OS aberta no app: cliente buscado ou cadastrado na hora, em tela cheia. */}
+          <Route path="os/nova" element={<NovaOSMecanico />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       )

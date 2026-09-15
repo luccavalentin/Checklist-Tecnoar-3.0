@@ -1,6 +1,6 @@
 import type { ComponentType, ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bell, CalendarCheck, ChevronRight, CloudOff, History, MapPin, PhoneCall, Plus, Siren, Brain, Star, Truck, Wrench } from 'lucide-react'
+import { Bell, CalendarCheck, ChevronRight, CloudOff, MapPin, PhoneCall, Plus, Siren, Brain, Star, Wrench } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { formatarCoordenadas } from '@/sos/geo'
 import { OCORRENCIAS, ROTULO_TIPO_VEICULO, STATUS_SOS, formatarEta, haQuanto, linkTelefone } from '@/sos/rotulos'
@@ -37,7 +37,7 @@ export function HomeCliente() {
     <>
       <header className="cli-home-top z-30 pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))]">
         <div className="mx-auto flex h-16 max-w-xl items-center justify-between gap-3 px-4 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]">
-          <LogoSOS negativo altura={58} />
+          <LogoSOS negativo altura={40} />
           <div className="flex items-center gap-1">
             <button
               type="button"
@@ -57,17 +57,13 @@ export function HomeCliente() {
             </button>
           </div>
         </div>
-        <div className="mx-auto flex max-w-xl flex-col gap-1 px-4 pt-1 pb-7 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]">
-          <span className="text-[12px] font-semibold tracking-[0.08em] text-[#00afef] uppercase">Assistência Tecnoar</span>
-          <h1 className="font-display text-[25px] leading-tight font-bold text-white">
-            {saudacao()}
-            {nome ? `, ${nome}` : ''}
-          </h1>
-          <p className="max-w-[18rem] text-[13.5px] leading-snug text-white/68">Socorro, manutenção e acompanhamento em uma experiência rápida.</p>
+        <div className="mx-auto flex max-w-xl flex-col gap-0.5 px-4 pt-2 pb-8 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]">
+          <p className="text-[14px] text-white/60">{saudacao()}</p>
+          <h1 className="font-display text-[30px] leading-[1.05] font-semibold tracking-tight text-white">{nome || 'Bem-vindo'}</h1>
         </div>
       </header>
 
-      <main className="entrada-suave mx-auto -mt-4 flex w-full max-w-xl flex-col gap-5 px-4 pr-[max(1rem,env(safe-area-inset-right))] pb-[calc(6.5rem+env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
+      <main className="entrada-suave mx-auto -mt-3 flex w-full max-w-xl flex-col gap-5 px-4 pr-[max(1rem,env(safe-area-inset-right))] pb-[calc(6.5rem+env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
         {home.isError && <ErroCarga erro={home.error} aoTentar={() => void home.refetch()} />}
         {semVinculo(d) && <Faixa tom="info">Seu pedido de socorro já funciona. O histórico da Tecnoar aparece assim que a conta for ligada ao seu cadastro.</Faixa>}
 
@@ -96,11 +92,9 @@ export function HomeCliente() {
         )}
 
         {/* ── nível 3: atalhos ── */}
-        <nav aria-label="Atalhos" className="grid grid-cols-4 gap-2">
-          <Atalho para="/veiculos" icone={Truck} rotulo="Meus veículos" />
-          <Atalho para="/historico" icone={History} rotulo="Histórico" />
-          <Atalho para="/tecno-ia" icone={Brain} rotulo="Tecno IA" />
-          <Atalho para="/revisoes" icone={CalendarCheck} rotulo="Revisões" contador={d?.lembretes} />
+        <nav aria-label="Atalhos" className="grid grid-cols-2 gap-3">
+          <Atalho para="/tecno-ia" icone={Brain} rotulo="Tecno IA" sub="Tire dúvidas do seu veículo" />
+          <Atalho para="/revisoes" icone={CalendarCheck} rotulo="Revisões" sub="Agende a preventiva" contador={d?.lembretes} />
         </nav>
       </main>
     </>
@@ -116,29 +110,25 @@ function BotaoPrecisoDeAjuda() {
     <button
       type="button"
       onClick={() => navegar('/sos')}
-      className="cli-sos-stage flex w-full flex-col justify-between px-4 pt-4 pb-4 text-left transition-transform active:scale-[0.985]"
+      className="cli-sos-stage flex w-full flex-col justify-between px-5 pt-5 pb-5 text-left transition-transform active:scale-[0.985]"
     >
-      <span className="flex items-center justify-between gap-3">
-        <span className="flex items-center gap-2 rounded-full border border-[#00afef]/35 bg-[#0D1C33]/64 px-3 py-1.5 text-[11px] font-black tracking-[0.14em] text-white/90 uppercase backdrop-blur-md">
-          <span className="size-2 rounded-full bg-[#00afef]" />
-          SOS Tecnoar
+      <span className="flex items-center gap-2 text-[12.5px] text-white/70">
+        <span className="relative flex size-2" aria-hidden>
+          <span className="mec-pulso absolute inset-0 rounded-full bg-[#00afef]" />
+          <span className="relative size-2 rounded-full bg-[#00afef]" />
         </span>
-        <span className="rounded-full border border-white/14 bg-white/10 px-3 py-1.5 text-[11px] font-bold text-white/82 backdrop-blur-md">24h</span>
+        Socorro 24 horas, onde você estiver
       </span>
 
       <span className="flex items-end justify-between gap-4">
         <span className="min-w-0 flex-1">
-          <span className="block text-[13px] leading-snug font-semibold text-white/72">Assistência automotiva em tempo real</span>
-          <span className="mt-1 block font-display text-[24px] leading-[1.02] font-black tracking-normal text-white">Preciso de ajuda</span>
-          <span className="mt-2 inline-flex items-center gap-2 rounded-full bg-[#ff6600] px-4 py-2 font-display text-[13px] font-bold text-white shadow-[0_12px_26px_-16px_rgb(255_102_0/0.9)]">
-            Acionar SOS
-            <ChevronRight className="size-4" />
-          </span>
+          <span className="block font-display text-[28px] leading-[1.02] font-semibold tracking-tight text-white">Preciso de ajuda</span>
+          <span className="mt-1.5 block text-[14px] leading-snug text-white/70">Toque e a Tecnoar localiza você.</span>
         </span>
         <span className="cli-sos-orb sos-respira shrink-0">
-          <span className="flex flex-col items-center justify-center">
-            <Siren className="sos-sirene size-7" strokeWidth={2.35} />
-            <span className="font-display text-[22px] leading-none font-black tracking-normal">SOS</span>
+          <span className="flex flex-col items-center justify-center gap-0.5">
+            <Siren className="sos-sirene size-7" />
+            <span className="font-display text-[19px] leading-none font-semibold">SOS</span>
           </span>
         </span>
       </span>
@@ -284,18 +274,18 @@ function CartaoVeiculo({ dados, carregando }: { dados: DadosHome | undefined; ca
   const total = dados?.total_veiculos ?? 1
 
   return (
-    <section aria-label="Seu veículo" className="overflow-hidden rounded-[1.25rem] border border-line bg-surface">
+    <section aria-label="Seu veículo" className="overflow-hidden rounded-[1.5rem] border border-line bg-surface mec-sombra">
       <button type="button" onClick={() => navegar('/veiculos')} className="flex w-full flex-col gap-4 p-4 text-left active:bg-surface-2">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <Rotulo>{total > 1 ? `Veículo principal · ${total} veículos` : 'Seu veículo'}</Rotulo>
-            <p className="mt-0.5 font-display text-[21px] leading-tight font-bold break-words text-ink">{nomeVeiculo(v)}</p>
+            <p className="mt-0.5 font-display text-[22px] leading-tight font-semibold tracking-tight break-words text-ink">{nomeVeiculo(v)}</p>
             {detalhes && <p className="mt-0.5 text-[13px] text-ink-3">{detalhes}</p>}
           </div>
           <PlacaVeiculo placa={v.placa} className="mt-1" />
         </div>
 
-        <dl className="grid grid-cols-1 divide-y divide-line rounded-2xl bg-surface-2 min-[400px]:grid-cols-3 min-[400px]:divide-x min-[400px]:divide-y-0">
+        <dl className="-mx-4 -mb-4 grid grid-cols-3 divide-x divide-line border-t border-line">
           <Dado rotulo="Último serviço" valor={u ? (u.encerrada ? dataNumerica(u.em) : 'Na oficina') : '—'} />
           <Dado
             rotulo="Próxima revisão"
@@ -330,34 +320,52 @@ function CartaoVeiculo({ dados, carregando }: { dados: DadosHome | undefined; ca
 
 function Dado({ rotulo, valor, tom }: { rotulo: string; valor: ReactNode; tom?: 'ok' | 'warn' | 'crit' }) {
   return (
-    <div className="flex min-w-0 items-center justify-between gap-3 px-3.5 py-2.5 min-[400px]:flex-col min-[400px]:items-start min-[400px]:justify-start min-[400px]:gap-1 min-[400px]:px-2.5 min-[400px]:py-3 min-[400px]:first:pl-3.5 min-[400px]:last:pr-3.5">
-      <dt className="text-[12.5px] leading-tight font-medium text-ink-3 min-[400px]:text-[11.5px]">{rotulo}</dt>
+    <div className="flex min-w-0 flex-col items-center gap-1 px-2 py-3.5 text-center">
       <dd
         className={cn(
-          'truncate text-[14.5px] leading-tight font-bold min-[400px]:text-[14px]',
+          'num max-w-full truncate text-[15px] leading-tight font-semibold',
           tom === 'crit' ? 'text-crit-ink' : tom === 'warn' ? 'text-warn-ink' : tom === 'ok' ? 'text-ok-ink' : 'text-ink',
         )}
       >
         {valor}
       </dd>
+      <dt className="max-w-full truncate text-[11.5px] leading-tight text-ink-3">{rotulo}</dt>
     </div>
   )
 }
 
 /* ── nível 3 ────────────────────────────────────────────────────────────── */
 
-function Atalho({ para, icone: Icone, rotulo, contador }: { para: string; icone: ComponentType<{ className?: string }>; rotulo: string; contador?: number }) {
+function Atalho({
+  para,
+  icone: Icone,
+  rotulo,
+  sub,
+  contador,
+}: {
+  para: string
+  icone: ComponentType<{ className?: string }>
+  rotulo: string
+  sub: string
+  contador?: number
+}) {
   return (
-    <Link to={para} className="group flex min-w-0 flex-col items-center gap-2 rounded-2xl py-1 text-center">
-      <span className="relative flex size-14 items-center justify-center rounded-2xl border border-line bg-surface text-accent-ink transition-transform group-active:scale-95">
-        <Icone className="size-6" />
-        {!!contador && (
-          <span className="num absolute -top-1.5 -right-1.5 flex min-w-[20px] items-center justify-center rounded-full bg-[#ff6600] px-1 text-[10.5px] leading-5 font-bold text-white ring-2 ring-canvas">
-            {contador > 99 ? '99+' : contador}
-          </span>
-        )}
+    <Link
+      to={para}
+      className="relative flex min-w-0 flex-col gap-3 rounded-[1.5rem] border border-line bg-surface p-4 mec-sombra transition-transform active:scale-[0.98]"
+    >
+      <span className="flex size-10 items-center justify-center rounded-full bg-accent-soft text-accent-ink">
+        <Icone className="size-5" />
       </span>
-      <span className="text-[12.5px] leading-tight font-semibold text-ink-2">{rotulo}</span>
+      <span className="min-w-0">
+        <span className="block truncate text-[15.5px] leading-tight font-semibold text-ink">{rotulo}</span>
+        <span className="mt-0.5 block text-[12.5px] leading-snug text-ink-3">{sub}</span>
+      </span>
+      {!!contador && (
+        <span className="num absolute top-3.5 right-3.5 flex min-w-[20px] items-center justify-center rounded-full bg-[#ff6600] px-1.5 text-[11px] leading-5 font-semibold text-white">
+          {contador > 99 ? '99+' : contador}
+        </span>
+      )}
     </Link>
   )
 }

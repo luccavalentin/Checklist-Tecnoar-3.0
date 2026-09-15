@@ -25,7 +25,7 @@ export function PlacaVeiculo({ placa, tamanho = 'md', className }: { placa: stri
       <span aria-hidden className={cn('flex items-center justify-center bg-[#1446a0] font-sans font-bold tracking-[0.25em] text-white', faixa)}>
         BRASIL
       </span>
-      <span aria-hidden className={cn('num text-center font-bold tracking-[0.08em]', texto)}>
+      <span aria-hidden className={cn('num placa-num text-center font-bold', texto)}>
         {formatarPlacaExibicao(placa)}
       </span>
     </span>

@@ -622,7 +622,16 @@ export function ChamadoCliente() {
                   Cancelar o socorro
                 </BotaoApp>
               )}
-              {ativo && !podeCancelar && <p className="text-center text-[12.5px] text-ink-3">O serviço já começou. Para cancelar, fale com a Tecnoar.</p>}
+              {ativo && !podeCancelar && (
+                /* A central decide até que etapa o cliente cancela sozinho. Dizer
+                   "o serviço já começou" com o mecânico ainda dirigindo informava
+                   algo falso a quem está parado na estrada. */
+                <p className="text-center text-[12.5px] text-ink-3">
+                  {ordemStatus(status) >= ordemStatus('servico_iniciado')
+                    ? 'O serviço já começou. Para cancelar, fale com a Tecnoar.'
+                    : 'O mecânico já está acionado para você. Para cancelar agora, fale com a Tecnoar.'}
+                </p>
+              )}
               {!ativo && (
                 <BotaoApp variante="fantasma" tamanho="md" largo icone={Wrench} onClick={() => navegar('/historico')}>
                   Ver histórico do veículo

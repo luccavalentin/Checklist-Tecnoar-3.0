@@ -45,6 +45,8 @@ import type {
   SugestaoMecanico,
   TipoAgendamento,
   TipoAnexo,
+  NovaOSApp,
+  OSAbertaApp,
 } from './tipos'
 
 /**
@@ -225,6 +227,12 @@ export const sosOSBuscarVeiculo = (placa: string) => rpc<VeiculoParaOS[]>('sos_o
 
 export const sosOSCriar = (veiculoId: string, problema: string) =>
   rpc<string>('sos_os_criar', { p_veiculo: veiculoId, p_problema: problema })
+
+/**
+ * Abre OS com cliente escolhido da busca ou cadastrado na hora (na tabela
+ * `clientes` do Checklist) e veículo escolhido ou informado pela placa.
+ */
+export const sosOSAbrir = (p: NovaOSApp) => rpc<OSAbertaApp>('sos_os_abrir', { p })
 
 export const sosAvaliar = (chamadoId: string, nota: number, comentario?: string | null) =>
   rpc<ChamadoSOS>('sos_avaliar', { p_chamado: chamadoId, p_nota: nota, p_comentario: comentario ?? null })
