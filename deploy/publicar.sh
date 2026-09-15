@@ -21,6 +21,7 @@ echo "==> Enviando código-fonte do Checklist"
 # quem os produz é o próprio Dockerfile, de forma reproduzível.
 tar --exclude=node_modules --exclude=dist --exclude=.git --exclude='*.log' \
     -czf - src public index.html package.json package-lock.json \
+           app vite.app.config.ts \
            vite.config.ts tsconfig*.json Dockerfile .dockerignore \
            docker-compose.yml deploy/nginx-app.conf \
   | "${SSH[@]}" "tar -xzf - -C $APP"
@@ -42,3 +43,4 @@ echo "==> Estado"
 "${SSH[@]}" "docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'"
 echo
 echo "==> Publicado: https://checklist.tecnoarsistemas.com.br"
+echo "               https://sos.tecnoarsistemas.com.br (app SOS Tecnoar)"

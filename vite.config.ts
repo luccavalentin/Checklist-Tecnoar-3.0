@@ -8,6 +8,10 @@ export default defineConfig({
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
+  // O mapa do SOS (tela carregada sob demanda) entra no cache de dependências
+  // já na partida: descoberto só ao abrir a central, o Vite recarregava a
+  // página. O app SOS usa outro cache (ver `cacheDir` em vite.app.config.ts).
+  optimizeDeps: { include: ['leaflet', 'react-leaflet'] },
   plugins: [
     react(),
     tailwindcss(),
@@ -43,13 +47,30 @@ export default defineConfig({
         importScripts: ['sw-notificacoes.js'],
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
-        globIgnores: ['**/*.map'],
+        // Gerador de PDF (~1,8 MB): baixa no primeiro laudo/relatório, não na instalação.
+        globIgnores: ['**/*.map', '**/pdfmake-*.js', '**/vfs_fonts-*.js'],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: '/index.html',
         // Nunca servir resposta de API a partir de cache: dado operacional
         // desatualizado é pior do que estado de erro honesto.
-        navigateFallbackDenylist: [/^\/api/, /^\/rest\/v1/, /^\/auth\/v1/, /^\/storage\/v1/, /^\/functions\/v1/],
+        navigateFallbackDenylist: [
+          /^\/api/,
+          /^\/rest\/v1/,
+          /^\/auth\/v1/,
+          /^\/storage\/v1/,
+          /^\/functions\/v1/,
+          // /app/ é o SOS Tecnoar, outro aplicativo com service worker próprio.
+          // Sem isto, num aparelho que já tem o Checklist instalado, abrir o
+          // link do SOS mostraria a tela do Checklist no lugar.
+          /^\/app(\/|$)/,
+        ],
         runtimeCaching: [
+          {
+            // Depois do primeiro uso, o gerador de PDF fica guardado (funciona sem sinal).
+            urlPattern: ({ url }) => /\/assets\/(pdfmake|vfs_fonts)-/.test(url.pathname),
+            handler: 'CacheFirst',
+            options: { cacheName: 'gerador-pdf', expiration: { maxEntries: 4 } },
+          },
           {
             urlPattern: ({ url }) => url.origin === 'https://fonts.googleapis.com',
             handler: 'StaleWhileRevalidate',

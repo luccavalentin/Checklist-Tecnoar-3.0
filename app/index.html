@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script>
+      // Mesmo cuidado do Checklist: no iPhone, tocar num campo com letra menor
+      // que 16px aproxima a tela e, no app instalado, o zoom não volta.
+      // `maximum-scale=1` desliga só esse zoom — o gesto de pinça continua.
+      (function () {
+        var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+        if (!ios) return
+        var meta = document.querySelector('meta[name="viewport"]')
+        if (meta) meta.setAttribute('content', meta.getAttribute('content') + ', maximum-scale=1')
+      })()
+    </script>
+    <title>SOS Tecnoar</title>
+    <meta name="description" content="Socorro mecânico, histórico do seu veículo e revisões com a Tecnoar Freios." />
+
+    <link rel="icon" type="image/png" sizes="64x64" href="/icone-64.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="SOS Tecnoar" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#081830" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+    />
+
+    <script>
+      // O app do cliente é claro por padrão (ao sol, na estrada, claro lê
+      // melhor); quem escolher escuro no perfil tem a escolha respeitada.
+      (function () {
+        try {
+          var t = localStorage.getItem('sos.tema') || 'claro'
+          var escuro = t === 'escuro' || (t === 'sistema' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          document.documentElement.classList.toggle('dark', escuro)
+        } catch (e) {}
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="raiz"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -12,6 +12,7 @@ import { MenuConta } from './MenuConta'
 import { PainelNotificacoes, useNaoLidas } from './PainelNotificacoes'
 import { IndicadorOffline } from './StatusApp'
 import { EnviosPendentes } from './EnviosPendentes'
+import { AlertaSOS } from './AlertaSOS'
 import { ConviteNotificacoes, useNotificacoesDoAparelho } from '@/notificacoes/NotificacoesDoAparelho'
 import '@/busca/fonteNavegacao'
 
@@ -175,6 +176,8 @@ export function AppShell() {
       </div>
 
       {usuario && <ConviteNotificacoes usuarioId={usuario.id} />}
+      {/* SOS novo avisa em qualquer tela — o componente só aparece para quem vê o SOS. */}
+      {usuario && <AlertaSOS />}
 
       <BuscaGlobal aberto={buscaAberta} aoFechar={() => setBuscaAberta(false)} />
       {usuario && (

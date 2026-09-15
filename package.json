@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && vite build -c vite.app.config.ts",
     "preview": "vite preview",
-    "typecheck": "tsc -b --noEmit"
+    "typecheck": "tsc -b --noEmit",
+    "dev:app": "vite -c vite.app.config.ts",
+    "test:sos": "node scripts/testes-sos/teste-sos.mjs && node scripts/testes-sos/impressao.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -15,18 +17,20 @@
     "@tanstack/react-query": "^5.62.7",
     "@types/pdfmake": "^0.3.3",
     "clsx": "^2.1.1",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.468.0",
     "pdfmake": "^0.3.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.1",
+    "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.28.0",
     "tailwind-merge": "^2.5.5",
-    "xlsx": "^0.18.5",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
+    "@types/leaflet": "^1.9.12",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",

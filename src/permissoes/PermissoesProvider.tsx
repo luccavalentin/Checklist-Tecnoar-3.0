@@ -32,10 +32,15 @@ export function ProvedorPermissoes({ children }: { children: ReactNode }) {
   })
 
   const concedidas = consulta.data ?? new Set<string>()
+  const admin = Boolean(usuario?.is_admin && usuario.situacao === 'ativo')
 
+  /* Administrador tem acesso total — inclusive a módulo novo cujo recurso
+     ainda não chegou ao banco (o SOS antes da migração): ele precisa ver o
+     item no menu para abrir a tela e saber o que falta ativar. No banco a
+     RLS continua decidindo tudo. */
   const pode = useCallback(
-    (recurso: string, acao: AcaoPermissao) => concedidas.has(`${recurso}:${acao}`),
-    [concedidas],
+    (recurso: string, acao: AcaoPermissao) => admin || concedidas.has(`${recurso}:${acao}`),
+    [concedidas, admin],
   )
 
   const podeVer = useCallback((recurso: string) => pode(recurso, 'visualizar'), [pode])

@@ -17,7 +17,7 @@ import {
   X,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { mensagemErro, cn } from '@/lib/utils'
+import { mensagemErro, cn, escaparCampos, escaparHtml } from '@/lib/utils'
 import { mascaraDocumento } from '@/lib/formatos'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
 import { useExclusao, DialogoExclusao } from '@/dados/exclusao'
@@ -177,8 +177,8 @@ function ModalExport({
             <strong>Filtros aplicados:</strong>
             ${filtroTipo ? ` Tipo: ${filtroTipo === 'fisica' ? 'Pessoa Física' : 'Pessoa Jurídica'} |` : ''}
             ${filtroStatus ? ` Status: ${filtroStatus === 'ativo' ? 'Ativos' : 'Inativos'} |` : ''}
-            ${filtroUF ? ` UF: ${filtroUF} |` : ''}
-            ${filtroTag ? ` Tag: ${tags.find(t => t.id === filtroTag)?.nome || ''} |` : ''}
+            ${filtroUF ? ` UF: ${escaparHtml(filtroUF)} |` : ''}
+            ${filtroTag ? ` Tag: ${escaparHtml(tags.find(t => t.id === filtroTag)?.nome || '')} |` : ''}
             <strong>Total: ${clientesFiltrados.length} registro(s)</strong>
           </div>
           <table>
@@ -199,7 +199,7 @@ function ModalExport({
               </tr>
             </thead>
             <tbody>
-              ${clientesFiltrados.map(c => `
+              ${clientesFiltrados.map(escaparCampos).map(c => `
                 <tr>
                   <td>#${String(c.codigo).padStart(4, '0')}</td>
                   <td><span class="badge ${c.tipo_pessoa === 'fisica' ? 'badge-pf' : 'badge-pj'}">${c.tipo_pessoa === 'fisica' ? 'PF' : 'PJ'}</span></td>
@@ -286,8 +286,8 @@ function ModalExport({
             <strong>Filtros aplicados:</strong>
             ${filtroTipo ? ` Tipo: ${filtroTipo === 'fisica' ? 'Pessoa Física' : 'Pessoa Jurídica'} |` : ''}
             ${filtroStatus ? ` Status: ${filtroStatus === 'ativo' ? 'Ativos' : 'Inativos'} |` : ''}
-            ${filtroUF ? ` UF: ${filtroUF} |` : ''}
-            ${filtroTag ? ` Tag: ${tags.find(t => t.id === filtroTag)?.nome || ''} |` : ''}
+            ${filtroUF ? ` UF: ${escaparHtml(filtroUF)} |` : ''}
+            ${filtroTag ? ` Tag: ${escaparHtml(tags.find(t => t.id === filtroTag)?.nome || '')} |` : ''}
             <strong>Total: ${clientesFiltrados.length} registro(s)</strong>
           </div>
           <table>
@@ -304,7 +304,7 @@ function ModalExport({
               </tr>
             </thead>
             <tbody>
-              ${clientesFiltrados.map(c => `
+              ${clientesFiltrados.map(escaparCampos).map(c => `
                 <tr>
                   <td>#${String(c.codigo).padStart(4, '0')}</td>
                   <td><span class="badge ${c.tipo_pessoa === 'fisica' ? 'badge-pf' : 'badge-pj'}">${c.tipo_pessoa === 'fisica' ? 'PF' : 'PJ'}</span></td>

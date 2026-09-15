@@ -42,7 +42,7 @@ mostrar um placeholder plausível.
 │  ├── PostgREST   API gerada do schema       │
 │  ├── Postgres    dados + RLS + RPCs         │
 │  ├── Storage     fotos, vídeos, documentos  │
-│  └── Edge Funcs  omie, omie-envio           │
+│  └── Edge Funcs  omie, ia, sos-ia, push…    │
 └─────────────────────────────────────────────┘
 ```
 
@@ -57,7 +57,7 @@ contornável por quem abrisse o DevTools. Ver §5.
 | Camada | Tecnologia |
 | --- | --- |
 | Build | Vite 6 |
-| Interface | React 18, TypeScript 5.7 |
+| Interface | React 18, TypeScript 5.9 |
 | Estilo | Tailwind CSS v4 (tokens em `src/styles/theme.css`) |
 | Rotas | React Router 6, com carregamento sob demanda |
 | Dados | TanStack Query 5 (cache e revalidação) |
@@ -92,7 +92,8 @@ src/
 design/            artboards da direção visual e vetores da marca
 deploy/            infraestrutura: nginx do container, Traefik, scripts
 supabase/
-  functions/       Edge Functions (omie, omie-envio) e o dicionário de campos
+  functions/       Edge Functions (admin-usuarios, ia, ia-modelos, placa, omie,
+                   omie-envio, push, sos-ia) e o dicionário de campos
   migrations/      migrações SQL
 ```
 
@@ -532,3 +533,297 @@ O componente `<Logo>` escolhe sozinho conforme o tema. Não criar símbolo
 reduzido alternativo nem recolorir a marca.
 
 Paleta: Navy `#081830` · Laranja `#FC6400` · Ciano `#00A8E8`.
+
+---
+
+## 13. SOS Tecnoar
+
+Socorro mecânico com acompanhamento em tempo real, ligado ao Checklist. Três
+ambientes, um banco:
+
+| Ambiente | Onde | Quem usa |
+| --- | --- | --- |
+| **Central SOS** | Checklist → menu **SOS Tecnoar** (`/sos`) | Equipe com permissão `sos` |
+| **App do cliente** | `https://sos.tecnoarsistemas.com.br` (subdomínio próprio) | Proprietário ou motorista |
+| **App do mecânico** | o mesmo endereço, entrando com o usuário do Checklist | **Todo usuário ativo do Checklist** |
+
+O app é outro aplicativo: build `vite.app.config.ts` (sai em `dist/app`),
+servido pelo mesmo container num `server` próprio do nginx e num roteador
+próprio do Traefik (certificado separado). O endereço fica em
+`src/sos/endereco.ts` (`URL_APP_SOS`, `URL_CHECKLIST`; `VITE_SOS_URL` e
+`VITE_CHECKLIST_URL` trocam). Links antigos `…/app/…` redirecionam, e os links
+de notificação gravados como `/app/...` são convertidos pelo app e pelo
+service worker (`public/sw-notificacoes.js`).
+
+O Checklist continua sendo a fonte da verdade: cliente, veículo, produto,
+serviço, mecânico e OS são os mesmos registros — o SOS nunca cadastra em
+paralelo. Os produtos e serviços lançados no atendimento vêm do catálogo
+(com preço e estoque) e viram itens da OS.
+
+### Ativação (uma vez)
+
+1. Banco: aplicar **todas** as migrações `supabase/migrations/20260912_*` em
+   diante, **na ordem**, num banco que ainda não tem o SOS (em produção isso
+   já foi feito — confira em `supabase/historico-producao/`). **Nunca reaplique
+   um arquivo antigo sozinho**: várias funções foram redefinidas em migrações
+   posteriores, e rodar de novo o `20260912_sos_tecnoar.sql` volta essas
+   funções à versão antiga sem dar erro. Mudança nova = migração nova.
+2. Regerar `src/tipos/supabase.ts` (a camada `src/sos/api.ts` funciona sem
+   isso, mas o tipo gerado passa a conhecer as tabelas `sos_*`).
+3. Na Central → **Configurações**: modo de distribuição, velocidade média,
+   telefone da central e, se quiser, WhatsApp (Evolution API).
+4. Mecânicos: todo usuário ativo do Checklist entra no app. Cada um toca
+   **Ficar disponível** — só aí passa a aparecer no despacho da central (quem
+   tem função "atua como mecânico" aparece desde o início).
+
+Sem a migração, as telas do SOS mostram "O SOS Tecnoar ainda não foi ativado
+no banco de dados" — nada quebra no restante do sistema.
+
+### Fluxo de um chamado
+
+```
+cliente toca SOS ──► sos_abrir_chamado ──► status recebido/procurando_mecanico
+                                              │  notifica central (sino + push + sirene)
+                                              │  notifica mecânicos DISPONÍVEIS
+                                              │  WhatsApp (se configurado)
+mecânico aceita ──► sos_aceitar ─────────► a_caminho  (posição ao vivo nos 2 lados)
+"Cheguei"       ──► sos_avancar ─────────► no_local
+"Iniciar"       ──► sos_avancar ─────────► servico_iniciado  (diagnóstico, itens, fotos)
+"Finalizar"     ──► sos_avancar ─────────► servico_finalizado ──► OS gerada sozinha
+cliente avalia  ──► sos_avaliar ─────────► concluido
+```
+
+A ordem é regra do banco (`sos_avancar` recusa pular etapa). Cliente cancela
+até a etapa configurada; mecânico nunca cancela; a central cancela com
+permissão `sos:cancelar` e motivo obrigatório. Toda mudança fica em
+`sos_eventos` (linha do tempo) e as ações da central em `auditoria`.
+
+### Contas
+
+- **Cliente**: entra pelo mesmo Supabase Auth, com `tipo_conta = 'sos_cliente'`
+  nos metadados. Vira `sos_contas_cliente` ligado a um `clientes` existente
+  (por CPF/CNPJ ou celular) ou criado na hora. **Nunca** vira linha em
+  `usuarios`: o gatilho `sos_ignorar_conta_cliente` descarta o "pedido de
+  acesso" automático e o Checklist redireciona essa conta para o app do SOS.
+- **Mecânico**: qualquer `usuarios` ativo usa o app de atendimento
+  (`sos_eh_mecanico`, `20260917_sos_toda_equipe_no_app.sql`). Mapa e
+  sugestão de despacho da central listam quem tem função de mecânico ou ficha
+  em `sos_mecanicos` — a ficha nasce quando a pessoa define a situação no app.
+  Situação: disponível · em atendimento · pausa · indisponível · offline. Só
+  **disponível** recebe chamado automático.
+- **Central**: `usuarios` com `sos:visualizar` (admins sempre).
+- **Equipe também cliente** (`20260918_sos_equipe_tambem_cliente.sql`): um
+  funcionário ativo pode ter conta de cliente (`sos_registrar_conta` aceita;
+  `sos_meu_papel` devolve `cliente` junto). No app, `CartaoModoApp` alterna
+  entre o app do mecânico e o do cliente (modo guardado no aparelho,
+  `app/src/sessao.tsx`). No chamado, o papel sai do vínculo com ele
+  (`sos_papel_no_chamado`: dono do pedido = cliente, mecânico dele =
+  mecânico); `sos_abrir_chamado` só usa o fluxo da central quando ela informa
+  `cliente_id`. A Tecno IA técnica do mecânico é a ação `atendimento` com
+  `perfil: 'tecnico'` (`sosIaTecnica`).
+
+### Tabelas
+
+`sos_chamados` (o chamado e todos os carimbos de tempo), `sos_eventos`
+(linha do tempo), `sos_posicoes` (rastro GPS; apagado 30 dias após encerrar —
+LGPD), `sos_mensagens` (chat), `sos_itens` (produtos/serviços do catálogo,
+espelhados na OS por `os_item_id`), `sos_anexos` (fotos, áudios, vídeos no
+bucket privado `sos`, pasta = id do chamado), `sos_mecanicos` (situação e
+posição), `sos_recusas`, `sos_compartilhamentos` (link público temporário),
+`sos_agendamentos`, `sos_lembretes` (revisão por tempo/km, gerados todo dia
+pelo `pg_cron`), `sos_contatos_emergencia`, `sos_contas_cliente`,
+`sos_config` (linha única).
+
+Leitura por RLS (cada lado só vê o que é seu); escrita quase sempre por RPC
+`security definer`. O cliente final ganha políticas **adicionais** de leitura
+só dos próprios registros em `clientes`, `veiculos`, `ordens_servico`,
+`os_servicos`, `os_produtos` e `eventos_veiculo`.
+
+### Tempo real
+
+Supabase Realtime sobre `sos_chamados`, `sos_posicoes`, `sos_mensagens`,
+`sos_eventos`, `sos_itens`, `sos_anexos`, `sos_mecanicos` e
+`sos_agendamentos`. O Realtime respeita a RLS. O mecânico manda posição a
+cada ~25 m / 15 s durante o chamado; disponível sem chamado, a cada ~150 m /
+2 min. A previsão de chegada é recalculada no servidor a cada posição.
+
+Quando o canal cai (túnel, aparelho dormindo), as telas não dependem dele:
+cada consulta tem intervalo de segurança e recarrega ao voltar o foco ou a
+internet.
+
+### Vigia (`sos_vigiar`, pg_cron a cada 30 s)
+
+O que garante que nenhum SOS fica esquecido, com todas as telas fechadas:
+
+| Situação | O que acontece |
+| --- | --- |
+| Ninguém aceitou no prazo (`tempo_aceite_seg`) | Nível 1: mecânicos disponíveis (menos quem recusou) e central avisados de novo. 3× o prazo: central acionada, WhatsApp, cliente tranquilizado. 6×: alerta máximo. |
+| Mecânico escolhido pela central não respondeu | Modo inteligente: o SOS volta para todos. Modo manual: central e mecânico avisados. |
+| Deslocamento além de 1,5× a previsão inicial + 10 min | Central avisada ("atrasado"). |
+| 8 min sem posição do mecânico em deslocamento | Central avisada e o mecânico recebe push para reabrir o app. |
+| Serviço finalizado sem avaliação por `concluir_apos_horas` | Concluído automaticamente. |
+| "Disponível" sem sinal do app por `offline_apos_min` | Vira offline (sai do despacho) e o mecânico é avisado. |
+
+Cada aviso é marcado no chamado (`alerta_nivel`, `atraso_avisado_em`,
+`sinal_avisado_em`) e sai uma vez só; a espera recomeça (`espera_desde`) quando
+o chamado é atribuído ou volta para a fila. O app do mecânico manda um pulso
+(`sos_pulso`) por minuto com a tela aberta, gravado em `sos_presenca` — fora
+do Realtime, para não acordar a central a cada minuto. A central vê os avisos
+nos cartões e a sirene volta a tocar quando um SOS é escalado.
+
+Limite da plataforma: app instalado pelo navegador não manda GPS com a tela
+bloqueada. O vigia detecta e avisa; só um app de loja resolveria.
+
+O vigia também avisa quando estoura o **prazo de chegada de um contrato**, e a
+central vê a saúde dele (`sos_vigia_status`: última execução no pg_cron,
+falhas na última hora).
+
+### Atendimento premium (`20260914_sos_premium_ia.sql`)
+
+- **Orçamento pelo app**: o mecânico (ou a central) envia com o mecânico no
+  local (`sos_enviar_orcamento`); o cliente aprova **assinando** na tela — a
+  assinatura vai para o bucket `sos` como anexo — ou recusa
+  (`sos_responder_orcamento`). A central pode registrar a resposta dada por
+  telefone, sempre com observação. Com `exigir_aprovacao_orcamento`, o serviço
+  só começa com orçamento aprovado (trava no gatilho `sos_chamados_antes`).
+  Item alterado depois da resposta marca `orcamento_desatualizado`.
+- **Taxa de deslocamento**: na chegada (`no_local`), o gatilho
+  `sos_chamados_deslocamento` lança o item de deslocamento (km do aceite ×
+  valor do km, com taxa mínima; ida e volta opcional), que segue para a OS.
+  Valores do contrato do cliente têm prioridade.
+- **Contratos de frotistas** (`sos_contratos`): um ativo por cliente, com prazo
+  de chegada (SLA), prioridade mínima e valor de km próprios; o chamado herda
+  prazo e prioridade ao nascer. Relatórios mostram % no prazo.
+- **Mapa de calor** nos relatórios (`pontos`, agregados a ~1 km).
+- **Laudo em PDF** (`src/sos/laudo.ts`, sobre `src/documentos/pdf.ts`):
+  cliente, veículo, linha do tempo, diagnóstico, itens, orçamento com
+  assinatura, fotos e avaliação. No celular vai em dois toques
+  (`useLaudoSOS`): o 1º monta o PDF, o 2º abre a folha de compartilhar — o
+  Safari do iPhone só a abre direto do toque.
+
+### OS em campo (`20260919_sos_os_em_campo.sql`)
+
+O mecânico gera a OS pelo app logo na chegada (`sos_gerar_os`). O gatilho
+`sos_chamados_texto_os` leva diagnóstico, serviço e observações registrados
+depois para a OS — sem trocar o que a oficina já editou nela e nunca em OS
+encerrada — e, na finalização sem serviço do catálogo, lança "Socorro: …"
+como linha para precificar. A quilometragem lida no painel entra por
+`sos_registrar_km` (veículo e OS; recusa km menor que o do cadastro).
+
+### OS e estoque no app (`20260921_sos_os_e_estoque_no_app.sql`)
+
+Produtos e serviços do app são **o cadastro do sistema** (`produtos`,
+`servicos`, sincronizados com a Omie) — `sos_catalogo` lista tudo, com termo
+vazio e paginação (`20260922`). Estoque:
+
+```
+disponível = saldo (Omie) − reservado (Omie) − comprometido (Tecnoar)
+comprometido = peças de OS aberta (estado necessário/reservado/utilizado)
+             + peças lançadas em chamado SOS que ainda não entraram em OS
+```
+
+A Omie é a dona do saldo (a sincronização sobrescreve `saldo`/`reservado`); o
+Tecnoar só desconta o que já prometeu. Peça lançada no chamado fica
+**reservada até a OS ser efetivada** (encerrada) ou o chamado cancelado. Na OS
+ela entra como `reservado` (havia estoque) ou `necessario` (faltou — a central
+recebe "Peça sem estoque") e vira `utilizado` na finalização do socorro.
+
+O mecânico vê e mexe nas OS dele pelo app (`sos_minhas_os`, `sos_os_detalhe`,
+`sos_os_adicionar_item`, `sos_os_alterar_item`, `sos_os_atualizar`); OS de
+socorro aberto recebe item pelo chamado (os dois lados iguais). Abrir OS pelo
+app (`sos_os_buscar_veiculo`, `sos_os_criar`) exige `ordens_servico:criar`.
+Tudo registra `os_eventos` ("… pelo app SOS").
+
+### Chamado aberto pelo mecânico (`20260922_sos_chamado_pelo_mecanico.sql`)
+
+Além de aceitar da fila, o mecânico abre o próprio chamado
+(`sos_mecanico_abrir_chamado`, app `/novo-chamado`): acha o cliente por nome,
+telefone, documento ou placa (`sos_buscar_cliente_campo`, com a OS aberta de
+cada veículo) ou cadastra na hora (mesmo celular = mesmo cliente; a central é
+avisada para completar o cadastro). Nasce já com ele — `no_local` (está com o
+cliente) ou `a_caminho` (distância e previsão calculadas) — com origem
+`mecanico`, na mesma fila/mapa da central. Um atendimento aberto por vez.
+Ponto marcado à mão no mapa vai com `ponto_ajustado`
+(`20260923_sos_ponto_ajustado_mecanico.sql`), como no pedido do cliente.
+Pode abrir OS nova junto ou **ligar à OS já aberta** do veículo
+(`sos_os_para_vincular` + `sos_vincular_os`, que também vale no atendimento e
+para a central): os itens do chamado vão para a OS.
+
+Entrada do app: cliente em `/entrar`, mecânico em `/mecanico/entrar` (usuário
+e senha do sistema; conta de cliente é recusada ali). O aparelho lembra a
+última porta (`sos.entrada`); pessoa da equipe que entra pela porta do cliente
+usa o app como cliente.
+
+GPS: `posicaoPrecisa` (`src/sos/geo.ts`) só aceita leitura nova (sem cache),
+vai trocando pela melhor e para em ±10 m (ou na melhor em até 45 s);
+`acompanharPosicao` descarta o "pulo" de leitura de antena logo depois de uma
+de GPS.
+
+### Sem sinal no campo (`20260916_sos_hora_do_aparelho.sql`)
+
+O app do mecânico guarda no aparelho as ações feitas sem internet (etapas,
+diagnóstico, mensagens) e envia sozinho quando o sinal volta, na ordem
+(`app/src/mecanico/filaOffline.ts`). Etapa que sai com mais de 1 min de atraso
+leva `registrado_no_aparelho_em`, e `sos_avancar` usa essa hora para
+`chegou_em`, tempos e SLA — só se for passada, de no máximo 12 h, e nunca antes
+da etapa anterior; fora disso vale a hora do servidor. O evento guarda
+`hora_da_etapa`.
+
+### IA do SOS (função `sos-ia`)
+
+Configurada **dentro da Gestão SOS** (Configurações): provedor (Anthropic,
+OpenAI ou Gemini), modelo, chave própria (gravada em `privado.config`, nunca
+volta para a tela) ou a mesma chave da Tecnoar IA (`integracoes`), recursos
+ligados e limite diário por cliente. Ações da função:
+
+| Ação | Quem | O que faz |
+| --- | --- | --- |
+| `atendimento` | cliente (TECNO IA) | Triagem por conversa, com foto; segurança primeiro; sugere abrir o SOS (tipo, prioridade, descrição) ou agendar. |
+| `foto` | quem vê o chamado | Analisa uma foto do chamado e registra na linha do tempo. |
+| `kit` | mecânico / central | O que levar: hipóteses, ferramentas, cuidados e peças conferidas no catálogo do Checklist (preço e estoque). |
+| `resumo` | mecânico / central | Registro técnico (diagnóstico, serviço, observações) para a OS. |
+| `testar` | central (`configurar`) | Confere provedor, modelo e chave. |
+
+Tudo que o usuário vê passa pela sessão dele (as RPCs conferem o acesso ao
+chamado); a chave de serviço só lê a credencial (`sos_ia_credencial`, fechada
+para contas logadas) e grava o uso em `sos_ia_mensagens`. Erros temporários
+do provedor (429/5xx) têm uma segunda tentativa automática. Sem internet, o
+app volta para o guia rápido offline.
+
+### LGPD
+
+Termos de uso e política de privacidade no app; o cliente exclui a própria
+conta (`sos_excluir_minha_conta`): saem conta, rastro de localização,
+contatos de emergência e conversas com a IA; o histórico de serviço da
+empresa (chamados e OS) fica, sem vínculo com a conta.
+
+### Testes
+
+`npm run test:sos` — todas as migrações do SOS num PostgreSQL local (PGlite)
+com o ciclo completo (135 etapas) + impressão digital das funções para
+comparar com o banco real (ver `scripts/testes-sos/LEIA-ME.md`).
+
+### Mapas
+
+Base OpenStreetMap (sem chave; tema escuro por filtro de cor), rota pelo OSRM público com
+fallback para linha reta × 1,3 e velocidade média da configuração, endereço
+pelo Nominatim (1 consulta/s, com cache). "Ir até o cliente" abre Google Maps,
+Waze ou Apple Maps.
+
+### Código
+
+| Caminho | Conteúdo |
+| --- | --- |
+| `src/sos/` | Camada compartilhada: tipos, API (uma função por RPC), rótulos, GPS/rota, mapa, tempo real, alerta sonoro, componentes (chat, galeria, itens do catálogo, linha do tempo) |
+| `src/paginas/sos/` | Central SOS no Checklist |
+| `src/layout/AlertaSOS.tsx` | Alerta global de novo SOS (sirene + banner) em qualquer tela do Checklist |
+| `app/` | App SOS (cliente e mecânico): build próprio (`vite.app.config.ts`), manifesto "SOS Tecnoar", service worker próprio, servido na raiz de `sos.tecnoarsistemas.com.br` |
+
+`npm run build` gera os dois: `dist/` (Checklist) e `dist/app/` (App SOS).
+`npm run dev:app` sobe o app em `http://localhost:5174/`.
+
+### WhatsApp (opcional)
+
+Evolution API, disparada pelo banco (`pg_net`) **depois** que o chamado já
+existe — canal complementar, nunca condição. A chave fica em `privado.config`
+(`sos_whatsapp_apikey`) e nunca volta para o navegador.

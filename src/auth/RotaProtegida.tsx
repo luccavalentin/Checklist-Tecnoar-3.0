@@ -6,6 +6,7 @@ import { TelaCarregando } from '@/componentes/ui/Estados'
 import { Botao } from '@/componentes/ui/Botao'
 import { Aviso } from '@/componentes/ui/Aviso'
 import { Logo } from '@/componentes/marca/Logo'
+import { linkAppSOS } from '@/sos/endereco'
 
 function TelaFalhaAcesso({
   titulo,
@@ -75,6 +76,14 @@ export function RotaProtegida() {
   }
 
   if (carregandoPerfil && !usuario) return <TelaCarregando />
+
+  // Conta de cliente do app SOS (mesmo login) que caiu no endereço do
+  // Checklist: não é funcionário, então vai para o app dela, no subdomínio
+  // do SOS, em vez de ver "conta sem cadastro".
+  if (!usuario && sessao.user.user_metadata?.tipo_conta === 'sos_cliente') {
+    window.location.replace(linkAppSOS())
+    return <TelaCarregando />
+  }
 
   if (erroPerfil) {
     return (

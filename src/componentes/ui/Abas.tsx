@@ -49,6 +49,16 @@ export function Abas<T extends string>({
     }
   }, [abas.length])
 
+  // Aba escolhida fora da tela (ex.: aberta pelo menu no celular) rola para
+  // dentro do trilho — só na horizontal, sem mexer na rolagem da página.
+  useEffect(() => {
+    const el = trilho.current
+    const sel = el?.querySelector<HTMLElement>('[aria-selected="true"]')
+    if (!el || !sel) return
+    const fora = sel.offsetLeft < el.scrollLeft || sel.offsetLeft + sel.offsetWidth > el.scrollLeft + el.clientWidth
+    if (fora) el.scrollLeft = sel.offsetLeft - (el.clientWidth - sel.offsetWidth) / 2
+  }, [ativa])
+
   const mascara = {
     nenhuma: undefined,
     fim: 'linear-gradient(to right, #000 85%, transparent)',
@@ -62,7 +72,7 @@ export function Abas<T extends string>({
       role="tablist"
       style={mascara ? { maskImage: mascara, WebkitMaskImage: mascara } : undefined}
       className={cn(
-        'flex gap-1 overflow-x-auto rounded-lg border border-line bg-surface p-1 shadow-e1',
+        'relative flex gap-1 overflow-x-auto rounded-lg border border-line bg-surface p-1 shadow-e1',
         '[-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
         className,
       )}

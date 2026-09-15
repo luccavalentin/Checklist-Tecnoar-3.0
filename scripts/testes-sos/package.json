@@ -1,0 +1,12 @@
+{
+  "name": "testes-sos",
+  "private": true,
+  "type": "module",
+  "description": "Aplica a migração do SOS num PostgreSQL real (PGlite) e simula o ciclo completo de um chamado.",
+  "scripts": {
+    "teste": "node teste-sos.mjs"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.8"
+  }
+}

@@ -274,6 +274,19 @@
   pointer-events: none;
 }
 
+/*
+ * Cartão dos componentes compartilhados do SOS (src/sos). No Checklist é o
+ * painel sóbrio do sistema; o app SOS redefine com vidro em
+ * app/src/estilo.css, que é carregado depois e prevalece.
+ */
+@layer components {
+  .sos-card {
+    border: 1px solid var(--c-line);
+    background: var(--c-surface);
+    box-shadow: 0 1px 2px rgb(16 24 40 / 0.05);
+  }
+}
+
 /* Micro-rótulo de instrumento — usado em toda a interface. */
 @utility lbl {
   font-family: var(--font-display);
@@ -361,6 +374,20 @@
     opacity: 1;
     transform: none;
   }
+}
+
+/* SOS aguardando mecânico: pisca devagar — chama o olho sem virar ruído. */
+@keyframes tec-piscar {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+@utility sos-piscar {
+  animation: tec-piscar 1.4s ease-in-out infinite;
 }
 
 @utility pulso-ativo {

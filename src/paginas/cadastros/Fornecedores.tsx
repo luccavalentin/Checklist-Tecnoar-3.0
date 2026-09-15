@@ -15,7 +15,7 @@ import {
   Truck,
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
-import { mensagemErro, cn } from '@/lib/utils'
+import { mensagemErro, cn, escaparCampos, escaparHtml } from '@/lib/utils'
 import { UFS, mascaraCEP, mascaraDocumento, mascaraTelefone, somenteDigitos, validarDocumento } from '@/lib/formatos'
 import { consultarCNPJ } from '@/lib/consultasExternas'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
@@ -191,7 +191,7 @@ function ModalExport({
             <strong>Filtros aplicados:</strong>
             ${filtroTipo ? ` Tipo: ${filtroTipo === 'fisica' ? 'Pessoa Física' : 'Pessoa Jurídica'} |` : ''}
             ${filtroStatus ? ` Status: ${filtroStatus === 'ativo' ? 'Ativos' : 'Inativos'} |` : ''}
-            ${filtroUF ? ` UF: ${filtroUF} |` : ''}
+            ${filtroUF ? ` UF: ${escaparHtml(filtroUF)} |` : ''}
             <strong>Total: ${filtrados.length} registro(s)</strong>
           </div>
           <table>
@@ -210,7 +210,7 @@ function ModalExport({
               </tr>
             </thead>
             <tbody>
-              ${filtrados.map(f => `
+              ${filtrados.map(escaparCampos).map(f => `
                 <tr>
                   <td>#${String(f.codigo).padStart(6, '0')}</td>
                   <td>${f.descricao}</td>
@@ -294,7 +294,7 @@ function ModalExport({
             <strong>Filtros:</strong>
             ${filtroTipo ? ` Tipo: ${filtroTipo === 'fisica' ? 'Pessoa Física' : 'Pessoa Jurídica'} |` : ''}
             ${filtroStatus ? ` Status: ${filtroStatus === 'ativo' ? 'Ativos' : 'Inativos'} |` : ''}
-            ${filtroUF ? ` UF: ${filtroUF} |` : ''}
+            ${filtroUF ? ` UF: ${escaparHtml(filtroUF)} |` : ''}
             <strong>Total: ${filtrados.length} registro(s)</strong>
           </div>
           <table>
@@ -310,7 +310,7 @@ function ModalExport({
               </tr>
             </thead>
             <tbody>
-              ${filtrados.map(f => `
+              ${filtrados.map(escaparCampos).map(f => `
                 <tr>
                   <td>#${String(f.codigo).padStart(6, '0')}</td>
                   <td>${f.descricao}</td>

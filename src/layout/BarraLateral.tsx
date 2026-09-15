@@ -8,6 +8,7 @@ import { Confirmacao } from '@/componentes/ui/Sobreposicoes'
 import { useAuth } from '@/auth/AuthProvider'
 import { NAVEGACAO, grupoDaRota, type ItemMenu } from './navegacao'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
+import { useIndicadoresSOS } from '@/paginas/sos/comum'
 
 const CHAVE_GRUPOS = 'tecnoar.menu.grupos'
 
@@ -35,6 +36,9 @@ export function BarraLateral({
   const navegar = useNavigate()
   const { sair } = useAuth()
   const { podeVer, carregando } = usePermissoes()
+  // Mesma consulta do alerta global (mesmo cache): não gera requisição a mais.
+  const indicadoresSos = useIndicadoresSOS(podeVer('sos'))
+  const sosAguardando = indicadoresSos.data && indicadoresSos.data.ok !== false ? indicadoresSos.data.aguardando ?? 0 : 0
   const [abertos, setAbertos] = useState<string[]>(lerGruposAbertos)
   const [confirmandoSaida, setConfirmandoSaida] = useState(false)
   const [saindo, setSaindo] = useState(false)
@@ -103,6 +107,7 @@ export function BarraLateral({
               <li key={item.rota}>
                 <NavLink
                   to={item.rota}
+                  end={itens.some((o) => o.rota.startsWith(`${item.rota}/`))}
                   title={item.rotulo}
                   aria-label={item.rotulo}
                   className={({ isActive }) =>
@@ -215,6 +220,8 @@ export function BarraLateral({
                         <NavLink
                           to={item.rota}
                           onClick={aoNavegar}
+                          // "/sos" não fica aceso junto com "/sos/relatorios" e irmãos.
+                          end={grupo.itens.some((o) => o.rota.startsWith(`${item.rota}/`))}
                           className={({ isActive }) =>
                             cn(
                               /*
@@ -250,6 +257,14 @@ export function BarraLateral({
                                 )}
                               />
                               <span className="truncate">{item.rotulo}</span>
+                              {item.rota === '/sos' && sosAguardando > 0 && (
+                                <span
+                                  className="num ml-auto rounded-full bg-crit px-1.5 py-0.5 text-[10.5px] font-semibold text-white"
+                                  aria-label={`${sosAguardando} aguardando mecânico`}
+                                >
+                                  {sosAguardando}
+                                </span>
+                              )}
                             </>
                           )}
                         </NavLink>

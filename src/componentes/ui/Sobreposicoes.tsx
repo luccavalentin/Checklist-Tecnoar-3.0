@@ -12,7 +12,13 @@ import { Botao, BotaoIcone } from './Botao'
  * tecla digitada rodaria a limpeza, que devolve o foco ao elemento de origem
  * e tira o cursor do campo. A referência mantém a função sempre atual sem
  * reexecutar o efeito.
+ *
+ * Com uma sobreposição aberta por cima de outra (confirmação sobre o painel
+ * do chamado, por exemplo), o Esc fecha só a de cima: a pilha guarda a ordem
+ * de abertura e apenas o topo responde à tecla.
  */
+const pilha: symbol[] = []
+
 function useSobreposicao(aberto: boolean, aoFechar: () => void) {
   const anterior = useRef<HTMLElement | null>(null)
   const fechar = useRef(aoFechar)
@@ -21,9 +27,13 @@ function useSobreposicao(aberto: boolean, aoFechar: () => void) {
   useEffect(() => {
     if (!aberto) return
     anterior.current = document.activeElement as HTMLElement | null
+    const eu = Symbol()
+    pilha.push(eu)
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') fechar.current()
+      if (e.key !== 'Escape' || pilha[pilha.length - 1] !== eu) return
+      e.stopImmediatePropagation()
+      fechar.current()
     }
     document.addEventListener('keydown', onKey)
 
@@ -32,6 +42,8 @@ function useSobreposicao(aberto: boolean, aoFechar: () => void) {
 
     return () => {
       document.removeEventListener('keydown', onKey)
+      const i = pilha.indexOf(eu)
+      if (i >= 0) pilha.splice(i, 1)
       document.body.style.overflow = overflow
       anterior.current?.focus?.()
     }
@@ -117,7 +129,7 @@ export function Modal({
             <h2 className="font-display text-[15px] font-semibold text-ink">{titulo}</h2>
             {descricao && <p className="text-[13px] leading-relaxed text-ink-2">{descricao}</p>}
           </div>
-          <BotaoIcone rotulo="Fechar" tamanho="sm" onClick={aoFechar}>
+          <BotaoIcone rotulo="Fechar" tamanho="sm" onClick={aoFechar} className="shrink-0 max-lg:-mt-1.5 max-lg:-mr-2 max-lg:size-11">
             <X />
           </BotaoIcone>
         </div>
@@ -192,7 +204,7 @@ export function PainelLateral({
             <h2 className="font-display text-[15px] font-semibold text-ink">{titulo}</h2>
             {descricao && <p className="text-[13px] leading-relaxed text-ink-2">{descricao}</p>}
           </div>
-          <BotaoIcone rotulo="Fechar" tamanho="sm" onClick={aoFechar}>
+          <BotaoIcone rotulo="Fechar" tamanho="sm" onClick={aoFechar} className="shrink-0 max-lg:-mt-1.5 max-lg:-mr-2 max-lg:size-11">
             <X />
           </BotaoIcone>
         </div>
