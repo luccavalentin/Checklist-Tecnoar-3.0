@@ -156,6 +156,15 @@ export function PainelMecanico() {
 
 /* ── status: o controle grande ──────────────────────────────────────────── */
 
+function PontoStatus() {
+  return (
+    <span className="relative flex size-2 shrink-0" aria-hidden>
+      <span className="mec-pulso absolute inset-0 rounded-full bg-white" />
+      <span className="relative size-2 rounded-full bg-white" />
+    </span>
+  )
+}
+
 function ControleStatus({
   situacao,
   carregando,
@@ -176,7 +185,7 @@ function ControleStatus({
   aoFicarIndisponivel: () => void
 }) {
   const navegar = useNavigate()
-  if (carregando) return <EsqueletoM className="mx-auto h-[4.5rem] w-64 rounded-2xl" />
+  if (carregando) return <EsqueletoM className="mx-auto h-12 w-60 rounded-full" />
 
   // Em atendimento: o status é do chamado, não da mão do mecânico.
   if (chamadoId || situacao === 'em_atendimento') {
@@ -184,16 +193,14 @@ function ControleStatus({
       <button
         type="button"
         onClick={() => chamadoId && navegar(`/chamado/${chamadoId}`)}
-        className="mx-auto flex min-h-[3.65rem] w-fit max-w-full items-center gap-3 rounded-2xl mec-status-online border border-[#7fd6f7]/50 px-4 py-2.5 text-left text-white active:scale-[0.99]"
+        className="mec-status mec-status-online mx-auto flex h-12 w-fit max-w-full items-center gap-2.5 rounded-full pr-5 pl-4 text-left text-white active:scale-[0.99]"
       >
-        <span className="relative flex size-3 shrink-0" aria-hidden>
-          <span className="mec-pulso absolute inset-0 rounded-full bg-white" />
-          <span className="relative size-3 rounded-full bg-white" />
-        </span>
+        <PontoStatus />
         <span className="min-w-0">
-          <span className="block font-display text-[10.5px] font-extrabold tracking-[0.14em] text-white/80 uppercase">Status</span>
-          <span className="block font-display text-[16px] leading-tight font-bold text-white">EM ATENDIMENTO</span>
-          <span className="block truncate text-[12px] text-white/80">Chamado ativo em campo</span>
+          <span className="block truncate text-[10px] leading-none font-semibold tracking-[0.12em] text-white/75 uppercase">
+            Status · Chamado em campo
+          </span>
+          <span className="mt-1 block font-display text-[14.5px] leading-none font-bold tracking-[0.02em]">EM ATENDIMENTO</span>
         </span>
       </button>
     )
@@ -224,31 +231,32 @@ function ControleStatus({
       onClick={alternar}
       disabled={mudando || !online}
       className={cn(
-        'mx-auto flex min-h-[3.65rem] w-fit max-w-full items-center gap-3.5 rounded-2xl border px-4 py-2.5 text-left text-white transition-colors active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70',
+        /* Pílula baixa e contida: o status é o controle principal e continua no
+           centro, mas não precisa ser o maior objeto da tela para ser achado. */
+        'mec-status mx-auto flex h-12 w-fit max-w-full items-center gap-3 rounded-full pr-1.5 pl-4 text-left text-white transition-colors active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70',
         // Online (recebendo SOS): azul Tecnoar piscando. Fora do ar: vermelho piscando.
-        recebendo ? 'mec-status-online border-[#7fd6f7]/50' : 'mec-status-offline border-[#ff8a8a]/40',
+        recebendo ? 'mec-status-online' : 'mec-status-offline',
       )}
     >
+      <PontoStatus />
       <span className="min-w-0">
-        <span className="flex items-center gap-2 font-display text-[10.5px] font-extrabold tracking-[0.14em] text-white/80 uppercase">
-          <span className="relative flex size-2" aria-hidden>
-            <span className="mec-pulso absolute inset-0 rounded-full bg-white" />
-            <span className="relative size-2 rounded-full bg-white" />
-          </span>
-          Status
+        <span className="block truncate text-[10px] leading-none font-semibold tracking-[0.12em] text-white/75 uppercase">
+          Status · {sub}
         </span>
-        <span className="mt-0.5 block font-display text-[16px] leading-[1.05] font-bold tracking-normal text-white">{titulo}</span>
-        <span className="mt-0.5 block truncate text-[12px] leading-snug font-medium text-white/80">{sub}</span>
+        <span className="mt-1 block font-display text-[14.5px] leading-none font-bold tracking-[0.02em]">{titulo}</span>
       </span>
 
-      <span aria-hidden className={cn('relative h-8 w-14 shrink-0 rounded-full transition-colors', recebendo ? 'bg-white/35' : 'bg-white/18')}>
+      <span
+        aria-hidden
+        className={cn('relative ml-1 h-9 w-[3.75rem] shrink-0 rounded-full transition-colors', recebendo ? 'bg-white/28' : 'bg-black/15')}
+      >
         <span
           className={cn(
-            'absolute top-1 flex size-6 items-center justify-center rounded-full bg-white shadow transition-all',
-            recebendo ? 'left-[calc(100%-1.75rem)] text-[#0096d6]' : 'left-1 text-[#d92d2d]',
+            'absolute top-1 flex size-7 items-center justify-center rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.25)] transition-all',
+            recebendo ? 'left-[calc(100%-2rem)] text-[#0096d6]' : 'left-1 text-[#d92d2d]',
           )}
         >
-          {mudando ? <Loader2 className="size-4 animate-spin" /> : <Power className="size-4" strokeWidth={2.5} />}
+          {mudando ? <Loader2 className="size-3.5 animate-spin" /> : <Power className="size-3.5" strokeWidth={2.6} />}
         </span>
       </span>
     </button>
