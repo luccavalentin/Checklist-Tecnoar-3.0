@@ -897,3 +897,87 @@ html.dark .mec-sombra {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
 }
 
+/* ── entrada do cliente: botão de emergência piscando ─────────────────────── */
+.sos-emergencia {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.45rem 1.4rem 0.45rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  background: rgb(13 28 51 / 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.9);
+  transition: transform 0.15s ease;
+}
+.sos-emergencia:active {
+  transform: scale(0.97);
+}
+.sos-emergencia-orb {
+  position: relative;
+  display: flex;
+  width: 3.9rem;
+  height: 3.9rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 32%, #ff9a3d 0%, #ff6600 48%, #d94f00 100%);
+  box-shadow:
+    inset 0 1.5px 6px rgb(255 255 255 / 0.35),
+    inset 0 -6px 12px rgb(96 36 0 / 0.28);
+  animation: sos-emergencia-brilho 1.2s ease-in-out infinite;
+}
+.sos-emergencia-orb::before,
+.sos-emergencia-orb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid rgb(255 102 0 / 0.8);
+  animation: sos-emergencia-onda 1.8s cubic-bezier(0.2, 0.6, 0.4, 1) infinite;
+}
+.sos-emergencia-orb::after {
+  animation-delay: 0.9s;
+}
+.sos-emergencia-orb .sos-raios {
+  animation: sos-emergencia-raios 1.2s ease-in-out infinite;
+}
+@keyframes sos-emergencia-onda {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.75);
+    opacity: 0;
+  }
+}
+@keyframes sos-emergencia-brilho {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.25);
+  }
+}
+@keyframes sos-emergencia-raios {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sos-emergencia-orb,
+  .sos-emergencia-orb::before,
+  .sos-emergencia-orb::after,
+  .sos-emergencia-orb .sos-raios {
+    animation: none;
+  }
+}
+
