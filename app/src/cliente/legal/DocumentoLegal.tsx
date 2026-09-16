@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Check, ChevronLeft, ExternalLink, MessageCircle, PhoneCall, ScrollText, ShieldCheck } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { linkTelefone, linkWhatsApp } from '@/sos/rotulos'
+import { WHATSAPP_SOS_PADRAO, linkTelefone, linkWhatsApp } from '@/sos/rotulos'
 import { BotaoApp, Folha } from '../../comum/ui'
 import { useInfoPublica } from '../dados'
 import { VIGENCIA_LEGAL, politicaDePrivacidade, termosDeUso, type ContextoLegal, type TipoDocumentoLegal } from './textos'
@@ -20,7 +20,7 @@ function useContextoLegal(): ContextoLegal {
   // Enquanto a informação pública não chega (ou sem rede), o texto fala da empresa pelo nome da marca.
   const empresa = d?.empresa?.trim() || 'Tecnoar'
   const telefone = d?.telefone ?? null
-  const whatsapp = d?.whatsapp ?? null
+  const whatsapp = d?.whatsapp ?? WHATSAPP_SOS_PADRAO
   const politicaUrl = d?.politica_privacidade_url?.trim() || null
   return useMemo(() => ({ empresa, telefone, whatsapp, politicaUrl }), [empresa, telefone, whatsapp, politicaUrl])
 }

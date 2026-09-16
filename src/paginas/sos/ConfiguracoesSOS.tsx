@@ -16,6 +16,7 @@ import {
   Loader2,
   MessageCircle,
   PackageSearch,
+  PhoneCall,
   Plug,
   Receipt,
   RefreshCw,
@@ -43,9 +44,46 @@ import { Confirmacao } from '@/componentes/ui/Sobreposicoes'
 import { useToast } from '@/componentes/ui/Toast'
 import { ErroIa, sosCatalogo, sosGerarLembretes, sosIaTestar, sosSalvarConfig } from '@/sos/api'
 import { CHAVES_SOS } from '@/sos/tempoReal'
-import { STATUS_SOS } from '@/sos/rotulos'
+import { STATUS_SOS, WHATSAPP_SOS_PADRAO, linkTelefone, linkWhatsApp } from '@/sos/rotulos'
 import type { ConfigSOS, ProvedorIa, StatusSOS } from '@/sos/tipos'
 import { ALVO_ALTERNADOR, CHAVE_IA_PUBLICO, ErroSOS, LinhaAlternador, haQuantoSegundos, lerNumero, saudeVigia, useAgora, useConfigSOS, useVigiaSOS } from './comum'
+
+/**
+ * Abre a conversa no WhatsApp com o número digitado — ainda antes de salvar —
+ * para a central conferir que é o aparelho certo que vai atender.
+ */
+function TestarWhatsApp({ numero }: { numero: string }) {
+  const link = linkWhatsApp(numero, 'Teste do botão de WhatsApp do app SOS Tecnoar.')
+  return (
+    <Botao
+      type="button"
+      variante="neutro"
+      iconeInicio={<MessageCircle aria-hidden />}
+      disabled={!link}
+      title={link ? 'Abrir a conversa com este número' : 'Digite o número com DDD'}
+      onClick={() => link && window.open(link, '_blank', 'noopener')}
+    >
+      Testar
+    </Botao>
+  )
+}
+
+/** Mesmo gesto do botão "Ligar" do app: no celular abre o discador com o número. */
+function TestarLigacao({ numero }: { numero: string }) {
+  const link = linkTelefone(numero)
+  return (
+    <Botao
+      type="button"
+      variante="neutro"
+      iconeInicio={<PhoneCall aria-hidden />}
+      disabled={!link}
+      title={link ? 'Ligar para este número' : 'Digite o número com DDD'}
+      onClick={() => link && (window.location.href = link)}
+    >
+      Testar
+    </Botao>
+  )
+}
 
 /** Etapas em que faz sentido travar o cancelamento pelo cliente. */
 const ETAPAS_CANCELAMENTO: StatusSOS[] = ['procurando_mecanico', 'aceito', 'a_caminho', 'no_local', 'servico_iniciado', 'servico_finalizado']
@@ -68,6 +106,7 @@ interface Formulario {
   velocidade_media_kmh: string
   tempo_aceite_min: string
   telefone_central: string
+  whatsapp_atendimento: string
   gerar_os_ao_finalizar: boolean
   cancelamento_cliente_ate: StatusSOS
   mensagem_espera: string
@@ -114,6 +153,8 @@ function doConfig(c: ConfigSOS): Formulario {
     // A central pensa em minutos; o banco guarda segundos.
     tempo_aceite_min: String(Math.round(((c.tempo_aceite_seg ?? 120) / 60) * 10) / 10),
     telefone_central: c.telefone_central ? mascaraTelefone(c.telefone_central) : '',
+    // Guardado só com dígitos; o DDI 55, se veio junto, não entra na máscara.
+    whatsapp_atendimento: c.whatsapp_atendimento ? mascaraTelefone(c.whatsapp_atendimento.replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, '')) : '',
     gerar_os_ao_finalizar: c.gerar_os_ao_finalizar,
     cancelamento_cliente_ate: c.cancelamento_cliente_ate,
     mensagem_espera: c.mensagem_espera ?? '',
@@ -171,6 +212,7 @@ function milhares(n: number): string {
 const SECOES = [
   ['cfg-distribuicao', 'Distribuição'],
   ['cfg-vigia', 'Vigia'],
+  ['cfg-contatos', 'Contatos no app'],
   ['cfg-atendimento', 'Atendimento'],
   ['cfg-orcamento', 'Orçamento'],
   ['cfg-deslocamento', 'Deslocamento'],
@@ -221,6 +263,14 @@ export function ConfiguracoesSOS({ podeConfigurar }: { podeConfigurar: boolean }
     if (off == null || off < 0 || off > 72 || (off > 0 && off < 0.25)) e.offline_apos_horas = 'De 0,25 a 72 h (0 = nunca).'
     const concl = numero(form.concluir_apos_horas)
     if (concl == null || concl < 1 || concl > 720 || !Number.isInteger(concl)) e.concluir_apos_horas = 'Horas inteiras, de 1 a 720.'
+    const telCentral = form.telefone_central.replace(/\D/g, '')
+    if (telCentral && (telCentral.length < 10 || telCentral.length > 11)) {
+      e.telefone_central = 'DDD + número, como (19) 3333-4444.'
+    }
+    const whatsAtendimento = form.whatsapp_atendimento.replace(/\D/g, '')
+    if (whatsAtendimento && (whatsAtendimento.length < 10 || whatsAtendimento.length > 11)) {
+      e.whatsapp_atendimento = 'DDD + número, como (11) 99999-9999.'
+    }
     if (form.whatsapp_ativo) {
       if (!/^https?:\/\/\S+$/i.test(form.whatsapp_url.trim())) e.whatsapp_url = 'Informe a URL da Evolution API (https://…).'
       if (!form.whatsapp_instancia.trim()) e.whatsapp_instancia = 'Informe a instância.'
@@ -257,6 +307,7 @@ export function ConfiguracoesSOS({ podeConfigurar }: { podeConfigurar: boolean }
         velocidade_media_kmh: numero(f.velocidade_media_kmh)!,
         tempo_aceite_seg: Math.round(numero(f.tempo_aceite_min)! * 60),
         telefone_central: f.telefone_central.replace(/\D/g, '') || null,
+        whatsapp_atendimento: f.whatsapp_atendimento.replace(/\D/g, '') || null,
         gerar_os_ao_finalizar: f.gerar_os_ao_finalizar,
         cancelamento_cliente_ate: f.cancelamento_cliente_ate,
         mensagem_espera: f.mensagem_espera.trim(),
@@ -384,24 +435,75 @@ export function ConfiguracoesSOS({ podeConfigurar }: { podeConfigurar: boolean }
             </Painel>
           </Secao>
 
-          <Secao id="cfg-atendimento" className="max-xl:order-3">
+          <Secao id="cfg-contatos" className="max-xl:order-3">
             <Painel semPadding>
-              <CabecalhoPainel titulo="Atendimento" descricao="O que o cliente vê e o que acontece ao finalizar." />
+              <CabecalhoPainel titulo="Contatos no app" descricao="Os números dos botões “Ligar” e “WhatsApp” do app SOS — login, início, contato e chamado." />
               <div className="flex flex-col gap-4 p-5">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <Campo rotulo="Telefone da central" dica="Aparece no app para o cliente ligar.">
+                  <Campo rotulo="Telefone para ligar" erro={erros.telefone_central} dica="Vazio: usa o telefone do cadastro da empresa.">
                     {(p) => (
-                      <Entrada
-                        {...p}
-                        type="tel"
-                        inputMode="tel"
-                        value={form.telefone_central}
-                        onChange={(e) => mudar('telefone_central', mascaraTelefone(e.target.value))}
-                        placeholder="(11) 0000-0000"
-                        mono
-                      />
+                      <div className="flex gap-2">
+                        <Entrada
+                          {...p}
+                          type="tel"
+                          inputMode="tel"
+                          value={form.telefone_central}
+                          onChange={(e) => mudar('telefone_central', mascaraTelefone(e.target.value))}
+                          placeholder="(19) 3333-4444"
+                          className="min-w-0 flex-1"
+                          mono
+                        />
+                        <TestarLigacao numero={erros.telefone_central ? '' : form.telefone_central} />
+                      </div>
                     )}
                   </Campo>
+                  <Campo rotulo="WhatsApp" erro={erros.whatsapp_atendimento} dica="Vazio: usa o oficial, (19) 99389-6000.">
+                    {(p) => (
+                      <div className="flex gap-2">
+                        <Entrada
+                          {...p}
+                          type="tel"
+                          inputMode="tel"
+                          value={form.whatsapp_atendimento}
+                          onChange={(e) => mudar('whatsapp_atendimento', mascaraTelefone(e.target.value))}
+                          placeholder="(19) 99389-6000"
+                          className="min-w-0 flex-1"
+                          mono
+                        />
+                        <TestarWhatsApp numero={erros.whatsapp_atendimento ? '' : form.whatsapp_atendimento || WHATSAPP_SOS_PADRAO} />
+                      </div>
+                    )}
+                  </Campo>
+                </div>
+                <div className="flex flex-col gap-2 rounded-xl border border-line bg-surface-2/60 p-3.5">
+                  <span className="text-[11.5px] font-semibold tracking-wide text-ink-3 uppercase">Como o cliente vê</span>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <div className="flex min-w-0 items-center gap-2.5 rounded-lg bg-[#0D1C33] px-3 py-2.5 text-white">
+                      <PhoneCall aria-hidden className="size-4 shrink-0" />
+                      <span className="min-w-0">
+                        <span className="block text-[13px] font-semibold">Ligar</span>
+                        <span className="num block truncate text-[12px] text-white/75">{form.telefone_central || 'Telefone da empresa'}</span>
+                      </span>
+                    </div>
+                    <div className="flex min-w-0 items-center gap-2.5 rounded-lg border border-line bg-surface px-3 py-2.5 text-ink">
+                      <MessageCircle aria-hidden className="size-4 shrink-0 text-ok" />
+                      <span className="min-w-0">
+                        <span className="block text-[13px] font-semibold">WhatsApp</span>
+                        <span className="num block truncate text-[12px] text-ink-3">{form.whatsapp_atendimento || mascaraTelefone(WHATSAPP_SOS_PADRAO)}</span>
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-[12px] text-ink-3">Depois de salvar, o app atualiza em até 5 minutos (ou ao ser aberto de novo).</span>
+                </div>
+              </div>
+            </Painel>
+          </Secao>
+
+          <Secao id="cfg-atendimento" className="max-xl:order-3">
+            <Painel semPadding>
+              <CabecalhoPainel titulo="Atendimento" descricao="Cancelamento, mensagem de espera e o que acontece ao finalizar." />
+              <div className="flex flex-col gap-4 p-5">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <Campo rotulo="Cliente pode cancelar até" dica="A partir desta etapa, só a central cancela.">
                     {(p) => (
                       <Selecao {...p} value={form.cancelamento_cliente_ate} onChange={(e) => mudar('cancelamento_cliente_ate', e.target.value as StatusSOS)}>

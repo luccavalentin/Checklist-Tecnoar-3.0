@@ -37,7 +37,8 @@ export function useInfoPublica() {
   return useQuery({
     queryKey: CHAVE_INFO_PUBLICA,
     queryFn: sosInfoPublica,
-    staleTime: 30 * 60_000,
+    // Curto o bastante para um WhatsApp trocado na Gestão SOS chegar logo.
+    staleTime: 5 * 60_000,
     retry: 1,
   })
 }

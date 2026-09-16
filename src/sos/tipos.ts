@@ -815,6 +815,8 @@ export interface ConfigSOS {
   velocidade_media_kmh: number
   tempo_aceite_seg: number
   telefone_central: string | null
+  /** WhatsApp que o cliente chama pelo app. Vazio = oficial do SOS, (19) 99389-6000. */
+  whatsapp_atendimento?: string | null
   whatsapp_ativo: boolean
   whatsapp_url: string | null
   whatsapp_instancia: string | null

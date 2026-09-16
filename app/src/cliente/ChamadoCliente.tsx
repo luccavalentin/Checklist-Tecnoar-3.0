@@ -44,6 +44,7 @@ import {
   linkTelefone,
   linkWhatsApp,
   ordemStatus,
+  WHATSAPP_SOS_PADRAO,
 } from '@/sos/rotulos'
 import { useRastreioChamado } from '@/sos/useRastreio'
 import { CHAVES_SOS, useTempoRealChamado } from '@/sos/tempoReal'
@@ -305,7 +306,7 @@ export function ChamadoCliente() {
   const limite = info.data?.cancelamento_cliente_ate ?? 'servico_iniciado'
   const podeCancelar = ativo && ordemStatus(status) < ordemStatus(limite)
   const telCentral = linkTelefone(info.data?.telefone)
-  const whatsCentral = linkWhatsApp(info.data?.whatsapp ?? info.data?.telefone, `Olá! Sobre o meu socorro ${c.protocolo}.`)
+  const whatsCentral = linkWhatsApp(info.data?.whatsapp ?? WHATSAPP_SOS_PADRAO, `Olá! Sobre o meu socorro ${c.protocolo}.`)
   const telMecanico = linkTelefone(d.mecanico?.telefone)
   const chegadaPrevista = eta != null ? new Date(Date.now() + eta * 60_000) : null
   // Sem posição nova há 3 min: o pino parou, e a tela diz por quê.
