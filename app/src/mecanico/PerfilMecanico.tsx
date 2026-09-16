@@ -5,7 +5,7 @@ import { Bell, ChevronRight, ExternalLink, Eye, LogOut, Monitor, Moon, Phone, Ra
 import { cn } from '@/lib/utils'
 import { mascaraTelefone } from '@/lib/formatos'
 import { useToast } from '@/componentes/ui/Toast'
-import { permissaoAtual } from '@/notificacoes/sistema'
+
 import { sosDefinirSituacao } from '@/sos/api'
 import { URL_CHECKLIST } from '@/sos/endereco'
 import { destravarAudio, tocarAlerta, vibrarAlerta } from '@/sos/alerta'
@@ -13,6 +13,7 @@ import { SITUACOES_MECANICO } from '@/sos/rotulos'
 import { useMecanico } from '../sessao'
 import { CartaoModoApp } from '../ModoApp'
 import { Avatar } from '../comum/ui'
+import { CartaoAparelho } from '../comum/Aparelho'
 import { atualizarFicha, temaEscuroAgora, useHomeMecanico } from './dados'
 import { Interruptor, PontoSituacao } from './pecas'
 import { aplicarTemaMecanico, lerTemaMecanico, type TemaMecanico } from './tema'
@@ -107,7 +108,6 @@ export function PerfilMecanico() {
   }
 
   const aceitaSos = aceitar.isPending ? (aceitar.variables ?? true) : (ficha?.aceita_sos ?? true)
-  const permissao = permissaoAtual()
 
   return (
     <>
@@ -192,14 +192,16 @@ export function PerfilMecanico() {
                 <Bell className="size-5" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-[15px] font-semibold text-ink">Notificações</span>
-                <span className={cn('block text-[13px] leading-snug', permissao === 'granted' ? 'text-ok-ink' : 'text-warn-ink')}>
-                  {permissao === 'granted' ? 'Ativadas neste aparelho' : permissao === 'denied' ? 'Bloqueadas neste aparelho' : 'Desativadas — toque para ativar'}
-                </span>
+                <span className="block text-[15px] font-semibold text-ink">Avisos recebidos</span>
+                <span className="block text-[13px] leading-snug text-ink-3">Chamados, mensagens e mudanças de atendimento.</span>
               </span>
               <ChevronRight className="size-5 text-ink-3" />
             </Link>
           </div>
+        </SecaoM>
+
+        <SecaoM titulo="App e notificações">
+          <CartaoAparelho />
         </SecaoM>
 
         <SecaoM titulo="Aparência">

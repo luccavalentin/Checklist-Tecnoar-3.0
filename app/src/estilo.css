@@ -696,6 +696,26 @@ a[role='button'] {
   animation: sos-sobe 0.28s cubic-bezier(0.2, 0.9, 0.3, 1) both;
 }
 
+/* Aviso que desce do topo com o app aberto, como a notificação do sistema. */
+@keyframes sos-aviso-desce {
+  from {
+    opacity: 0;
+    transform: translateY(-120%) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@utility sos-aviso-desce {
+  animation: sos-aviso-desce 0.36s cubic-bezier(0.2, 0.9, 0.3, 1.08) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sos-aviso-desce {
+    animation: none;
+  }
+}
+
 @keyframes sos-tremor {
   0%,
   100% {

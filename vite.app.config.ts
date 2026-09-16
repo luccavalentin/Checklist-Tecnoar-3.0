@@ -89,13 +89,27 @@ export default defineConfig({
         background_color: '#081830',
         theme_color: '#081830',
         categories: ['auto', 'utilities', 'navigation'],
+        // Link do SOS aberto no celular (WhatsApp, SMS, e-mail) abre no app instalado.
+        handle_links: 'preferred',
         icons: [
           { src: '/icone-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: '/icone-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
           { src: '/icone-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
+        // Toque longo no ícone (Android) / clique direito (computador).
         shortcuts: [
-          { name: 'Pedir socorro', short_name: 'SOS', url: '/sos', icons: [{ src: '/icone-192.png', sizes: '192x192' }] },
+          { name: 'Pedir socorro', short_name: 'SOS', description: 'Abrir um pedido de socorro agora', url: '/sos', icons: [{ src: '/icone-192.png', sizes: '192x192' }] },
+          { name: 'Meus chamados', short_name: 'Chamados', url: '/chamados', icons: [{ src: '/icone-192.png', sizes: '192x192' }] },
+          { name: 'Notificações', short_name: 'Avisos', url: '/notificacoes', icons: [{ src: '/icone-192.png', sizes: '192x192' }] },
+          { name: 'Falar com a Tecnoar', short_name: 'Contato', url: '/contato', icons: [{ src: '/icone-192.png', sizes: '192x192' }] },
+        ],
+        // Janela de instalação "de loja" no Android e no Chrome do computador.
+        // Geradas por scripts/pwa/gerar-telas.mjs.
+        screenshots: [
+          { src: '/capturas/celular-entrar.jpg', sizes: '1080x2340', type: 'image/jpeg', form_factor: 'narrow', label: 'Pedir socorro e falar com a Tecnoar' },
+          { src: '/capturas/celular-mecanico.jpg', sizes: '1080x2340', type: 'image/jpeg', form_factor: 'narrow', label: 'Área do mecânico' },
+          { src: '/capturas/celular-privacidade.jpg', sizes: '1080x2340', type: 'image/jpeg', form_factor: 'narrow', label: 'Seus dados protegidos (LGPD)' },
+          { src: '/capturas/computador-entrar.jpg', sizes: '1920x1200', type: 'image/jpeg', form_factor: 'wide', label: 'SOS Tecnoar no computador' },
         ],
       },
       workbox: {
@@ -104,7 +118,9 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         // Gerador de PDF (~1,8 MB): baixa no primeiro laudo/relatório, não na instalação.
-        globIgnores: ['**/*.map', '**/pdfmake-*.js', '**/vfs_fonts-*.js'],
+        // Aberturas do iPhone e capturas da loja não entram no pacote de
+        // instalação: o sistema lê cada uma só quando precisa.
+        globIgnores: ['**/*.map', '**/pdfmake-*.js', '**/vfs_fonts-*.js', 'splash/**', 'capturas/**'],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: '/index.html',
         runtimeCaching: [

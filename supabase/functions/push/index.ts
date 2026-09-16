@@ -91,6 +91,14 @@ Deno.serve(async (req: Request) => {
     .select('id, endpoint, p256dh, auth')
     .eq('usuario_id', n.usuario_id)
 
+  /* O número no ícone do app, como nos nativos: vai junto, porque com o app
+     fechado ninguém mais consegue contar as não lidas. */
+  const { count: naoLidas } = await admin
+    .from('notificacoes')
+    .select('id', { count: 'exact', head: true })
+    .eq('usuario_id', n.usuario_id)
+    .is('lida_em', null)
+
   webpush.setVapidDetails(ASSUNTO, vapid.vapid_publica, vapid.vapid_privada)
   const carga = JSON.stringify({
     id: n.id,
@@ -98,6 +106,7 @@ Deno.serve(async (req: Request) => {
     mensagem: n.mensagem,
     link: n.link,
     criada_em: n.created_at,
+    nao_lidas: naoLidas ?? null,
   })
 
   let enviadas = 0

@@ -4,14 +4,35 @@
     {
       "name": "tecnoar-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 5173
     },
     {
       "name": "sos-app-dev",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite", "-c", "vite.app.config.ts"],
+      "runtimeArgs": [
+        "vite",
+        "-c",
+        "vite.app.config.ts"
+      ],
       "port": 5174
+    },
+    {
+      "name": "sos-app-producao",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "preview",
+        "-c",
+        "vite.app.config.ts",
+        "--port",
+        "4174",
+        "--strictPort"
+      ],
+      "port": 4174
     }
   ]
 }

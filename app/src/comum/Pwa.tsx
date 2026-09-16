@@ -4,6 +4,7 @@ import { WifiOff } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import { ConviteInstalacao, configurarInstalacao } from '@/layout/ConviteInstalacao'
 import { useSessao } from '../sessao'
+import { ConviteNotificacoesApp } from './Aparelho'
 
 /**
  * Comportamento de aplicativo instalado do SOS Tecnoar: convite de
@@ -17,6 +18,9 @@ configurarInstalacao({
   icone: '/apple-touch-icon.png',
   chaveAdiado: 'sos.instalacao.adiada',
   endereco: () => `${window.location.origin}/`,
+  // No computador o SOS também instala (central, mecânico no notebook):
+  // o "Instalar o app" do perfil usa o convite nativo do navegador.
+  guardarNoDesktop: true,
 })
 
 /** Telas de emergência: nada de convite, nada de recarregar a página. */
@@ -80,11 +84,16 @@ export function ConviteApp() {
     document.documentElement.style.setProperty('--barra-acoes', comBarra ? 'calc(4.25rem + env(safe-area-inset-bottom))' : '0px')
   }, [logado, pathname])
 
-  if (telaCritica(pathname) || pathname.startsWith('/acompanhar')) return null
   // Telas cheias sem a barra inferior: o convite cobriria o campo de
   // mensagem da TECNO IA; na despedida, a conta acabou de ser apagada.
-  if (/^\/(tecno-ia|conta-excluida)(\/|$)/.test(pathname)) return null
-  return <ConviteInstalacao />
+  const semConvite = telaCritica(pathname) || pathname.startsWith('/acompanhar') || /^\/(tecno-ia|conta-excluida)(\/|$)/.test(pathname)
+  return (
+    <>
+      {!semConvite && <ConviteInstalacao />}
+      {/* Instalado e logado: a vez de pedir as notificações (nunca no meio de um SOS). */}
+      <ConviteNotificacoesApp bloqueado={semConvite} />
+    </>
+  )
 }
 
 /* ── rede ───────────────────────────────────────────────────────────────── */
