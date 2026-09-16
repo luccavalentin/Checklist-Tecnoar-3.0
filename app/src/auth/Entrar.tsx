@@ -4,7 +4,7 @@ import { Eye, EyeOff, Lock, Mail, UserRound, Wrench } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabase'
 import { sosInfoPublica } from '@/sos/api'
-import { linkTelefone, linkWhatsApp } from '@/sos/rotulos'
+import { WHATSAPP_SOS_PADRAO, linkTelefone, linkWhatsApp } from '@/sos/rotulos'
 import { consumirAvisoContaNaoEquipe, useSessao } from '../sessao'
 import { BotaoApp, CampoApp, Faixa } from '../comum/ui'
 import { MolduraAcesso, traduzirErroAuth } from './Moldura'
@@ -55,7 +55,7 @@ export function Entrar({ perfil = 'cliente' }: { perfil?: 'cliente' | 'mecanico'
   const [entrando, setEntrando] = useState(false)
   const info = useQuery({ queryKey: ['sos', 'info-publica'], queryFn: sosInfoPublica, staleTime: 60 * 60_000, retry: false, enabled: !mecanico })
   const telefone = linkTelefone(info.data?.telefone)
-  const whatsapp = linkWhatsApp(info.data?.whatsapp ?? info.data?.telefone, 'Olá, Tecnoar! Preciso de ajuda.')
+  const whatsapp = linkWhatsApp(info.data?.whatsapp ?? WHATSAPP_SOS_PADRAO, 'Olá, Tecnoar! Preciso de ajuda.')
 
   async function entrar(e: FormEvent) {
     e.preventDefault()

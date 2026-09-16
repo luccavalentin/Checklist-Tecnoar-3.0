@@ -1,7 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { CalendarPlus, ChevronRight, MessageCircle, PhoneCall, ShieldAlert, Siren, Brain } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { linkTelefone, linkWhatsApp } from '@/sos/rotulos'
+import { mascaraTelefone } from '@/lib/formatos'
+import { WHATSAPP_SOS_PADRAO, linkTelefone, linkWhatsApp } from '@/sos/rotulos'
 import { CabecalhoTela, Esqueleto, Tela } from '../comum/ui'
 import { useInfoPublica } from './dados'
 import { ErroCarga, GrupoLista, LinhaLista } from './pecas'
@@ -15,7 +16,8 @@ export function Contato() {
   const info = useInfoPublica()
   const d = info.data
   const tel = linkTelefone(d?.telefone)
-  const whats = linkWhatsApp(d?.whatsapp ?? d?.telefone, 'Olá, Tecnoar! Vim pelo app.')
+  const numeroWhats = d?.whatsapp ?? WHATSAPP_SOS_PADRAO
+  const whats = linkWhatsApp(numeroWhats, 'Olá, Tecnoar! Vim pelo app.')
 
   return (
     <>
@@ -35,7 +37,7 @@ export function Contato() {
               href={whats}
               icone={MessageCircle}
               titulo="WhatsApp"
-              detalhe={d?.whatsapp ?? d?.telefone ?? 'WhatsApp não cadastrado'}
+              detalhe={mascaraTelefone(numeroWhats.replace(/D/g, '').replace(/^55(?=d{10,11}$)/, ''))}
               classe="border border-line bg-surface text-ink"
               corIcone="bg-ok-soft text-ok"
             />

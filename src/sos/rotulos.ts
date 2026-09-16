@@ -314,6 +314,13 @@ export function linkTelefone(tel: string | null | undefined): string | null {
   return `tel:${d.length >= 12 ? '+' + d : d}`
 }
 
+/**
+ * WhatsApp oficial de atendimento do SOS Tecnoar. É o número que o cliente
+ * chama pelo app; a Gestão SOS pode trocar em Configurações › Atendimento.
+ * Fica aqui também para o botão funcionar antes da informação pública chegar.
+ */
+export const WHATSAPP_SOS_PADRAO = '19993896000'
+
 export function linkWhatsApp(tel: string | null | undefined, texto?: string): string | null {
   let d = (tel ?? '').replace(/\D/g, '')
   if (d.length < 10) return null

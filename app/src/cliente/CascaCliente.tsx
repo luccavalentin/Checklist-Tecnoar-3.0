@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate, useNavigationType } from 'react-route
 import { ChevronRight, History, House, Siren, Truck, UserRound, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { tocarAlerta, vibrarAlerta } from '@/sos/alerta'
-import { STATUS_SOS, linkWhatsApp } from '@/sos/rotulos'
+import { STATUS_SOS, WHATSAPP_SOS_PADRAO, linkWhatsApp } from '@/sos/rotulos'
 import { useTempoRealCliente } from '@/sos/tempoReal'
 import type { ChamadoSOS, StatusSOS } from '@/sos/tipos'
 import { aplicarTema, lerTema, useCliente } from '../sessao'
@@ -125,7 +125,7 @@ function BotaoCentralSOS({ chamadoAtivoId }: { chamadoAtivoId: string | null }) 
  */
 function BotaoWhatsApp() {
   const info = useInfoPublica()
-  const link = linkWhatsApp(info.data?.whatsapp ?? info.data?.telefone, 'Olá, Tecnoar! Vim pelo app SOS.')
+  const link = linkWhatsApp(info.data?.whatsapp ?? WHATSAPP_SOS_PADRAO, 'Olá, Tecnoar! Vim pelo app SOS.')
   if (!link) return null
   return (
     <div className="cli-fixo pointer-events-none fixed z-[45] flex justify-end px-4" style={{ bottom: 'calc(4.25rem + env(safe-area-inset-bottom) + 0.85rem)' }}>

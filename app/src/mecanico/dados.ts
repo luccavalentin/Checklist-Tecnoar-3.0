@@ -29,7 +29,7 @@ export function useHomeMecanico() {
 
 /** Telefone e WhatsApp da Tecnoar — "falar com a central" no meio do atendimento. */
 export function useInfoCentral() {
-  return useQuery({ queryKey: ['sos', 'info-publica'], queryFn: sosInfoPublica, staleTime: 60 * 60_000, retry: false })
+  return useQuery({ queryKey: ['sos', 'info-publica'], queryFn: sosInfoPublica, staleTime: 5 * 60_000, retry: false })
 }
 
 /**

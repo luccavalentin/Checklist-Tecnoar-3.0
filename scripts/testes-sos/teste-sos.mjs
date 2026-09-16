@@ -651,6 +651,26 @@ await etapa('WhatsApp disparado no próximo SOS (depois do chamado existir)', as
 })
 await etapa('modo manual: chamado nasce "recebido"', () => um(null, `select status from public.sos_chamados order by numero desc limit 1`))
 await etapa('info pública', () => um(null, `select public.sos_info_publica()`))
+
+await etapa('WhatsApp de atendimento: definido na Gestão SOS, só dígitos, aparece para o visitante', async () => {
+  const c = await um(ids.admin, `select public.sos_salvar_config('{"whatsapp_atendimento":"(11) 98765-4321"}'::jsonb)`)
+  if (c.whatsapp_atendimento !== '11987654321') throw new Error(`gravou ${c.whatsapp_atendimento}`)
+  const info = await um(null, `select public.sos_info_publica()`)
+  if (info.whatsapp !== '11987654321') throw new Error(`app vê ${info.whatsapp}`)
+  // Salvar outra regra sem mandar o campo não apaga o número.
+  await um(ids.admin, `select public.sos_salvar_config('{"raio_busca_km":80}'::jsonb)`)
+  if ((await um(null, `select public.sos_info_publica()`)).whatsapp !== '11987654321') throw new Error('perdeu o número')
+  return info.whatsapp
+})
+
+await etapa('WhatsApp de atendimento: vazio volta ao oficial (19) 99389-6000; cliente não altera', async () => {
+  await db.exec(`update public.dados_empresa set celular = '11911112222' where singleton`)
+  await um(ids.admin, `select public.sos_salvar_config('{"whatsapp_atendimento":""}'::jsonb)`)
+  const info = await um(null, `select public.sos_info_publica()`)
+  if (info.whatsapp !== '19993896000') throw new Error(`app vê ${info.whatsapp}`)
+  await falhaCom(ids.cliente, `select public.sos_salvar_config('{"whatsapp_atendimento":"11900000000"}'::jsonb)`, [], 'Sem permissão')
+  return info.whatsapp
+})
 await etapa('buscar cliente pela placa', async () => (await como(ids.admin, `select nome from public.sos_buscar_cliente('ABC1')`)).map((x) => x.nome))
 await etapa('contas do app', async () => (await um(ids.admin, `select public.sos_contas_app(null)`)).length)
 await etapa('limpar rastro antigo', () => um(null, `select public.sos_limpar_posicoes()`))
