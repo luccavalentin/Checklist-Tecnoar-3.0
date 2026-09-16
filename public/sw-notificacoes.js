@@ -46,6 +46,13 @@ self.addEventListener('push', (evento) => {
 
   evento.waitUntil(
     (async () => {
+      /* Número no ícone do app instalado (Badging API). Onde não existe, a
+         falta é silenciosa; ao abrir, o app recalcula o número. */
+      if (typeof dados.nao_lidas === 'number' && self.navigator && 'setAppBadge' in self.navigator) {
+        const badge = dados.nao_lidas > 0 ? self.navigator.setAppBadge(dados.nao_lidas) : self.navigator.clearAppBadge()
+        await Promise.resolve(badge).catch(() => {})
+      }
+
       /* App aberto e em foco: a pessoa já está olhando a tela, e uma
          notificação do sistema por cima só duplica o aviso. Como nos apps
          nativos, vira aviso dentro do app. */

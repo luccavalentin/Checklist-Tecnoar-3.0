@@ -38,6 +38,12 @@ interface MarcaInstalacao {
   icone: string
   chaveAdiado: string
   endereco: () => string
+  /**
+   * Guarda o evento também no desktop, sem cancelar o convite do navegador:
+   * o ícone da barra de endereço continua, e um botão "Instalar" da página
+   * passa a funcionar. O cartão flutuante segue só no celular.
+   */
+  guardarNoDesktop?: boolean
 }
 
 let marca: MarcaInstalacao = {
@@ -82,7 +88,13 @@ if (typeof window !== 'undefined') {
   window.addEventListener('beforeinstallprompt', (e) => {
     // No desktop, deixa o navegador oferecer do jeito dele: interceptar sem
     // ter o que mostrar no lugar seria remover a única forma de instalar.
-    if (ehDesktop()) return
+    if (ehDesktop()) {
+      if (marca.guardarNoDesktop) {
+        eventoGuardado = e as EventoInstalacao
+        avisarOuvintes()
+      }
+      return
+    }
     e.preventDefault()
     eventoGuardado = e as EventoInstalacao
     avisarOuvintes()
@@ -330,7 +342,7 @@ export function ConviteInstalacao() {
     return () => window.clearTimeout(relogio)
   }, [candidato])
 
-  const convite = candidato && !dispensado && !guia && (evento !== null || instrucaoIOS)
+  const convite = candidato && !dispensado && !guia && !ehDesktop() && (evento !== null || instrucaoIOS)
 
   function dispensar() {
     try {

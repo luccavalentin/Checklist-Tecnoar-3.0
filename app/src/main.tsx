@@ -10,6 +10,7 @@ import { destravarNoPrimeiroToque } from '@/sos/alerta'
 import { ProvedorSessao } from './sessao'
 import { AppSOS } from './AppSOS'
 import { AtualizadorApp, ConviteApp, StatusRede, registrarServiceWorker } from './comum/Pwa'
+import { AvisosDoApp } from './comum/Aparelho'
 
 const cliente = new QueryClient({
   defaultOptions: {
@@ -63,6 +64,7 @@ createRoot(raiz).render(
               <AtualizadorApp />
               <ConviteApp />
               <StatusRede />
+              <AvisosDoApp />
             </BrowserRouter>
           </ProvedorSessao>
         </ProvedorToast>

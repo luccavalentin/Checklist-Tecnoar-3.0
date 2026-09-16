@@ -28,6 +28,7 @@ import { CHAVES_SOS } from '@/sos/tempoReal'
 import { aplicarTema, lerTema, useCliente } from '../sessao'
 import { Avatar, BotaoApp, CabecalhoTela, CampoApp, Faixa, Folha, Tela } from '../comum/ui'
 import { useOnline } from '../comum/Pwa'
+import { CartaoAparelho } from '../comum/Aparelho'
 import { CartaoModoApp } from '../ModoApp'
 import { useAlturaTeclado, useCasca, useHomeCliente, useInfoPublica } from './dados'
 import { Escolha, GrupoLista, LinhaLista } from './pecas'
@@ -152,6 +153,13 @@ export function PerfilCliente() {
           <LinhaLista para="/revisoes" icone={CalendarCheck} titulo="Revisões e agendamentos" />
           <LinhaLista para="/contato" icone={Headset} titulo="Falar com a Tecnoar" />
         </GrupoLista>
+
+        <section className="flex flex-col gap-2" aria-labelledby="perfil-aparelho">
+          <h2 id="perfil-aparelho" className="px-1 font-display text-[16px] font-bold text-ink">
+            App e notificações
+          </h2>
+          <CartaoAparelho />
+        </section>
 
         <section className="flex flex-col gap-3 rounded-[1.25rem] border border-line bg-surface p-4">
           <h2 className="font-display text-[16px] font-bold text-ink">Aparência</h2>
