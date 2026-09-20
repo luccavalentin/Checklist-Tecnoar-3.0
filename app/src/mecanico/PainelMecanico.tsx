@@ -39,7 +39,7 @@ import { BotaoM, EsqueletoM, FolhaM, RotuloM, SecaoM, SeloM, TelaM } from './ui'
  * Início do mecânico — extremamente operacional.
  *
  * De cima para baixo: quem é, o status (um controle grande: DISPONÍVEL em
- * verde, INDISPONÍVEL em vermelho), os números do dia, o chamado atual com
+ * azul Tecnoar quando recebe SOS, laranja oficial quando está indisponível, os números do dia, o chamado atual com
  * "Continuar atendimento", os chamados esperando resposta e os atalhos.
  */
 export function PainelMecanico() {
@@ -71,23 +71,25 @@ export function PainelMecanico() {
 
   return (
     <>
-      <header className="mx-auto flex max-w-xl flex-col gap-3 px-4 pt-[calc(env(safe-area-inset-top)+0.85rem)]">
-        <div className="flex items-center justify-between gap-3">
-          <LogoSOS altura={38} className="dark:hidden" />
-          <LogoSOS negativo altura={38} className="hidden dark:block" />
-          <Link to="/perfil" aria-label="Seu perfil" className="rounded-full ring-2 ring-line active:scale-95">
-            <Avatar nome={perfil.nome} url={perfil.avatar_url} tamanho="sm" />
-          </Link>
-        </div>
-        <div>
-          <p className="text-[13px] font-medium text-ink-3 first-letter:uppercase">
-            {new Date(agora).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
-          </p>
-          <h1 className="font-display text-[30px] leading-[1.05] font-semibold tracking-tight text-ink">Olá, {nome}</h1>
+      <header className="mec-command-top pt-[calc(env(safe-area-inset-top)+0.8rem)]">
+        <div className="mx-auto flex max-w-xl flex-col gap-3 px-4 pb-5">
+          <div className="flex items-center justify-between gap-3">
+            <LogoSOS negativo altura={38} />
+            <Link to="/perfil" aria-label="Seu perfil" className="rounded-full ring-2 ring-white/18 active:scale-95">
+              <Avatar nome={perfil.nome} url={perfil.avatar_url} tamanho="sm" />
+            </Link>
+          </div>
+          <div>
+            <p className="text-[12px] font-medium text-[#00afef] first-letter:uppercase">
+              {new Date(agora).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
+            </p>
+            <h1 className="font-display text-[26px] leading-[1.05] font-semibold tracking-tight text-white">Olá, {nome}</h1>
+            <p className="mt-1 max-w-[18rem] text-[13px] leading-snug text-white/64">Chamados, rota, OS e peças no fluxo de campo.</p>
+          </div>
         </div>
       </header>
 
-      <TelaM>
+      <TelaM className="-mt-3">
         {home.isError && !h ? (
           <ErroPainel mensagem={(home.error as Error).message} tentando={home.isFetching} aoTentar={() => void home.refetch()} />
         ) : (
@@ -107,7 +109,7 @@ export function PainelMecanico() {
               aoFicarIndisponivel={() => definir.mutate({ situacao: 'indisponivel' })}
             />
 
-            <section className="overflow-hidden rounded-[1.5rem] border border-line bg-surface mec-sombra">
+            <section className="mec-metrics-sheet overflow-hidden rounded-[1.55rem]">
               <NumerosDoDia h={h} emAndamento={chamadoAtual ? 1 : 0} />
               {!chamadoAtual && (
                 <button
@@ -234,7 +236,7 @@ function ControleStatus({
         /* Pílula baixa e contida: o status é o controle principal e continua no
            centro, mas não precisa ser o maior objeto da tela para ser achado. */
         'mec-status mx-auto flex h-12 w-fit max-w-full items-center gap-3 rounded-full pr-1.5 pl-4 text-left text-white transition-colors active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70',
-        // Online (recebendo SOS): azul Tecnoar piscando. Fora do ar: vermelho piscando.
+        // Online (recebendo SOS): azul Tecnoar. Fora do ar: laranja oficial.
         recebendo ? 'mec-status-online' : 'mec-status-offline',
       )}
     >
@@ -301,7 +303,7 @@ function CartaoChamadoAtual({ chamado }: { chamado: NonNullable<HomeMecanico['ch
   const detalhe = useDetalheChamado(chamado.id)
   const veiculo = detalhe.data ? modeloVeiculo(detalhe.data) : null
   return (
-    <section className="entrada-suave overflow-hidden rounded-[1.5rem] border-2 border-accent/60 bg-surface">
+    <section className="entrada-suave sos-native-card overflow-hidden rounded-[1.55rem]">
       <div className="flex flex-col gap-1 p-4 pb-3">
         <div className="flex items-center justify-between gap-2">
           <RotuloM className="text-accent-ink">Chamado atual</RotuloM>
@@ -343,8 +345,8 @@ function AbrirChamado({ atual }: { atual: { id: string; protocolo: string; clien
         type="button"
         onClick={() => (ocupado ? setAviso(true) : navegar('/novo-chamado'))}
         className={cn(
-          'flex min-h-[4.35rem] w-full items-center gap-3 rounded-[1.2rem] px-3.5 py-3 text-left transition-transform active:scale-[0.99]',
-          ocupado ? 'border-2 border-line bg-surface' : 'bg-[#0D1C33] text-white shadow-[0_14px_30px_-18px_rgb(8_24_48/0.9)] dark:bg-[#002061]',
+          'mec-new-call flex min-h-[4.35rem] w-full items-center gap-3 rounded-[1.35rem] px-3.5 py-3 text-left transition-transform active:scale-[0.99]',
+          ocupado ? 'border-2 border-line bg-surface' : 'text-white',
         )}
       >
         <span className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', ocupado ? 'bg-surface-2 text-ink-3' : 'bg-[#ff6600] text-white')}>
@@ -389,7 +391,7 @@ function CartaoFila({ chamado: c, agora, aoAbrir }: { chamado: HomeMecanico['agu
       type="button"
       onClick={aoAbrir}
       className={cn(
-        'flex w-full items-center gap-3 rounded-[1.25rem] border bg-surface p-3.5 text-left transition-transform active:scale-[0.99]',
+          'sos-choice-card flex w-full items-center gap-3 rounded-[1.25rem] p-3.5 text-left transition-transform active:scale-[0.99]',
         c.para_mim ? 'border-2 border-accent' : c.prioridade === 'emergencia' ? 'border-2 border-crit/60' : 'border-line',
         c.recusei && 'opacity-70',
       )}
@@ -433,16 +435,16 @@ function Atalhos() {
   ]
   return (
     <SecaoM titulo="Atalhos">
-      <nav aria-label="Atalhos" className="overflow-hidden rounded-[1.5rem] border border-line bg-surface mec-sombra">
+      <nav aria-label="Atalhos" className="sos-premium-list">
         {itens.map((i) => {
           const Icone = i.icone
           return (
             <Link
               key={i.rotulo}
               to={i.para}
-              className="group flex min-h-[3.4rem] items-center gap-3.5 px-4 active:bg-surface-2 [&:not(:last-child)>span:last-child]:border-b [&:not(:last-child)>span:last-child]:border-line"
+              className="sos-premium-row group flex min-h-[3.4rem] items-center gap-3.5 px-4 [&:not(:last-child)>span:last-child]:border-b [&:not(:last-child)>span:last-child]:border-line"
             >
-              <span className="flex size-8 shrink-0 items-center justify-center rounded-[0.7rem] bg-accent-soft text-accent-ink">
+              <span className="sos-subtle-chip flex size-8 shrink-0 items-center justify-center rounded-[0.7rem] text-accent-ink">
                 <Icone className="size-[18px]" />
               </span>
               <span className="flex min-h-[3.4rem] min-w-0 flex-1 items-center justify-between gap-2">
@@ -475,8 +477,8 @@ function AvisoNotificacoes({ usuarioId }: { usuarioId: string | null }) {
   }
 
   return (
-    <section className="flex items-center gap-3 rounded-[1.5rem] border border-line bg-surface p-3.5 mec-sombra">
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-warn-soft text-warn-ink">
+    <section className="sos-native-card flex items-center gap-3 rounded-[1.5rem] p-3.5">
+      <span className="sos-subtle-chip flex size-10 shrink-0 items-center justify-center rounded-full text-warn-ink">
         <BellRing className="size-5" />
       </span>
       <div className="min-w-0 flex-1">
@@ -502,7 +504,7 @@ function AvisoNotificacoes({ usuarioId }: { usuarioId: string | null }) {
 
 function ErroPainel({ mensagem, tentando, aoTentar }: { mensagem: string; tentando: boolean; aoTentar: () => void }) {
   return (
-    <section className="flex flex-col items-center gap-3 rounded-[1.25rem] border border-line bg-surface px-5 py-8 text-center">
+    <section className="sos-native-card flex flex-col items-center gap-3 rounded-[1.55rem] px-5 py-8 text-center">
       <span className="flex size-14 items-center justify-center rounded-2xl bg-crit-soft text-crit-ink">
         <AlertTriangle className="size-7" />
       </span>

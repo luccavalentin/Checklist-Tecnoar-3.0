@@ -66,7 +66,7 @@ export function DetalheOS() {
             aria-label="Atualizar"
             onClick={() => void detalhe.refetch()}
             disabled={detalhe.isFetching}
-            className="flex size-12 items-center justify-center rounded-2xl text-ink-2 active:bg-surface-2 disabled:opacity-60"
+            className="sos-icon-button flex size-12 items-center justify-center rounded-full text-ink-2 disabled:opacity-60"
           >
             <RefreshCw className={cn('size-5', detalhe.isFetching && 'animate-spin')} />
           </button>
@@ -74,8 +74,8 @@ export function DetalheOS() {
       />
       <TelaM>
         {detalhe.isError && !d ? (
-          <div className="flex flex-col items-center gap-3 rounded-[1.25rem] border border-line bg-surface px-5 py-8 text-center">
-            <span className="flex size-14 items-center justify-center rounded-2xl bg-crit-soft text-crit-ink">
+          <div className="sos-native-card flex flex-col items-center gap-3 rounded-[1.55rem] px-5 py-8 text-center">
+            <span className="sos-subtle-chip flex size-14 items-center justify-center rounded-2xl text-crit-ink">
               <AlertTriangle className="size-7" />
             </span>
             <p className="font-display text-[17px] font-bold text-ink">Não foi possível abrir a OS</p>
@@ -150,7 +150,7 @@ function ConteudoOS({ d, aoAdicionar }: { d: DetalheOSApp; aoAdicionar: (t: Tipo
   return (
     <>
       {/* cabeçalho: status, cliente, veículo */}
-      <CartaoM className="flex flex-col gap-3.5">
+      <CartaoM className="flex flex-col gap-3.5 rounded-[1.75rem] p-[1.1rem]">
         <div className="flex flex-wrap items-center gap-2">
           {os.status && (
             <SeloM tom={tomStatusOS(os.status.cor)} ponto className="max-w-full min-w-0">
@@ -172,7 +172,7 @@ function ConteudoOS({ d, aoAdicionar }: { d: DetalheOSApp; aoAdicionar: (t: Tipo
             <a
               href={telefone}
               aria-label={`Ligar para ${d.cliente?.nome ?? 'o cliente'}`}
-              className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-[#00afef] text-white active:bg-[#009bd6]"
+              className="sos-operator-action flex size-14 shrink-0 items-center justify-center rounded-2xl text-[#0D1C33] active:bg-[#009bd6]"
             >
               <Phone className="size-6" />
             </a>
@@ -201,9 +201,9 @@ function ConteudoOS({ d, aoAdicionar }: { d: DetalheOSApp; aoAdicionar: (t: Tipo
         <button
           type="button"
           onClick={() => navegar(`/chamado/${d.chamado?.id}`)}
-          className="flex min-h-16 w-full items-center gap-3 rounded-[1.25rem] border-2 border-cyan/40 bg-cyan-soft px-4 py-3 text-left active:scale-[0.99]"
+          className="sos-premium-row sos-native-card flex min-h-16 w-full items-center gap-3 rounded-[1.55rem] px-4 py-3 text-left"
         >
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-surface text-cyan-ink">
+          <span className="sos-subtle-chip flex size-11 shrink-0 items-center justify-center rounded-2xl text-cyan-ink">
             <LifeBuoy className="size-6" />
           </span>
           <span className="min-w-0 flex-1">
@@ -216,17 +216,17 @@ function ConteudoOS({ d, aoAdicionar }: { d: DetalheOSApp; aoAdicionar: (t: Tipo
       )}
 
       {!d.pode_editar && (
-        <p className="flex items-start gap-2 rounded-2xl bg-surface-2 px-3.5 py-3 text-[13.5px] leading-snug text-ink-2">
+        <p className="sos-native-card flex items-start gap-2 rounded-2xl px-3.5 py-3 text-[13.5px] leading-snug text-ink-2">
           <Lock className="mt-0.5 size-4 shrink-0" />
           {os.encerrada_em ? 'OS encerrada: só consulta.' : 'Você pode consultar esta OS, mas não alterar.'}
         </p>
       )}
       {d.pode_editar && !online && (
-        <p className="rounded-2xl bg-warn-soft px-3.5 py-2.5 text-[13.5px] font-medium text-warn-ink">Sem internet: para alterar a OS, espere o sinal voltar.</p>
+        <p className="sos-native-card rounded-2xl px-3.5 py-2.5 text-[13.5px] font-medium text-warn-ink">Sem internet: para alterar a OS, espere o sinal voltar.</p>
       )}
 
       {semEstoque > 0 && (
-        <p className="flex items-start gap-2 rounded-2xl bg-crit-soft px-3.5 py-3 text-[13.5px] leading-snug font-semibold text-crit-ink">
+        <p className="sos-native-card flex items-start gap-2 rounded-2xl px-3.5 py-3 text-[13.5px] leading-snug font-semibold text-crit-ink">
           <AlertTriangle className="mt-0.5 size-4 shrink-0" />
           {semEstoque} {semEstoque === 1 ? 'peça sem estoque' : 'peças sem estoque'} — a central foi avisada.
         </p>
@@ -235,9 +235,9 @@ function ConteudoOS({ d, aoAdicionar }: { d: DetalheOSApp; aoAdicionar: (t: Tipo
       {/* peças */}
       <SecaoM titulo={`Peças · ${d.produtos.length}`} acao={<span className="num text-[15px] font-bold text-ink">{moeda(valorProdutos)}</span>}>
         {d.produtos.length === 0 ? (
-          <p className="rounded-[1.25rem] border border-dashed border-line-strong px-4 py-4 text-center text-[14px] text-ink-3">Nenhuma peça lançada.</p>
+          <p className="sos-native-card rounded-[1.55rem] border-dashed px-4 py-4 text-center text-[14px] text-ink-3">Nenhuma peça lançada.</p>
         ) : (
-          <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-[1.25rem] border border-line bg-surface mec-sombra">
+          <ul className="sos-premium-list flex flex-col divide-y divide-line">
             {d.produtos.map((p) => (
               <LinhaItem
                 key={p.id}
@@ -262,9 +262,9 @@ function ConteudoOS({ d, aoAdicionar }: { d: DetalheOSApp; aoAdicionar: (t: Tipo
       {/* serviços */}
       <SecaoM titulo={`Serviços · ${d.servicos.length}`} acao={<span className="num text-[15px] font-bold text-ink">{moeda(valorServicos)}</span>}>
         {d.servicos.length === 0 ? (
-          <p className="rounded-[1.25rem] border border-dashed border-line-strong px-4 py-4 text-center text-[14px] text-ink-3">Nenhum serviço lançado.</p>
+          <p className="sos-native-card rounded-[1.55rem] border-dashed px-4 py-4 text-center text-[14px] text-ink-3">Nenhum serviço lançado.</p>
         ) : (
-          <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-[1.25rem] border border-line bg-surface mec-sombra">
+          <ul className="sos-premium-list flex flex-col divide-y divide-line">
             {d.servicos.map((s) => (
               <LinhaItem
                 key={s.id}
@@ -287,7 +287,7 @@ function ConteudoOS({ d, aoAdicionar }: { d: DetalheOSApp; aoAdicionar: (t: Tipo
       </SecaoM>
 
       {/* totais */}
-      <CartaoM className="flex flex-col gap-1.5">
+      <CartaoM className="flex flex-col gap-1.5 rounded-[1.55rem]">
         <LinhaTotal rotulo="Peças" valor={moeda(valorProdutos)} />
         <LinhaTotal rotulo="Serviços" valor={moeda(valorServicos)} />
         {desconto > 0 && <LinhaTotal rotulo="Desconto" valor={`− ${moeda(desconto)}`} />}
@@ -316,7 +316,7 @@ function ConteudoOS({ d, aoAdicionar }: { d: DetalheOSApp; aoAdicionar: (t: Tipo
         href={linkOSNoSistema(os.id)}
         target="_blank"
         rel="noreferrer"
-        className="flex min-h-14 items-center justify-center gap-2 rounded-2xl border border-line bg-surface-2 px-4 font-display text-[15px] font-extrabold text-ink active:bg-line"
+        className="sos-action-link flex min-h-14 items-center justify-center gap-2 rounded-2xl px-4 font-display text-[15px] font-semibold text-ink active:bg-line"
       >
         <ExternalLink className="size-4" /> Abrir no sistema Tecnoar
       </a>
@@ -391,7 +391,7 @@ function LinhaItem({
   const recusado = item.aprovacao === 'recusado'
 
   return (
-    <li className={cn('flex flex-col gap-2 px-3.5 py-3', recusado && 'opacity-70')}>
+    <li className={cn('sos-premium-row flex flex-col gap-2 px-3.5 py-3', recusado && 'opacity-70')}>
       <div className="min-w-0">
         <p className="text-[15.5px] leading-snug font-bold text-ink">{item.descricao}</p>
         <p className="num mt-0.5 truncate text-[12.5px] text-ink-3">
@@ -419,7 +419,7 @@ function LinhaItem({
               aria-label={`Remover ${item.descricao}`}
               disabled={ocupado}
               onClick={aoRemover}
-              className="flex size-12 items-center justify-center rounded-xl text-ink-3 active:bg-crit-soft active:text-crit-ink disabled:opacity-40"
+              className="sos-icon-button flex size-12 items-center justify-center rounded-xl text-ink-3 active:text-crit-ink disabled:opacity-40"
             >
               <Trash2 className="size-5" />
             </button>
@@ -498,7 +498,7 @@ function DadosOS({ d, socorroAberto }: { d: DetalheOSApp; socorroAberto: boolean
 
   return (
     <SecaoM titulo="Dados da OS">
-      <CartaoM className="flex flex-col gap-4">
+      <CartaoM className="flex flex-col gap-4 rounded-[1.55rem]">
         <CampoM
           rotulo="Quilometragem do painel"
           icone={Gauge}
@@ -586,4 +586,3 @@ function TelaAdicionar({ d, tipo, aoFechar }: { d: DetalheOSApp; tipo: TipoItem;
     </div>
   )
 }
-

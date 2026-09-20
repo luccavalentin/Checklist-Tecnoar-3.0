@@ -286,7 +286,7 @@ export function FluxoSOS() {
                     aria-checked={sel}
                     onClick={() => setEscolhaVeiculo(v.id)}
                     className={cn(
-                      'flex min-h-14 shrink-0 items-center gap-2.5 rounded-2xl border-2 bg-surface px-3 py-2 text-left transition-colors',
+                      'sos-choice-card flex min-h-14 shrink-0 items-center gap-2.5 rounded-2xl px-3 py-2 text-left transition-colors',
                       sel ? 'border-accent' : 'border-line',
                     )}
                   >
@@ -301,14 +301,14 @@ export function FluxoSOS() {
                 role="radio"
                 aria-checked={digitarPlaca}
                 onClick={() => setEscolhaVeiculo('outro')}
-                className={cn('flex min-h-14 shrink-0 items-center gap-2 rounded-2xl border-2 border-dashed bg-surface px-3.5 text-[14px] font-semibold text-ink-2', digitarPlaca ? 'border-accent' : 'border-line-strong')}
+                className={cn('sos-choice-card flex min-h-14 shrink-0 items-center gap-2 rounded-2xl border-dashed px-3.5 text-[14px] font-semibold text-ink-2', digitarPlaca ? 'border-accent' : 'border-line-strong')}
               >
                 <Truck className="size-4" /> Outro
               </button>
             </div>
           </section>
         ) : veiculo ? (
-          <div className="flex min-h-14 items-center gap-3 rounded-2xl border border-line bg-surface px-3.5 py-2.5">
+          <div className="sos-choice-card flex min-h-14 items-center gap-3 rounded-2xl px-3.5 py-2.5">
             <PlacaVeiculo placa={veiculo.placa} tamanho="sm" />
             <span className="min-w-0 flex-1 truncate text-[14.5px] font-semibold text-ink">{nomeVeiculo(veiculo)}</span>
             <button type="button" onClick={() => setTrocandoVeiculo(true)} className="min-h-10 shrink-0 px-1 text-[13.5px] font-semibold text-accent-ink">
@@ -333,11 +333,11 @@ export function FluxoSOS() {
                 }}
                 aria-pressed={escolhido}
                 className={cn(
-                  'flex min-h-[6.25rem] flex-col items-start justify-between gap-2 rounded-[1.25rem] border-2 bg-surface p-3.5 text-left transition-[transform,border-color] active:scale-[0.97]',
+                  'sos-choice-card flex min-h-[6.25rem] flex-col items-start justify-between gap-2 rounded-[1.25rem] p-3.5 text-left transition-[transform,border-color] active:scale-[0.98]',
                   escolhido ? 'border-accent' : 'border-line',
                 )}
               >
-                <span className={cn('flex size-10 items-center justify-center rounded-xl', grave ? 'bg-crit-soft text-crit' : 'bg-surface-2 text-ink-2')}>
+                <span className={cn('sos-subtle-chip flex size-10 items-center justify-center rounded-xl', grave ? 'text-crit' : 'text-ink-2')}>
                   <Icone className="size-5" />
                 </span>
                 <span className="font-display text-[15px] leading-tight font-bold text-ink">{dados.rotulo}</span>
@@ -415,7 +415,7 @@ export function FluxoSOS() {
           </Faixa>
         )}
 
-        <section aria-label="Resumo do pedido" className="flex flex-col divide-y divide-line overflow-hidden rounded-[1.25rem] border border-line bg-surface">
+        <section aria-label="Resumo do pedido" className="sos-premium-list flex flex-col divide-y divide-line">
           <Linha icone={Truck} rotulo="Veículo" acao={lista.length > 0 ? { rotulo: 'Trocar', aoClicar: () => setTrocandoVeiculo(true) } : undefined}>
             {digitarPlaca ? (
               <CampoApp
@@ -528,7 +528,7 @@ function OpcaoVeiculo({ ativo, tracejado, onClick, children }: { ativo: boolean;
       onClick={onClick}
       aria-pressed={ativo}
       className={cn(
-        'flex min-h-14 w-full items-center gap-3 rounded-2xl border-2 bg-surface px-3.5 py-2.5 text-left active:scale-[0.99]',
+        'sos-choice-card flex min-h-14 w-full items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left active:scale-[0.99]',
         tracejado && 'border-dashed',
         ativo ? 'border-accent' : 'border-line',
       )}
@@ -544,7 +544,7 @@ function AvisoJaTemSocorro({ protocolo, aoAcompanhar }: { protocolo: string; aoA
     <button
       type="button"
       onClick={aoAcompanhar}
-      className="flex min-h-14 w-full items-center gap-3 rounded-2xl border border-crit/25 bg-crit-soft px-3.5 py-2.5 text-left text-crit-ink"
+      className="sos-premium-row flex min-h-14 w-full items-center gap-3 rounded-2xl border border-crit/25 bg-crit-soft px-3.5 py-2.5 text-left text-crit-ink"
     >
       <Siren className="size-5 shrink-0" />
       <span className="min-w-0 flex-1 text-[13.5px] leading-snug">
@@ -559,9 +559,9 @@ function AvisoJaTemSocorro({ protocolo, aoAcompanhar }: { protocolo: string; aoA
 function Detalhes({ aberto: inicial, temConteudo, children }: { aberto: boolean; temConteudo: boolean; children: ReactNode }) {
   const [aberto, setAberto] = useState(inicial)
   return (
-    <section className="overflow-hidden rounded-[1.25rem] border border-line bg-surface">
+    <section className="sos-premium-list">
       <button type="button" aria-expanded={aberto} onClick={() => setAberto((a) => !a)} className="flex min-h-16 w-full items-center gap-3 px-4 py-3 text-left">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent-ink">
+        <span className="sos-subtle-chip flex size-10 shrink-0 items-center justify-center rounded-xl text-accent-ink">
           <Camera className="size-5" />
         </span>
         <span className="min-w-0 flex-1">
@@ -619,9 +619,9 @@ function PaginaFluxo({
   return (
     <div className="cli-palco">
       <div className="cli-coluna">
-        <header className="sticky top-0 z-30 border-b border-line/70 bg-canvas/95 pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))] backdrop-blur-md">
+        <header className="sos-native-header sticky top-0 z-30 pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))]">
           <div className="mx-auto flex h-14 max-w-xl items-center justify-between gap-2 px-2 pr-[max(0.5rem,env(safe-area-inset-right))] pl-[max(0.5rem,env(safe-area-inset-left))]">
-            <button type="button" onClick={aoVoltar} aria-label="Voltar" className="flex size-11 items-center justify-center rounded-full text-ink hover:bg-surface-2">
+            <button type="button" onClick={aoVoltar} aria-label="Voltar" className="sos-icon-button flex size-11 items-center justify-center rounded-full text-ink">
               <ChevronLeft className="size-6" />
             </button>
             <ol className="flex flex-1 items-center justify-center gap-1.5" aria-label={`Passo ${passo} de 3`}>
@@ -631,11 +631,11 @@ function PaginaFluxo({
             </ol>
             <div className="flex items-center">
               {telCentral && (
-                <a href={telCentral} aria-label="Ligar para a Tecnoar" className="flex size-11 items-center justify-center rounded-full text-ok hover:bg-surface-2">
+                <a href={telCentral} aria-label="Ligar para a Tecnoar" className="sos-icon-button flex size-11 items-center justify-center rounded-full text-ok">
                   <PhoneCall className="size-5" />
                 </a>
               )}
-              <button type="button" onClick={aoFechar} aria-label="Fechar pedido de socorro" className="flex size-11 items-center justify-center rounded-full text-ink-2 hover:bg-surface-2">
+              <button type="button" onClick={aoFechar} aria-label="Fechar pedido de socorro" className="sos-icon-button flex size-11 items-center justify-center rounded-full text-ink-2">
                 <X className="size-5" />
               </button>
             </div>
@@ -648,7 +648,7 @@ function PaginaFluxo({
           )}
         >
           <div>
-            <p className="text-[12.5px] font-semibold text-crit">Passo {passo} de 3</p>
+          <p className="text-[12.5px] font-semibold text-crit">Passo {passo} de 3</p>
             <h1 className="mt-1 font-display text-[26px] leading-tight font-bold text-ink">{titulo}</h1>
             <p className="mt-1 text-[14.5px] leading-snug text-ink-2">{subtitulo}</p>
           </div>

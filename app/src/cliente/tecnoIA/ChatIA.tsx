@@ -406,7 +406,7 @@ export function ChatIA({
         </div>
 
         {limite && (
-          <section role="alert" className="sos-card entrada-suave flex flex-col gap-3 rounded-[1.45rem] border-warn/40 p-4">
+          <section role="alert" className="sos-native-card entrada-suave flex flex-col gap-3 rounded-[1.55rem] border-warn/40 p-4">
             <div className="flex items-start gap-3">
               <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-warn-soft text-warn-ink">
                 <Clock className="size-5" />
@@ -421,7 +421,7 @@ export function ChatIA({
                 {ativo ? 'Ver meu socorro' : 'Pedir SOS'}
               </BotaoApp>
               {tel && (
-                <a href={tel} className="sos-night-action flex min-h-12 items-center justify-center gap-2 rounded-[1rem] px-4 font-display text-[15px] font-extrabold text-white dark:bg-white dark:text-[#0D1C33]">
+                <a href={tel} className="sos-night-action flex min-h-12 items-center justify-center gap-2 rounded-[1.05rem] px-4 font-display text-[15px] font-semibold text-white dark:bg-white dark:text-[#0D1C33]">
                   <PhoneCall className="size-5" /> Ligar para a Tecnoar
                 </a>
               )}
@@ -433,7 +433,7 @@ export function ChatIA({
         )}
 
         {!online && !limite && (
-          <section role="status" className="sos-card flex flex-col gap-3 rounded-[1.45rem] p-4">
+          <section role="status" className="sos-native-card flex flex-col gap-3 rounded-[1.55rem] p-4">
             <div className="flex items-start gap-3">
               <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-warn-soft text-warn-ink">
                 <WifiOff className="size-5" />
@@ -456,7 +456,7 @@ export function ChatIA({
         ref={rodape}
         style={teclado ? { bottom: teclado } : undefined}
         className={cn(
-          'cli-fixo fixed bottom-0 z-40 border-t border-line bg-surface/98 shadow-[0_-10px_30px_-22px_rgb(8_24_48/0.5)]',
+          'tecno-ia-composer cli-fixo fixed bottom-0 z-40',
           teclado ? 'pb-2' : 'pb-[calc(0.5rem+env(safe-area-inset-bottom))]',
         )}
       >
@@ -481,7 +481,7 @@ export function ChatIA({
                     setFoto(null)
                     setErroFoto(null)
                   }}
-                  className="flex size-11 shrink-0 items-center justify-center rounded-full text-ink-3 active:bg-surface-2"
+                  className="sos-icon-button flex size-11 shrink-0 items-center justify-center rounded-full text-ink-3"
                 >
                   <X className="size-5" />
                 </button>
@@ -495,7 +495,7 @@ export function ChatIA({
               aria-label="Anexar uma foto do problema"
               disabled={bloqueado || pensando || preparandoFoto}
               onClick={() => arquivo.current?.click()}
-              className="flex size-12 shrink-0 items-center justify-center rounded-full border border-line-strong bg-surface text-accent-ink transition-transform active:scale-95 disabled:opacity-45"
+              className="sos-soft-action flex size-12 shrink-0 items-center justify-center rounded-full text-accent-ink transition-transform active:scale-95 disabled:opacity-45"
             >
               <Camera className="size-5" />
             </button>
@@ -551,10 +551,10 @@ function CartaoSugestaoSOS({ sugestao: s, ativo, aoPedir }: { sugestao: Sugestao
   const prioridade = PRIORIDADES[s.prioridade] ?? PRIORIDADES.alta
   const urgente = s.prioridade === 'emergencia'
   return (
-    <article aria-label="Sugestão: pedir socorro" className="entrada-suave ml-10 overflow-hidden rounded-[1.25rem] border-2 border-[#ff6600]/40 bg-surface max-[359px]:ml-0" role="alert">
+    <article aria-label="Sugestão: pedir socorro" className="sos-native-card entrada-suave ml-10 overflow-hidden rounded-[1.45rem] border-2 border-[#ff6600]/40 max-[359px]:ml-0" role="alert">
       <div className="flex flex-col gap-3 p-4">
         <div className="flex items-start gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-crit-soft text-crit">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-[1rem] bg-crit-soft text-crit">
             <Siren className="size-5" />
           </span>
           <div className="min-w-0 flex-1">
@@ -567,7 +567,7 @@ function CartaoSugestaoSOS({ sugestao: s, ativo, aoPedir }: { sugestao: Sugestao
           <span className="min-w-0 font-semibold text-ink">{ocorrencia.rotulo}</span>
           <span className={cn('rounded-full px-2.5 py-0.5 text-[11.5px] font-bold', urgente ? 'bg-crit-soft text-crit-ink' : 'bg-surface-2 text-ink-2')}>{prioridade.rotulo}</span>
         </div>
-        {s.descricao && <p className="rounded-xl bg-surface-2 px-3.5 py-2.5 text-[14px] leading-relaxed text-ink-2">{s.descricao}</p>}
+        {s.descricao && <p className="rounded-[1rem] bg-surface-2 px-3.5 py-2.5 text-[14px] leading-relaxed text-ink-2">{s.descricao}</p>}
         {ativo ? (
           <>
             <p className="text-[13px] leading-snug text-ink-2">
@@ -592,9 +592,9 @@ function CartaoSugestaoSOS({ sugestao: s, ativo, aoPedir }: { sugestao: Sugestao
 
 function CartaoSugestaoAgenda({ sugestao: a, aoAgendar }: { sugestao: SugestaoAgendamentoIa; aoAgendar: () => void }) {
   return (
-    <article aria-label="Sugestão: agendar" className="entrada-suave ml-10 flex flex-col gap-3 rounded-[1.25rem] border border-line bg-surface p-4 max-[359px]:ml-0">
+    <article aria-label="Sugestão: agendar" className="sos-native-card entrada-suave ml-10 flex flex-col gap-3 rounded-[1.45rem] p-4 max-[359px]:ml-0">
       <div className="flex items-start gap-3">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-ok-soft text-ok-ink">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-[1rem] bg-ok-soft text-ok-ink">
           <CalendarPlus className="size-5" />
         </span>
         <div className="min-w-0">

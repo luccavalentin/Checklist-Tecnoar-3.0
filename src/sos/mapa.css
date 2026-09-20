@@ -179,6 +179,20 @@
   font: 700 12px/1 var(--font-display, system-ui, sans-serif);
   letter-spacing: 0.02em;
 }
+
+.mapa-botao-premium {
+  border: 1px solid rgb(8 24 48 / 0.1);
+  background: rgb(255 255 255 / 0.88);
+  box-shadow:
+    0 14px 28px -18px rgb(8 24 48 / 0.55),
+    0 1px 0 rgb(255 255 255 / 0.85) inset;
+  backdrop-filter: blur(18px) saturate(1.18);
+}
+
+.mapa-botao-premium:hover,
+.mapa-botao-premium:active {
+  background: rgb(255 255 255 / 0.96);
+}
 .pino-mec.mec-livre {
   background: #16a34a;
 }

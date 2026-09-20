@@ -49,9 +49,9 @@ export function MolduraIA({
   return (
     <div className="cli-palco">
       <div className="cli-coluna">
-      <header className="sticky top-0 z-30 border-b border-line/70 bg-canvas/95 pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))] backdrop-blur-md">
-        <div className="mx-auto flex min-h-[3.75rem] max-w-2xl items-center gap-2 px-2 pr-[max(0.5rem,env(safe-area-inset-right))] pl-[max(0.5rem,env(safe-area-inset-left))]">
-          <button type="button" aria-label="Voltar" onClick={voltar} className="flex size-11 shrink-0 items-center justify-center rounded-full text-ink hover:bg-surface-2 active:bg-surface-2">
+      <header className="tecno-ia-header sticky top-0 z-30 pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))]">
+        <div className="mx-auto flex min-h-[4.2rem] max-w-2xl items-center gap-2 px-2 pr-[max(0.5rem,env(safe-area-inset-right))] pl-[max(0.5rem,env(safe-area-inset-left))]">
+          <button type="button" aria-label="Voltar" onClick={voltar} className="sos-icon-button flex size-11 shrink-0 items-center justify-center rounded-full text-ink">
             <ChevronLeft className="size-6" />
           </button>
           <AvatarIA className="max-[359px]:hidden" />
@@ -67,7 +67,7 @@ export function MolduraIA({
             aria-label="Mais opções"
             aria-haspopup="dialog"
             onClick={() => setMenu(true)}
-            className="flex size-11 shrink-0 items-center justify-center rounded-full text-ink-2 hover:bg-surface-2 active:bg-surface-2"
+            className="sos-icon-button flex size-11 shrink-0 items-center justify-center rounded-full text-ink-2"
           >
             <Ellipsis className="size-5" />
           </button>
@@ -83,7 +83,7 @@ export function MolduraIA({
             const Icone = o.icone
             const conteudo = (
               <>
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-[1rem] bg-accent-soft text-accent">
                   <Icone className="size-5" />
                 </span>
                 <span className="min-w-0 flex-1">
@@ -93,7 +93,7 @@ export function MolduraIA({
                 <ChevronRight className="size-5 shrink-0 text-ink-3" />
               </>
             )
-            const cls = cn('flex min-h-14 w-full items-center gap-3 rounded-2xl border border-line bg-surface px-3 py-2 text-left active:bg-surface-2', o.desativada && 'pointer-events-none opacity-45')
+            const cls = cn('sos-native-card flex min-h-14 w-full items-center gap-3 rounded-[1.25rem] px-3 py-2 text-left active:bg-surface-2', o.desativada && 'pointer-events-none opacity-45')
             return (
               <li key={o.rotulo}>
                 {o.href ? (
@@ -134,7 +134,7 @@ export function BotaoSOSTopo() {
       type="button"
       onClick={() => navegar(ativo ? `/chamado/${ativo.id}` : '/sos')}
       aria-label={ativo ? 'Acompanhar o socorro em andamento' : 'Pedir socorro (SOS)'}
-      className="flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-[#ff6600] px-3.5 font-display text-[15px] font-bold text-white active:scale-95"
+      className="sos-siren-action flex h-11 shrink-0 items-center gap-1.5 rounded-full px-3.5 font-display text-[15px] font-semibold text-white active:scale-95"
     >
       <span className={cn('size-2 rounded-full bg-white', ativo && 'sos-piscar')} aria-hidden />
       {ativo ? 'Ao vivo' : 'SOS'}
@@ -149,7 +149,7 @@ export function AvatarIA({ grande, className }: { grande?: boolean; className?: 
     <span
       aria-hidden
       className={cn(
-        'flex shrink-0 items-center justify-center rounded-full bg-[#0D1C33] text-[#ff9a4d] dark:bg-[#002061]',
+        'tecno-ia-avatar flex shrink-0 items-center justify-center rounded-full text-[#ff9a4d]',
         grande ? 'size-14 rounded-2xl' : 'size-8',
         className,
       )}
@@ -163,7 +163,7 @@ export function BalaoIA({ children, className }: { children: ReactNode; classNam
   return (
     <div className={cn('flex items-end gap-2', className)}>
       <AvatarIA />
-      <div className="max-w-[85%] min-w-0 rounded-2xl rounded-bl-md border border-line bg-surface px-4 py-3 text-[15px] leading-relaxed break-words text-ink">{children}</div>
+      <div className="tecno-ia-bubble-ai max-w-[85%] min-w-0 rounded-[1.25rem] rounded-bl-md px-4 py-3 text-[15px] leading-relaxed break-words text-ink">{children}</div>
     </div>
   )
 }
@@ -173,7 +173,7 @@ export function BalaoVoce({ children, rodape, soFoto }: { children: ReactNode; r
     <div className="flex flex-col items-end gap-1">
       <div
         className={cn(
-          'entrada-suave max-w-[80%] min-w-0 rounded-2xl rounded-br-md bg-[#0D1C33] text-[15px] font-medium break-words whitespace-pre-line text-white dark:bg-[#002061]',
+          'tecno-ia-bubble-user entrada-suave max-w-[80%] min-w-0 rounded-[1.25rem] rounded-br-md text-[15px] font-medium break-words whitespace-pre-line text-white',
           soFoto ? 'p-1' : 'px-4 py-2.5',
         )}
       >
@@ -188,7 +188,7 @@ export function Digitando() {
   return (
     <div className="flex items-end gap-2" role="status" aria-label="Tecno IA está pensando">
       <AvatarIA />
-      <div className="flex h-11 items-center gap-1.5 rounded-2xl rounded-bl-md border border-line bg-surface px-4">
+      <div className="tecno-ia-bubble-ai flex h-11 items-center gap-1.5 rounded-[1.25rem] rounded-bl-md px-4">
         {[0, 1, 2].map((i) => (
           <span key={i} className="size-2 animate-bounce rounded-full bg-ink-3" style={{ animationDelay: `${i * 120}ms` }} />
         ))}

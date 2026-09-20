@@ -21,7 +21,7 @@ export function Placa({ placa, tamanho = 'md', className }: { placa: string | nu
   const t = tamanho === 'lg' ? 'text-[17px] px-2.5 py-1' : tamanho === 'sm' ? 'text-[11px] px-1.5 py-[1px]' : 'text-[13px] px-2 py-0.5'
   return (
     <span
-      className={cn('inline-flex shrink-0 flex-col overflow-hidden rounded-[5px] border-[1.5px] border-[#0b1c33] bg-white leading-none shadow-[0_1px_0_rgb(0_0_0/0.08)]', className)}
+      className={cn('inline-flex shrink-0 flex-col overflow-hidden rounded-[6px] border-[1.5px] border-[#0b1c33] bg-white leading-none shadow-[0_8px_18px_-14px_rgb(8_24_48/0.45)]', className)}
       aria-label={`Placa ${formatarPlacaExibicao(placa)}`}
     >
       <span aria-hidden className={cn('bg-[#1f4fa8]', tamanho === 'sm' ? 'h-[3px]' : 'h-1')} />
@@ -50,7 +50,7 @@ export function IconeOcorrencia({
     <span
       aria-hidden
       className={cn(
-        'flex shrink-0 items-center justify-center',
+        'flex shrink-0 items-center justify-center shadow-[0_12px_26px_-22px_rgb(8_24_48/0.52)]',
         caixa,
         prioridade === 'emergencia' ? 'bg-[#ff6600] text-white' : prioridade === 'alta' ? 'bg-warn-soft text-warn-ink' : 'bg-accent-soft text-accent-ink',
         className,
@@ -98,7 +98,7 @@ export function Interruptor({
       className="flex w-full items-center gap-3 py-3 text-left disabled:opacity-50"
     >
       {Icone && (
-        <span className="sos-chip flex size-10 shrink-0 items-center justify-center rounded-xl text-ink-2">
+        <span className="sos-chip flex size-10 shrink-0 items-center justify-center rounded-[1rem] text-ink-2">
           <Icone className="size-5" />
         </span>
       )}
@@ -106,7 +106,7 @@ export function Interruptor({
         <span className="block text-[15px] font-semibold text-ink">{rotulo}</span>
         {descricao && <span className="block text-[12.5px] leading-snug text-ink-3">{descricao}</span>}
       </span>
-      <span aria-hidden className={cn('relative h-8 w-[3.25rem] shrink-0 rounded-full transition-colors', ligado ? 'bg-ok' : 'bg-line-strong')}>
+      <span aria-hidden className={cn('relative h-8 w-[3.25rem] shrink-0 rounded-full transition-colors shadow-[inset_0_1px_2px_rgb(8_24_48/0.16)]', ligado ? 'bg-ok' : 'bg-line-strong')}>
         <span className={cn('absolute top-1 size-6 rounded-full bg-white shadow transition-all', ligado ? 'left-[1.5rem]' : 'left-1')} />
       </span>
     </button>

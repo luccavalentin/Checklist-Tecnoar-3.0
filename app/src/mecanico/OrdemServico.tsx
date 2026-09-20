@@ -116,7 +116,7 @@ export function OrdemServico({ d, podeGerar = true }: { d: DetalheChamado; podeG
   return (
     <>
       {os ? (
-        <section className="rounded-[1.25rem] border-2 border-ok/50 bg-surface p-4">
+        <section className="sos-native-card rounded-[1.55rem] p-4">
           <div className="flex items-center justify-between gap-2">
             <RotuloM className="text-ok-ink">OS no sistema Tecnoar</RotuloM>
             {os.status && <SeloM tom="ok">{os.status}</SeloM>}
@@ -134,7 +134,7 @@ export function OrdemServico({ d, podeGerar = true }: { d: DetalheChamado; podeG
               href={linkOS(os.id)}
               target="_blank"
               rel="noreferrer"
-              className="flex min-h-14 items-center justify-center gap-2 rounded-2xl border border-line bg-surface-2 px-3 font-display text-[14.5px] font-extrabold text-ink"
+              className="sos-action-link flex min-h-14 items-center justify-center gap-2 rounded-2xl px-3 font-display text-[14.5px] font-semibold text-ink"
             >
               <ExternalLink className="size-4" /> Abrir a OS
             </a>
@@ -142,7 +142,7 @@ export function OrdemServico({ d, podeGerar = true }: { d: DetalheChamado; podeG
               href={linkChecklistOS(os.id)}
               target="_blank"
               rel="noreferrer"
-              className="flex min-h-14 items-center justify-center gap-2 rounded-2xl border border-line bg-surface-2 px-3 font-display text-[14.5px] font-extrabold text-ink"
+              className="sos-action-link flex min-h-14 items-center justify-center gap-2 rounded-2xl px-3 font-display text-[14.5px] font-semibold text-ink"
             >
               <ListChecks className="size-4" /> Checklist da OS
             </a>
@@ -151,8 +151,8 @@ export function OrdemServico({ d, podeGerar = true }: { d: DetalheChamado; podeG
         </section>
       ) : lista.length > 0 ? (
         <section className="flex flex-col gap-2.5">
-          <div className="flex items-start gap-3 rounded-[1.25rem] border border-cyan/40 bg-cyan-soft p-4">
-            <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-surface text-cyan-ink">
+          <div className="sos-native-card flex items-start gap-3 rounded-[1.55rem] p-4">
+            <span className="sos-subtle-chip flex size-12 shrink-0 items-center justify-center rounded-2xl text-cyan-ink">
               <Link2 className="size-6" />
             </span>
             <div className="min-w-0">
@@ -191,8 +191,8 @@ export function OrdemServico({ d, podeGerar = true }: { d: DetalheChamado; podeG
           </div>
         </section>
       ) : (
-        <section className="flex items-start gap-3 rounded-[1.25rem] border border-line bg-surface p-4">
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-accent-ink">
+        <section className="sos-native-card flex items-start gap-3 rounded-[1.55rem] p-4">
+          <span className="sos-subtle-chip flex size-12 shrink-0 items-center justify-center rounded-2xl text-accent-ink">
             <FileText className="size-6" />
           </span>
           <div className="min-w-0">
@@ -209,7 +209,7 @@ export function OrdemServico({ d, podeGerar = true }: { d: DetalheChamado; podeG
 
       <section className="flex flex-col gap-2">
         <RotuloM className="px-1">{os ? 'Veio do chamado' : 'O sistema preenche sozinho'}</RotuloM>
-        <dl className="divide-y divide-line overflow-hidden rounded-[1.25rem] border border-line bg-surface">
+        <dl className="sos-premium-list divide-y divide-line">
           <Dado rotulo="Cliente" valor={d.cliente?.nome ?? '—'} />
           <Dado rotulo="Veículo" valor={modeloVeiculo(d) ?? (semVeiculo ? 'Sem veículo no chamado' : '—')} />
           <Dado rotulo="Placa" valor={<span className="num">{d.veiculo?.placa ? formatarPlacaExibicao(d.veiculo.placa) : '—'}</span>} />
@@ -289,8 +289,8 @@ function Quilometragem({ chamadoId, kmCadastro }: { chamadoId: string; kmCadastr
   return (
     <section className="flex flex-col gap-2">
       <RotuloM className="px-1">Quilometragem</RotuloM>
-      <div className="flex items-stretch gap-2 rounded-[1.25rem] border border-line bg-surface p-2">
-        <label className="flex min-h-14 min-w-0 flex-1 items-center gap-2.5 rounded-2xl bg-surface-2 px-3.5">
+      <div className="sos-native-card flex items-stretch gap-2 rounded-[1.55rem] p-2">
+        <label className="sos-field flex min-h-14 min-w-0 flex-1 items-center gap-2.5 rounded-2xl px-3.5">
           <Gauge aria-hidden className="size-5 shrink-0 text-ink-3" />
           <input
             inputMode="numeric"
@@ -313,7 +313,7 @@ function Quilometragem({ chamadoId, kmCadastro }: { chamadoId: string; kmCadastr
 
 function Dado({ rotulo, valor }: { rotulo: string; valor: ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-4 px-4 py-3">
+    <div className="sos-premium-row flex items-start justify-between gap-4 px-4 py-3">
       <dt className="shrink-0 text-[13.5px] text-ink-3">{rotulo}</dt>
       <dd className="min-w-0 text-right text-[15px] leading-snug font-semibold break-words text-ink">{valor}</dd>
     </div>

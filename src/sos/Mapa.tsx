@@ -374,7 +374,7 @@ export function BotaoMapa({
       title={rotulo}
       onClick={onClick}
       className={[
-        'flex size-11 items-center justify-center rounded-full border border-black/10 bg-white text-[#081830] shadow-[0_6px_20px_rgb(8_24_48_/_0.22)] transition-transform active:scale-95 [&>svg]:size-5',
+        'mapa-botao-premium flex size-11 items-center justify-center rounded-full text-[#081830] transition-transform active:scale-95 [&>svg]:size-5',
         className,
       ]
         .filter(Boolean)

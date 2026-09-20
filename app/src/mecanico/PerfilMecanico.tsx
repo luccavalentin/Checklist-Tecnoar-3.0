@@ -113,7 +113,7 @@ export function PerfilMecanico() {
     <>
       <TopoM titulo="Perfil" />
       <TelaM>
-        <section className="flex items-center gap-4 rounded-[1.25rem] border border-line bg-surface p-4">
+        <section className="sos-native-card flex items-center gap-4 rounded-[1.55rem] p-4">
           <Avatar nome={perfil.nome} url={perfil.avatar_url} tamanho="lg" />
           <div className="min-w-0 flex-1">
             <p className="truncate font-display text-[20px] font-extrabold text-ink">{perfil.nome}</p>
@@ -125,7 +125,7 @@ export function PerfilMecanico() {
         </section>
 
         <SecaoM titulo="O que o cliente vê">
-          <form onSubmit={enviar} className="flex flex-col gap-4 rounded-[1.25rem] border border-line bg-surface p-4">
+          <form onSubmit={enviar} className="sos-native-card flex flex-col gap-4 rounded-[1.55rem] p-4">
             <CampoM
               rotulo="Veículo de apoio"
               icone={Truck}
@@ -169,7 +169,7 @@ export function PerfilMecanico() {
         </SecaoM>
 
         <SecaoM titulo="Chamados">
-          <div className="flex flex-col divide-y divide-line rounded-[1.25rem] border border-line bg-surface px-4">
+          <div className="sos-premium-list flex flex-col divide-y divide-line px-4">
             <Interruptor
               ligado={aceitaSos}
               aoMudar={(v) => aceitar.mutate(v)}
@@ -178,8 +178,8 @@ export function PerfilMecanico() {
               descricao="Desligado, você não é avisado de novos chamados, mesmo disponível."
               icone={Radio}
             />
-            <button type="button" onClick={testarAlerta} className="flex min-h-16 w-full items-center gap-3 py-3 text-left">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-2 text-ink-2">
+            <button type="button" onClick={testarAlerta} className="sos-premium-row flex min-h-16 w-full items-center gap-3 py-3 text-left">
+              <span className="sos-subtle-chip flex size-10 shrink-0 items-center justify-center rounded-xl text-ink-2">
                 <Volume2 className="size-5" />
               </span>
               <span className="min-w-0 flex-1">
@@ -187,8 +187,8 @@ export function PerfilMecanico() {
                 <span className="block text-[13px] leading-snug text-ink-3">Toca a sirene e vibra por dois segundos.</span>
               </span>
             </button>
-            <Link to="/notificacoes" className="flex min-h-16 w-full items-center gap-3 py-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-surface-2 text-ink-2">
+            <Link to="/notificacoes" className="sos-premium-row flex min-h-16 w-full items-center gap-3 py-3">
+              <span className="sos-subtle-chip flex size-10 shrink-0 items-center justify-center rounded-xl text-ink-2">
                 <Bell className="size-5" />
               </span>
               <span className="min-w-0 flex-1">
@@ -216,8 +216,8 @@ export function PerfilMecanico() {
                   aria-checked={tema === t.id}
                   onClick={() => escolherTema(t.id)}
                   className={cn(
-                    'flex min-h-[4.5rem] flex-col items-center justify-center gap-1.5 rounded-2xl border-2 text-[14px] font-bold transition-colors',
-                    tema === t.id ? 'border-accent bg-accent-soft text-accent-ink' : 'border-line bg-surface text-ink-2',
+                    'sos-choice-card flex min-h-[4.5rem] flex-col items-center justify-center gap-1.5 rounded-2xl text-[14px] font-semibold transition-colors',
+                    tema === t.id ? 'border-accent text-accent-ink' : 'border-line text-ink-2',
                   )}
                 >
                   <Icone className="size-5" /> {t.rotulo}
@@ -229,11 +229,11 @@ export function PerfilMecanico() {
 
         <SecaoM titulo="Conta">
           <CartaoModoApp escuro={temaEscuroAgora()} className={temaEscuroAgora() ? 'bg-surface' : undefined} />
-          <div className="flex flex-col divide-y divide-line rounded-[1.25rem] border border-line bg-surface px-4">
+          <div className="sos-premium-list flex flex-col divide-y divide-line px-4">
             {/* O Checklist mora em outro endereço (outro login no navegador).
                 Quem opera a central vai direto para o SOS de lá. */}
-            <a href={perfil.central ? `${URL_CHECKLIST}/sos` : URL_CHECKLIST} className="flex min-h-16 w-full items-center gap-3 py-3">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent-ink">
+            <a href={perfil.central ? `${URL_CHECKLIST}/sos` : URL_CHECKLIST} className="sos-premium-row flex min-h-16 w-full items-center gap-3 py-3">
+              <span className="sos-subtle-chip flex size-10 shrink-0 items-center justify-center rounded-xl text-accent-ink">
                 <ShieldCheck className="size-5" />
               </span>
               <span className="min-w-0 flex-1">
@@ -244,8 +244,8 @@ export function PerfilMecanico() {
               </span>
               <ExternalLink className="size-4 text-ink-3" />
             </a>
-            <button type="button" onClick={() => setConfirmarSair(true)} className="flex min-h-16 w-full items-center gap-3 py-3 text-left">
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-crit-soft text-crit-ink">
+            <button type="button" onClick={() => setConfirmarSair(true)} className="sos-premium-row flex min-h-16 w-full items-center gap-3 py-3 text-left">
+              <span className="sos-subtle-chip flex size-10 shrink-0 items-center justify-center rounded-xl text-crit-ink">
                 <LogOut className="size-5" />
               </span>
               <span className="min-w-0 flex-1 text-[15px] font-semibold text-crit-ink">Sair</span>

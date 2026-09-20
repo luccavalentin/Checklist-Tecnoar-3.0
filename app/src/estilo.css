@@ -50,6 +50,9 @@ body {
   --sh-accent: 0 1px 2px rgb(11 28 51 / 0.1), 0 12px 28px -14px rgb(255 102 0 / 0.62);
   /* Coluna do app no computador (ver .cli-palco). */
   --cli-coluna: 34rem;
+  --sos-nav-height: 4.15rem;
+  --sos-nav-bottom: 0.82rem;
+  --sos-fab-size: 3.55rem;
 }
 
 .dark #raiz {
@@ -88,6 +91,132 @@ body {
     color: var(--c-ink);
     background: var(--c-surface);
     box-shadow: 0 1px 2px rgb(11 28 51 / 0.04);
+  }
+
+  .sos-native-header,
+  .mec-native-header {
+    border-bottom: 1px solid color-mix(in srgb, var(--c-line) 72%, transparent);
+    background: color-mix(in srgb, var(--c-canvas) 88%, transparent);
+    box-shadow: 0 12px 34px -30px rgb(8 24 48 / 0.38);
+    backdrop-filter: blur(24px) saturate(1.22);
+  }
+
+  .dark .sos-native-header,
+  .dark .mec-native-header {
+    background: color-mix(in srgb, var(--c-canvas) 80%, transparent);
+    box-shadow: 0 12px 34px -30px rgb(0 0 0 / 0.9);
+  }
+
+  .sos-native-card {
+    position: relative;
+    border: 1px solid color-mix(in srgb, var(--c-line) 82%, transparent);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 96%, white 4%), color-mix(in srgb, var(--c-surface) 92%, transparent)),
+      var(--c-surface);
+    box-shadow:
+      0 1px 2px rgb(8 24 48 / 0.045),
+      0 18px 44px -36px rgb(8 24 48 / 0.38);
+  }
+
+  .dark .sos-native-card {
+    border-color: color-mix(in srgb, var(--c-line) 84%, transparent);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.03) inset,
+      0 18px 44px -36px rgb(0 0 0 / 0.88);
+  }
+
+  .sos-premium-list {
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--c-line) 82%, transparent);
+    border-radius: 1.55rem;
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 97%, white 3%), color-mix(in srgb, var(--c-surface) 94%, transparent)),
+      var(--c-surface);
+    box-shadow:
+      0 1px 2px rgb(8 24 48 / 0.04),
+      0 18px 42px -34px rgb(8 24 48 / 0.34);
+  }
+
+  .dark .sos-premium-list {
+    background: color-mix(in srgb, var(--c-surface) 92%, transparent);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.035);
+  }
+
+  .sos-premium-row {
+    transition:
+      transform 140ms ease,
+      background-color 140ms ease,
+      border-color 140ms ease;
+  }
+
+  .sos-premium-row:active {
+    transform: scale(0.99);
+    background: color-mix(in srgb, var(--c-surface-2) 72%, transparent);
+  }
+
+  .sos-choice-card {
+    border: 1px solid color-mix(in srgb, var(--c-line) 84%, transparent);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 98%, white 2%), color-mix(in srgb, var(--c-surface) 94%, transparent)),
+      var(--c-surface);
+    box-shadow:
+      0 1px 2px rgb(8 24 48 / 0.035),
+      0 14px 32px -30px rgb(8 24 48 / 0.32);
+  }
+
+  .sos-choice-card[aria-pressed='true'],
+  .sos-choice-card[aria-checked='true'] {
+    border-color: #ff6600;
+    box-shadow:
+      0 0 0 3px rgb(255 102 0 / 0.1),
+      0 16px 34px -30px rgb(255 102 0 / 0.6);
+  }
+
+  .dark .sos-choice-card {
+    background: color-mix(in srgb, var(--c-surface) 91%, transparent);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.035);
+  }
+
+  .sos-subtle-chip {
+    border: 1px solid color-mix(in srgb, var(--c-line) 78%, transparent);
+    background: color-mix(in srgb, var(--c-surface-2) 76%, transparent);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.42);
+  }
+
+  .dark .sos-subtle-chip {
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.035);
+  }
+
+  .sos-icon-button {
+    transition:
+      transform 140ms ease,
+      background-color 140ms ease,
+      box-shadow 140ms ease;
+  }
+
+  .sos-icon-button:hover,
+  .sos-icon-button:active {
+    background: color-mix(in srgb, var(--c-surface-2) 82%, transparent);
+  }
+
+  .sos-icon-button:active {
+    transform: scale(0.96);
+  }
+
+  .sos-sheet {
+    border: 1px solid color-mix(in srgb, var(--c-line) 88%, transparent);
+    background: color-mix(in srgb, var(--c-surface) 96%, transparent);
+    box-shadow:
+      0 -18px 58px -34px rgb(8 24 48 / 0.5),
+      0 1px 0 rgb(255 255 255 / 0.72) inset;
+    backdrop-filter: blur(24px) saturate(1.12);
+  }
+
+  .dark .sos-sheet {
+    background: color-mix(in srgb, var(--c-surface) 92%, transparent);
+    box-shadow:
+      0 -18px 58px -34px rgb(0 0 0 / 0.92),
+      0 1px 0 rgb(255 255 255 / 0.05) inset;
   }
 
   .sos-lift {
@@ -144,7 +273,18 @@ body {
 
   .sos-field {
     border: 1px solid var(--c-line-strong);
-    background: var(--c-inset);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--c-inset) 96%, white 4%), var(--c-inset)),
+      var(--c-inset);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.6) inset,
+      0 10px 24px -24px rgb(8 24 48 / 0.28);
+  }
+
+  .dark .sos-field {
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.035) inset,
+      0 10px 24px -24px rgb(0 0 0 / 0.75);
   }
 
   .sos-field input:-webkit-autofill,
@@ -167,28 +307,67 @@ body {
   }
 
   .sos-bottom-nav {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-    border-top: 1px solid var(--c-line);
-    background: rgb(255 255 255 / 0.9);
-    box-shadow: 0 -14px 34px -24px rgb(11 28 51 / 0.28);
-    backdrop-filter: blur(20px);
+    left: max(0.85rem, env(safe-area-inset-left));
+    right: max(0.85rem, env(safe-area-inset-right));
+    bottom: calc(var(--sos-nav-bottom) + env(safe-area-inset-bottom));
+    overflow: visible;
+    border: 1px solid rgb(13 28 51 / 0.08);
+    border-radius: 1.7rem;
+    background: rgb(255 255 255 / 0.82);
+    box-shadow:
+      0 18px 50px -28px rgb(8 24 48 / 0.42),
+      0 1px 0 rgb(255 255 255 / 0.8) inset;
+    backdrop-filter: blur(26px) saturate(1.25);
+  }
+
+  .sos-bottom-nav::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: inherit;
   }
 
   .dark .sos-bottom-nav {
-    background: rgb(8 24 48 / 0.9);
+    border-color: rgb(0 175 239 / 0.14);
+    background: rgb(6 18 38 / 0.78);
+    box-shadow:
+      0 18px 50px -28px rgb(0 0 0 / 0.9),
+      0 1px 0 rgb(255 255 255 / 0.06) inset;
   }
 
   .sos-bottom-nav a[aria-current='page'] {
     color: var(--c-accent-ink) !important;
   }
 
+  .sos-bottom-nav a[aria-current='page'] > span:first-child {
+    border-radius: 999px;
+    color: #ff6600;
+    background: rgb(255 102 0 / 0.11);
+  }
+
   .dark .sos-bottom-nav a[aria-current='page'] {
     color: var(--c-accent) !important;
+  }
+
+  .sos-center-fab {
+    width: var(--sos-fab-size);
+    height: var(--sos-fab-size);
+  }
+
+  @media (max-width: 360px), (max-height: 660px) {
+    #raiz {
+      --sos-nav-height: 3.9rem;
+      --sos-nav-bottom: 0.55rem;
+      --sos-fab-size: 3.18rem;
+    }
+
+    .sos-bottom-nav {
+      left: max(0.65rem, env(safe-area-inset-left));
+      right: max(0.65rem, env(safe-area-inset-right));
+      border-radius: 1.45rem;
+    }
   }
 
   /* Ações: cores sólidas da marca, sem degradê. */
@@ -206,6 +385,34 @@ body {
     box-shadow:
       0 1px 2px rgb(11 28 51 / 0.12),
       0 10px 24px -12px rgb(255 102 0 / 0.65);
+  }
+
+  .sos-siren-action {
+    background: #ff6600;
+    box-shadow:
+      0 1px 2px rgb(11 28 51 / 0.12),
+      0 16px 34px -18px rgb(255 102 0 / 0.72),
+      0 1px 0 rgb(255 255 255 / 0.22) inset;
+  }
+
+  .sos-soft-action {
+    border: 1px solid color-mix(in srgb, var(--c-line-strong) 88%, transparent);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 95%, white 5%), color-mix(in srgb, var(--c-surface-2) 92%, transparent)),
+      var(--c-surface-2);
+    box-shadow:
+      0 1px 2px rgb(8 24 48 / 0.04),
+      0 12px 28px -24px rgb(8 24 48 / 0.32);
+  }
+
+  .sos-action-link {
+    border: 1px solid color-mix(in srgb, var(--c-line) 78%, transparent);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--c-surface-2) 94%, white 6%), color-mix(in srgb, var(--c-surface-2) 88%, transparent)),
+      var(--c-surface-2);
+    box-shadow:
+      0 1px 2px rgb(8 24 48 / 0.035),
+      0 12px 26px -24px rgb(8 24 48 / 0.3);
   }
 
   .sos-night-action {
@@ -438,18 +645,20 @@ body {
     position: relative;
     overflow: hidden;
     color: #fff;
-    background: linear-gradient(180deg, #0d1c33 0%, #0f2448 100%);
-    border-bottom-right-radius: 1.1rem;
-    border-bottom-left-radius: 1.1rem;
-    box-shadow: 0 14px 30px -24px rgb(8 24 48 / 0.7);
+    background:
+      linear-gradient(138deg, rgb(13 28 51 / 0.98) 0%, rgb(0 32 97 / 0.98) 64%, rgb(0 175 239 / 0.18) 100%),
+      linear-gradient(90deg, transparent 0 78%, rgb(255 102 0 / 0.82) 78.3% 79.3%, transparent 79.6%);
+    border-bottom-right-radius: 1.9rem;
+    border-bottom-left-radius: 1.9rem;
+    box-shadow: 0 24px 52px -34px rgb(0 32 97 / 0.86);
   }
 
   /* Fio de marca na base: laranja no centro, some nas pontas. */
   .cli-home-top::after {
     content: '';
     position: absolute;
-    left: 28%;
-    right: 28%;
+    left: 18%;
+    right: 18%;
     bottom: 0;
     height: 2px;
     pointer-events: none;
@@ -494,27 +703,44 @@ body {
     }
   }
 
+  .sos-bottom-nav.cli-fixo {
+    left: max(0.85rem, env(safe-area-inset-left));
+    right: max(0.85rem, env(safe-area-inset-right));
+  }
+
+  @media (min-width: 1024px) {
+    .sos-bottom-nav.cli-fixo {
+      left: calc(50% - var(--cli-coluna) / 2 + 0.85rem);
+      right: calc(50% - var(--cli-coluna) / 2 + 0.85rem);
+    }
+  }
+
   /* Cartão do cliente: branco liso, borda fina, sombra curta. */
   .cli-cartao {
     border: 1px solid var(--c-line);
     background: var(--c-surface);
-    border-radius: 1.15rem;
+    border-radius: 1.35rem;
     box-shadow:
       0 1px 2px rgb(11 28 51 / 0.04),
       0 14px 34px -30px rgb(11 28 51 / 0.28);
   }
 
   .cli-veiculo-card {
-    border: 1px solid rgb(13 28 51 / 0.08);
-    background: linear-gradient(180deg, rgb(255 255 255 / 0.98), rgb(255 255 255 / 0.92));
+    border: 1px solid rgb(13 28 51 / 0.07);
+    background:
+      linear-gradient(115deg, rgb(255 102 0 / 0.09) 0 0.55rem, transparent 0.6rem),
+      linear-gradient(180deg, rgb(255 255 255 / 0.98), rgb(255 255 255 / 0.91));
     box-shadow:
       0 1px 2px rgb(11 28 51 / 0.05),
-      0 18px 38px -32px rgb(11 28 51 / 0.38);
+      0 20px 44px -34px rgb(11 28 51 / 0.42);
+    backdrop-filter: blur(18px);
   }
 
   .dark .cli-veiculo-card {
     border-color: rgb(0 175 239 / 0.13);
-    background: linear-gradient(180deg, rgb(11 26 49 / 0.98), rgb(7 20 42 / 0.94));
+    background:
+      linear-gradient(115deg, rgb(255 102 0 / 0.18) 0 0.55rem, transparent 0.6rem),
+      linear-gradient(180deg, rgb(11 26 49 / 0.98), rgb(7 20 42 / 0.94));
   }
 
   .mec-command-top {
@@ -562,17 +788,33 @@ body {
 
   .cli-sos-stage {
     position: relative;
-    min-height: 14.25rem;
+    min-height: 15.2rem;
     overflow: hidden;
-    border: 1px solid rgb(8 24 48 / 0.08);
-    border-radius: 1.45rem;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    border-radius: 1.75rem;
     color: #fff;
     background:
-      linear-gradient(180deg, rgb(13 28 51 / 0.55), rgb(13 28 51 / 0.78) 43%, rgb(13 28 51 / 0.98) 100%),
+      linear-gradient(180deg, rgb(13 28 51 / 0.4), rgb(13 28 51 / 0.7) 44%, rgb(13 28 51 / 0.98) 100%),
       url('/sos/hero-cliente.png') center / cover no-repeat;
     box-shadow:
       0 1px 2px rgb(8 24 48 / 0.12),
-      0 18px 34px -28px rgb(8 24 48 / 0.66);
+      0 28px 56px -34px rgb(8 24 48 / 0.82);
+  }
+
+  .cli-sos-stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(115deg, transparent 0 73%, rgb(0 175 239 / 0.72) 73.3% 74.2%, transparent 74.6%),
+      linear-gradient(115deg, transparent 0 79%, rgb(255 102 0 / 0.72) 79.2% 80.1%, transparent 80.4%);
+    opacity: 0.9;
+  }
+
+  .cli-sos-stage > * {
+    position: relative;
+    z-index: 1;
   }
 
   .dark .cli-sos-stage {
@@ -585,7 +827,7 @@ body {
   .cli-sos-orb {
     position: relative;
     display: flex;
-    width: min(25vw, 6.75rem);
+    width: min(25vw, 6.55rem);
     aspect-ratio: 1;
     min-width: 5.75rem;
     align-items: center;
@@ -597,7 +839,7 @@ body {
       inset 0 2px 10px rgb(255 255 255 / 0.28),
       inset 0 -10px 18px rgb(96 36 0 / 0.24),
       0 0 0 7px rgb(255 255 255 / 0.13),
-      0 16px 34px -18px rgb(255 102 0 / 0.9);
+      0 18px 38px -18px rgb(255 102 0 / 0.92);
   }
 
   .cli-sos-orb::before {
@@ -749,6 +991,69 @@ a[role='button'] {
   animation: cli-onda 2.4s cubic-bezier(0.2, 0.6, 0.35, 1) infinite;
 }
 
+@layer components {
+  .tecno-ia-header {
+    border-bottom: 1px solid color-mix(in srgb, var(--c-line) 72%, transparent);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--c-canvas) 92%, transparent), color-mix(in srgb, var(--c-canvas) 82%, transparent)),
+      var(--c-canvas);
+    box-shadow: 0 16px 34px -30px rgb(8 24 48 / 0.42);
+    backdrop-filter: blur(24px) saturate(1.18);
+  }
+
+  .dark .tecno-ia-header {
+    background: color-mix(in srgb, var(--c-canvas) 82%, transparent);
+    box-shadow: 0 16px 34px -30px rgb(0 0 0 / 0.9);
+  }
+
+  .tecno-ia-avatar {
+    background:
+      linear-gradient(135deg, #0d1c33 0%, #002061 100%);
+    box-shadow:
+      0 10px 24px -18px rgb(0 32 97 / 0.9),
+      0 1px 0 rgb(255 255 255 / 0.12) inset;
+  }
+
+  .tecno-ia-bubble-ai {
+    border: 1px solid color-mix(in srgb, var(--c-line) 84%, transparent);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 96%, white 4%), color-mix(in srgb, var(--c-surface) 92%, transparent)),
+      var(--c-surface);
+    box-shadow:
+      0 1px 2px rgb(8 24 48 / 0.04),
+      0 14px 34px -30px rgb(8 24 48 / 0.34);
+  }
+
+  .tecno-ia-bubble-user {
+    background:
+      linear-gradient(135deg, #0d1c33 0%, #002061 100%);
+    box-shadow:
+      0 14px 32px -24px rgb(0 32 97 / 0.82),
+      0 1px 0 rgb(255 255 255 / 0.12) inset;
+  }
+
+  .dark .tecno-ia-bubble-user {
+    background:
+      linear-gradient(135deg, #002061 0%, #0d1c33 100%);
+  }
+
+  .tecno-ia-composer {
+    background: color-mix(in srgb, var(--c-surface) 92%, transparent);
+    border-top: 1px solid color-mix(in srgb, var(--c-line) 78%, transparent);
+    box-shadow:
+      0 -18px 44px -34px rgb(8 24 48 / 0.5),
+      0 1px 0 rgb(255 255 255 / 0.7) inset;
+    backdrop-filter: blur(26px) saturate(1.18);
+  }
+
+  .dark .tecno-ia-composer {
+    background: color-mix(in srgb, var(--c-surface) 88%, transparent);
+    box-shadow:
+      0 -18px 44px -34px rgb(0 0 0 / 0.92),
+      0 1px 0 rgb(255 255 255 / 0.05) inset;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sos-respira,
   .sos-sirene,
@@ -828,6 +1133,67 @@ a[role='button'] {
   .mec-fundo {
     min-height: 100dvh;
     background: var(--c-canvas);
+  }
+
+  .mec-native-tabbar {
+    box-shadow:
+      0 18px 50px -28px rgb(8 24 48 / 0.42),
+      0 1px 0 rgb(255 255 255 / 0.8) inset;
+  }
+
+  .dark .mec-native-tabbar {
+    box-shadow:
+      0 18px 50px -28px rgb(0 0 0 / 0.9),
+      0 1px 0 rgb(255 255 255 / 0.06) inset;
+  }
+
+  .mec-action-dock {
+    border-top: 1px solid color-mix(in srgb, var(--c-line) 78%, transparent);
+    background: color-mix(in srgb, var(--c-canvas) 88%, transparent);
+    box-shadow:
+      0 -18px 48px -34px rgb(8 24 48 / 0.45),
+      0 1px 0 rgb(255 255 255 / 0.72) inset;
+    backdrop-filter: blur(26px) saturate(1.18);
+  }
+
+  .dark .mec-action-dock {
+    background: color-mix(in srgb, var(--c-canvas) 84%, transparent);
+    box-shadow:
+      0 -18px 48px -34px rgb(0 0 0 / 0.92),
+      0 1px 0 rgb(255 255 255 / 0.05) inset;
+  }
+
+  @media (min-width: 1024px) {
+    .mec-native-tabbar {
+      left: calc(50% - var(--cli-coluna) / 2 + 0.85rem) !important;
+      right: calc(50% - var(--cli-coluna) / 2 + 0.85rem) !important;
+    }
+  }
+
+  .mec-metrics-sheet {
+    border: 1px solid rgb(13 28 51 / 0.08);
+    background: rgb(255 255 255 / 0.88);
+    box-shadow:
+      0 1px 2px rgb(8 24 48 / 0.05),
+      0 18px 44px -34px rgb(8 24 48 / 0.42);
+    backdrop-filter: blur(18px);
+  }
+
+  .dark .mec-metrics-sheet {
+    border-color: rgb(0 175 239 / 0.13);
+    background: rgb(11 26 49 / 0.86);
+  }
+
+  .mec-new-call {
+    border: 1px solid rgb(0 175 239 / 0.13);
+    background:
+      linear-gradient(115deg, transparent 0 72%, rgb(0 175 239 / 0.48) 72.4% 73.3%, transparent 73.7%),
+      linear-gradient(135deg, #0d1c33 0%, #002061 100%);
+    box-shadow: 0 18px 38px -28px rgb(0 32 97 / 0.78);
+  }
+
+  .dark .mec-new-call {
+    border-color: rgb(0 175 239 / 0.18);
   }
 
   .mec-hero-foto {
@@ -1124,7 +1490,7 @@ html.dark .mec-sombra {
 }
 
 
-/* ── status do mecânico: online azul Tecnoar, fora do ar vermelho, os dois piscando ──
+/* ── status do mecânico: online azul Tecnoar, fora do ar laranja oficial ──
    O pulso é um anel fino que se abre e some, sem mudar o brilho do botão: a
    versão anterior piscava a peça inteira e espalhava uma auréola de 30px, que
    pesava mais que o próprio conteúdo da tela. */
@@ -1136,8 +1502,8 @@ html.dark .mec-sombra {
   animation: mec-status-azul 2.4s ease-out infinite;
 }
 .mec-status-offline {
-  background: linear-gradient(180deg, #ea4545 0%, #cc2626 100%);
-  animation: mec-status-vermelho 1.6s ease-out infinite;
+  background: linear-gradient(180deg, #ff7a1f 0%, #ff6600 100%);
+  animation: mec-status-laranja 1.6s ease-out infinite;
 }
 @keyframes mec-status-azul {
   0% {
@@ -1154,19 +1520,19 @@ html.dark .mec-sombra {
       0 0 0 7px rgb(0 168 232 / 0);
   }
 }
-@keyframes mec-status-vermelho {
+@keyframes mec-status-laranja {
   0% {
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.25),
-      0 6px 14px -8px rgb(190 30 30 / 0.55),
-      0 0 0 0 rgb(234 69 69 / 0.42);
+      0 6px 14px -8px rgb(255 102 0 / 0.55),
+      0 0 0 0 rgb(255 102 0 / 0.42);
   }
   70%,
   100% {
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.25),
-      0 6px 14px -8px rgb(190 30 30 / 0.55),
-      0 0 0 7px rgb(234 69 69 / 0);
+      0 6px 14px -8px rgb(255 102 0 / 0.55),
+      0 0 0 7px rgb(255 102 0 / 0);
   }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -100,7 +100,7 @@ export function Entrar({ perfil = 'cliente' }: { perfil?: 'cliente' | 'mecanico'
                 rel="noopener noreferrer"
                 aria-label="Falar com a Tecnoar no WhatsApp"
                 title="WhatsApp"
-                className="flex size-[4.4rem] shrink-0 items-center justify-center rounded-full border border-white/18 bg-[#25D366] text-white shadow-[0_16px_34px_-18px_rgb(37_211_102/0.95)] transition-transform active:scale-95"
+                className="flex size-[4.4rem] shrink-0 items-center justify-center rounded-full border border-[#00afef]/36 bg-[#0D1C33]/72 text-[#00afef] shadow-[0_16px_34px_-18px_rgb(0_32_97/0.95)] backdrop-blur-md transition-transform active:scale-95"
               >
                 <IconeWhatsApp className="size-9" />
               </a>

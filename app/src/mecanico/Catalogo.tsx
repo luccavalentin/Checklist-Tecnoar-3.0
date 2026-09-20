@@ -145,7 +145,7 @@ export function Catalogo({
   return (
     <div className="flex flex-col gap-4">
       {/* busca */}
-      <label className="flex min-h-14 items-center gap-2.5 rounded-2xl border-2 border-line bg-inset px-3.5 focus-within:border-accent">
+      <label className="sos-field flex min-h-14 items-center gap-2.5 rounded-[1.15rem] px-3.5 transition-[border-color,box-shadow] focus-within:border-accent focus-within:ring-4 focus-within:ring-accent/15">
         <Search className="size-5 shrink-0 text-ink-3" />
         <input
           ref={campo}
@@ -168,21 +168,21 @@ export function Catalogo({
               setBusca('')
               campo.current?.focus()
             }}
-            className="-mr-1 flex size-11 shrink-0 items-center justify-center rounded-full text-ink-3 active:bg-surface-2"
+            className="sos-icon-button -mr-1 flex size-11 shrink-0 items-center justify-center rounded-full text-ink-3"
           >
             <X className="size-5" />
           </button>
         ) : null}
       </label>
 
-      {!online && <p className="rounded-2xl bg-warn-soft px-3.5 py-2.5 text-[13.5px] font-medium text-warn-ink">Sem internet: o cadastro precisa de sinal.</p>}
+      {!online && <p className="sos-native-card rounded-2xl px-3.5 py-2.5 text-[13.5px] font-medium text-warn-ink">Sem internet: o cadastro precisa de sinal.</p>}
       {editavel && tipo === 'produto' && (
         <p className="flex items-start gap-2 px-1 text-[13px] leading-snug text-ink-3">
           <Info className="mt-0.5 size-4 shrink-0" /> {AJUDA_RESERVA}
         </p>
       )}
       {!aoEscolher && !podeAdicionar && !!avisoConsulta && (
-        <p className="rounded-2xl bg-surface-2 px-3.5 py-2.5 text-[13.5px] leading-snug text-ink-2">
+        <p className="sos-native-card rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-snug text-ink-2">
           {avisoConsulta}
         </p>
       )}
@@ -198,7 +198,7 @@ export function Catalogo({
                 key={s}
                 type="button"
                 onClick={() => setBusca(s)}
-                className="min-h-11 rounded-full border border-line bg-surface px-4 text-[14px] font-semibold text-ink first-letter:uppercase active:bg-surface-2"
+                className="sos-subtle-chip min-h-11 rounded-full px-4 text-[14px] font-semibold text-ink first-letter:uppercase active:bg-surface-2"
               >
                 {s}
               </button>
@@ -210,7 +210,7 @@ export function Catalogo({
       {/* resultados */}
       <section className="flex flex-col gap-2" aria-live="polite" aria-busy={buscando || undefined}>
         {catalogo.isError && !resultados.length ? (
-          <div className="flex flex-col items-center gap-3 rounded-[1.25rem] border border-line bg-surface px-4 py-6 text-center">
+          <div className="sos-native-card flex flex-col items-center gap-3 rounded-[1.55rem] px-4 py-6 text-center">
             <AlertTriangle className="size-7 text-crit" />
             <p className="max-w-xs text-[14px] leading-snug text-ink-2">{(catalogo.error as Error).message}</p>
             <BotaoM variante="escuro" tamanho="md" icone={RefreshCw} carregando={catalogo.isFetching} onClick={() => void catalogo.refetch()}>
@@ -224,7 +224,7 @@ export function Catalogo({
             ))}
           </div>
         ) : catalogo.isPending ? null : resultados.length === 0 ? (
-          <div className="flex flex-col gap-3 rounded-[1.25rem] border border-dashed border-line-strong px-4 py-5 text-center">
+          <div className="sos-native-card flex flex-col gap-3 rounded-[1.55rem] border-dashed px-4 py-5 text-center">
             <p className="text-[15px] font-semibold text-ink">{termo ? `Nada encontrado para “${termo}”.` : `Nenhum ${t.nome} ativo no cadastro.`}</p>
             <p className="text-[13.5px] leading-snug text-ink-2">
               O app só usa o que está no cadastro da Tecnoar. Se o {t.nome} não existe lá, peça à central para cadastrar.
@@ -232,7 +232,7 @@ export function Catalogo({
             {central.data?.telefone && (
               <a
                 href={linkTelefone(central.data.telefone) ?? undefined}
-                className="mx-auto flex min-h-12 items-center gap-2 rounded-2xl border border-line bg-surface-2 px-4 text-[14px] font-bold text-ink"
+                className="sos-action-link mx-auto flex min-h-12 items-center gap-2 rounded-2xl px-4 text-[14px] font-semibold text-ink"
               >
                 <Headset className="size-4" /> Falar com a central
               </a>
@@ -240,7 +240,7 @@ export function Catalogo({
           </div>
         ) : (
           <>
-            <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-[1.25rem] border border-line bg-surface">
+            <ul className="sos-premium-list flex flex-col divide-y divide-line">
               {resultados.map((i) => (
                 <LinhaCatalogo
                   key={`${i.tipo}-${i.id}`}
@@ -275,7 +275,7 @@ export function Catalogo({
             <RotuloM>{t.plural} neste atendimento</RotuloM>
             <span className="num text-[15px] font-bold text-ink">{moeda(subtotal)}</span>
           </div>
-          <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-[1.25rem] border border-line bg-surface">
+          <ul className="sos-premium-list flex flex-col divide-y divide-line">
             {itens.map((i) => (
               <LinhaLancada
                 key={i.id}
@@ -354,7 +354,7 @@ function LinhaCatalogo({
   const corpo = (
     <>
       <div className="flex items-start gap-3">
-        <span className={cn('mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl', produto ? 'bg-accent-soft text-accent-ink' : 'bg-cyan-soft text-cyan-ink')}>
+        <span className={cn('sos-subtle-chip mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl', produto ? 'text-accent-ink' : 'text-cyan-ink')}>
           {produto ? <Package className="size-5" /> : <Wrench className="size-5" />}
         </span>
         <div className="min-w-0 flex-1">
@@ -367,7 +367,7 @@ function LinhaCatalogo({
                 e.stopPropagation()
                 aoVerFicha()
               }}
-              className="mt-1 inline-flex min-h-8 items-center gap-1 text-[13px] font-semibold text-cyan-ink"
+            className="mt-1 inline-flex min-h-8 items-center gap-1 text-[13px] font-semibold text-cyan-ink"
             >
               <Info className="size-3.5" /> Ver ficha do produto
             </button>
@@ -393,7 +393,7 @@ function LinhaCatalogo({
               aoEscolher()
             }}
             aria-label={`Lançar ${i.descricao}`}
-            className="flex min-h-11 shrink-0 items-center gap-1 rounded-2xl bg-accent px-3.5 font-display text-[14px] font-extrabold tracking-[0.02em] text-white uppercase active:bg-accent-hover"
+            className="sos-premium-action flex min-h-11 shrink-0 items-center gap-1 rounded-2xl px-3.5 font-display text-[14px] font-semibold tracking-tight text-white active:bg-accent-hover"
           >
             <Plus className="size-4" strokeWidth={3} />
             Lançar
@@ -407,7 +407,7 @@ function LinhaCatalogo({
               type="button"
               onClick={aoAdicionar}
               disabled={ocupado}
-              className="flex min-h-12 shrink-0 items-center gap-1 rounded-2xl bg-accent px-3.5 font-display text-[14px] font-extrabold tracking-[0.02em] text-white uppercase active:bg-accent-hover disabled:opacity-50"
+              className="sos-premium-action flex min-h-12 shrink-0 items-center gap-1 rounded-2xl px-3.5 font-display text-[14px] font-semibold tracking-tight text-white active:bg-accent-hover disabled:opacity-50"
             >
               {carregando ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" strokeWidth={3} />}
               Adicionar
@@ -422,7 +422,7 @@ function LinhaCatalogo({
   if (!aoEscolher && !editavel && aoVerFicha)
     return (
       <li>
-        <button type="button" onClick={aoVerFicha} aria-label={`Ver ficha de ${i.descricao}`} className="flex w-full flex-col gap-2.5 px-3.5 py-3.5 text-left transition-colors active:bg-surface-2">
+        <button type="button" onClick={aoVerFicha} aria-label={`Ver ficha de ${i.descricao}`} className="sos-premium-row flex w-full flex-col gap-2.5 px-3.5 py-3.5 text-left">
           {corpo}
         </button>
       </li>
@@ -436,13 +436,13 @@ function LinhaCatalogo({
           aria-label={aoVerFicha && !toqueLanca ? `Ver ficha de ${i.descricao}` : `Lançar ${i.descricao}`}
           onClick={toqueLanca ? aoEscolher : (aoVerFicha ?? aoEscolher)}
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (toqueLanca ? aoEscolher : (aoVerFicha ?? aoEscolher))()}
-          className="flex w-full flex-col gap-2.5 px-3.5 py-3.5 text-left transition-colors active:bg-surface-2"
+          className="sos-premium-row flex w-full flex-col gap-2.5 px-3.5 py-3.5 text-left"
         >
           {corpo}
         </div>
       </li>
     )
-  return <li className="flex flex-col gap-2.5 px-3.5 py-3.5">{corpo}</li>
+  return <li className="sos-premium-row flex flex-col gap-2.5 px-3.5 py-3.5">{corpo}</li>
 }
 
 /** Item já lançado: quantidade e remover, com o valor da linha. */
@@ -462,7 +462,7 @@ function LinhaLancada({
   aoRemover: () => void
 }) {
   return (
-    <li className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3.5 py-3">
+    <li className="sos-premium-row flex flex-wrap items-center gap-x-3 gap-y-2 px-3.5 py-3">
       <div className="min-w-[9rem] flex-1">
         <p className="flex min-w-0 items-center gap-1.5">
           <span className="truncate text-[15px] font-semibold text-ink">{i.descricao}</span>
@@ -482,7 +482,7 @@ function LinhaLancada({
             aria-label={`Remover ${i.descricao}`}
             disabled={ocupado}
             onClick={aoRemover}
-            className="flex size-12 items-center justify-center rounded-xl text-ink-3 active:bg-crit-soft active:text-crit-ink disabled:opacity-40"
+            className="sos-icon-button flex size-12 items-center justify-center rounded-xl text-ink-3 active:text-crit-ink disabled:opacity-40"
           >
             <Trash2 className="size-5" />
           </button>
@@ -498,7 +498,7 @@ function LinhaLancada({
 /** − quantidade + (toque de 44 px). */
 export function Contador({ quantidade, carregando, ocupado, aoMudar }: { quantidade: number; carregando: boolean; ocupado: boolean; aoMudar: (q: number) => void }) {
   return (
-    <div className="flex items-center rounded-2xl border-2 border-line bg-surface-2">
+    <div className="sos-subtle-chip flex items-center rounded-2xl">
       <button type="button" aria-label="Diminuir" disabled={ocupado} onClick={() => aoMudar(quantidade - 1)} className="flex size-11 items-center justify-center text-ink-2 disabled:opacity-40">
         <Minus className="size-5" />
       </button>

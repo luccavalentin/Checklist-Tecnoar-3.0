@@ -146,8 +146,10 @@ export function ConversaTecnica({ chamado, chaveConversa, topo }: { chamado: Det
     <>
       <div className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 px-4 pt-3 pb-[calc(9rem+env(safe-area-inset-bottom))]">
         {chamado && (
-          <div className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-3.5 py-3">
-            <Brain className="size-5 shrink-0 text-cyan-ink" />
+          <div className="sos-native-card flex items-center gap-3 rounded-[1.55rem] px-3.5 py-3">
+            <span className="sos-subtle-chip flex size-11 shrink-0 items-center justify-center rounded-2xl text-cyan-ink">
+              <Brain className="size-5" />
+            </span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[14.5px] font-bold text-ink">{veiculo ?? 'Veículo do chamado'}</p>
               <p className="truncate text-[13px] text-ink-3">{problema} · a IA já conhece o chamado</p>
@@ -158,21 +160,32 @@ export function ConversaTecnica({ chamado, chaveConversa, topo }: { chamado: Det
 
         {topo}
 
-        <p className="flex items-start gap-2 rounded-2xl bg-surface-2 px-3.5 py-2.5 text-[13px] leading-snug text-ink-2">
-          <ShieldAlert className="mt-0.5 size-4 shrink-0 text-warn-ink" />
-          Apoio técnico: confira no veículo. A Tecno IA não substitui o seu diagnóstico.
-        </p>
+        <section className="sos-native-card overflow-hidden rounded-[1.7rem] p-4">
+          <div className="flex items-start gap-3">
+            <span className="sos-subtle-chip flex size-11 shrink-0 items-center justify-center rounded-2xl text-cyan-ink">
+              <Brain className="size-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="font-display text-[20px] leading-tight font-semibold text-ink">Assistente técnico Tecnoar</p>
+              <p className="mt-1 text-[13.5px] leading-snug text-ink-2">Pergunte sobre sintomas, testes e peças com linguagem de oficina.</p>
+            </div>
+          </div>
+          <p className="mt-4 flex items-start gap-2 rounded-2xl bg-surface-2/80 px-3.5 py-2.5 text-[13px] leading-snug text-ink-2">
+            <ShieldAlert className="mt-0.5 size-4 shrink-0 text-warn-ink" />
+            Confira no veículo. A Tecno IA apoia o diagnóstico, não substitui o profissional.
+          </p>
+        </section>
 
         {mensagens.length === 0 ? (
           <div className="flex flex-col gap-2">
-            <p className="px-1 text-[14px] font-semibold text-ink-2">Toque numa pergunta ou escreva a sua:</p>
+            <p className="px-1 text-[14px] font-semibold text-ink-2">Perguntas rápidas</p>
             {sugestoes.map((s) => (
               <button
                 key={s}
                 type="button"
                 disabled={!online}
                 onClick={() => enviar(s)}
-                className="min-h-14 rounded-2xl border border-line bg-surface px-4 py-3 text-left text-[15px] leading-snug font-semibold text-ink active:bg-surface-2 disabled:opacity-50"
+                className="sos-premium-row sos-native-card min-h-14 rounded-[1.35rem] px-4 py-3 text-left text-[15px] leading-snug font-semibold text-ink disabled:opacity-50"
               >
                 {s}
               </button>
@@ -182,12 +195,12 @@ export function ConversaTecnica({ chamado, chaveConversa, topo }: { chamado: Det
           <div className="flex flex-col gap-3" aria-live="polite">
             {mensagens.map((m, i) =>
               m.papel === 'usuario' ? (
-                <div key={i} className="ml-8 self-end rounded-2xl rounded-br-md bg-accent px-3.5 py-2.5 text-[15px] leading-snug text-white">
+                <div key={i} className="ml-8 self-end rounded-2xl rounded-br-md bg-accent px-3.5 py-2.5 text-[15px] leading-snug text-white shadow-[0_12px_24px_-18px_rgb(255_102_0/0.7)]">
                   {m.texto}
                 </div>
               ) : (
-                <div key={i} className="mr-4 rounded-2xl rounded-bl-md border border-line bg-surface px-4 py-3">
-                  <p className="mb-1.5 flex items-center gap-1.5 font-display text-[11px] font-extrabold tracking-[0.12em] text-cyan-ink uppercase">
+                <div key={i} className="sos-native-card mr-4 rounded-2xl rounded-bl-md px-4 py-3">
+                  <p className="mb-1.5 flex items-center gap-1.5 font-display text-[11px] font-semibold tracking-normal text-cyan-ink">
                     <Brain className="size-3.5" /> Tecno IA
                   </p>
                   <TextoIa texto={m.texto} />
@@ -195,14 +208,14 @@ export function ConversaTecnica({ chamado, chaveConversa, topo }: { chamado: Det
               ),
             )}
             {perguntar.isPending && (
-              <div className="mr-4 flex items-center gap-2 rounded-2xl border border-line bg-surface px-4 py-3 text-[14px] text-ink-2">
+              <div className="sos-native-card mr-4 flex items-center gap-2 rounded-2xl px-4 py-3 text-[14px] text-ink-2">
                 <Loader2 className="size-4 animate-spin" /> Pensando no caso…
               </div>
             )}
             {erro && (
-              <div className="flex flex-col gap-2 rounded-2xl bg-crit-soft px-3.5 py-3 text-[14px] text-crit-ink">
+              <div className="sos-native-card flex flex-col gap-2 rounded-2xl px-3.5 py-3 text-[14px] text-crit-ink">
                 <p className="font-semibold">{erro}</p>
-                <button type="button" onClick={tentarDeNovo} className="flex min-h-11 items-center gap-1.5 self-start rounded-xl bg-surface px-3 text-[13.5px] font-bold text-ink">
+                <button type="button" onClick={tentarDeNovo} className="sos-action-link flex min-h-11 items-center gap-1.5 self-start rounded-xl px-3 text-[13.5px] font-semibold text-ink">
                   <RotateCw className="size-4" /> Tentar de novo
                 </button>
               </div>
@@ -223,7 +236,7 @@ export function ConversaTecnica({ chamado, chaveConversa, topo }: { chamado: Det
       </div>
 
       {/* campo de mensagem, preso no rodapé (sobe com o teclado) */}
-      <div className="fixed inset-x-0 z-40 border-t border-line bg-canvas/95 backdrop-blur-xl transition-[bottom] duration-150" style={{ bottom: teclado }}>
+      <div className="tecno-ia-composer fixed inset-x-0 z-40 transition-[bottom] duration-150" style={{ bottom: teclado }}>
         <div className={cn('mx-auto flex max-w-xl flex-col gap-2 px-4 pt-3', teclado ? 'pb-3' : 'pb-[calc(0.85rem+env(safe-area-inset-bottom))]')}>
           {foto && (
             <div className="flex items-center gap-3">
@@ -236,7 +249,7 @@ export function ConversaTecnica({ chamado, chaveConversa, topo }: { chamado: Det
                   URL.revokeObjectURL(foto.url)
                   setFoto(null)
                 }}
-                className="flex size-11 items-center justify-center rounded-full bg-surface-2 text-ink-2"
+                className="sos-icon-button flex size-11 items-center justify-center rounded-full text-ink-2"
               >
                 <X className="size-5" />
               </button>
@@ -259,7 +272,7 @@ export function ConversaTecnica({ chamado, chaveConversa, topo }: { chamado: Det
               aria-label="Anexar foto"
               onClick={() => arquivo.current?.click()}
               disabled={!online || perguntar.isPending}
-              className="flex size-12 shrink-0 items-center justify-center rounded-2xl border border-line bg-surface text-ink-2 disabled:opacity-45"
+              className="sos-soft-action flex size-12 shrink-0 items-center justify-center rounded-2xl text-ink-2 disabled:opacity-45"
             >
               <Camera className="size-5" />
             </button>
@@ -276,13 +289,13 @@ export function ConversaTecnica({ chamado, chaveConversa, topo }: { chamado: Det
               maxLength={2000}
               placeholder="Sintoma ou dúvida técnica"
               aria-label="Pergunta para a Tecno IA"
-              className="max-h-32 min-h-12 min-w-0 flex-1 resize-none rounded-2xl border-2 border-line bg-inset px-3.5 py-2.5 text-[16px] text-ink outline-none placeholder:text-ink-3 focus:border-accent"
+              className="sos-field max-h-32 min-h-12 min-w-0 flex-1 resize-none rounded-2xl px-3.5 py-2.5 text-[16px] text-ink outline-none placeholder:text-ink-3 focus:border-accent focus:ring-4 focus:ring-accent/15"
             />
             <button
               type="submit"
               aria-label="Enviar pergunta"
               disabled={(!texto.trim() && !foto) || perguntar.isPending || !online}
-              className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-accent text-white active:bg-accent-hover disabled:opacity-40"
+              className="sos-premium-action flex size-12 shrink-0 items-center justify-center rounded-2xl text-white active:bg-accent-hover disabled:opacity-40"
             >
               {perguntar.isPending ? <Loader2 className="size-5 animate-spin" /> : <Send className="size-5" />}
             </button>

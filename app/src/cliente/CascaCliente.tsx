@@ -110,8 +110,8 @@ function BotaoCentralSOS({ chamadoAtivoId }: { chamadoAtivoId: string | null }) 
       aria-label={ativo ? 'Acompanhar o socorro em andamento' : 'Pedir socorro (SOS)'}
       className="flex h-full w-full flex-col items-center justify-center gap-1 active:scale-95"
     >
-      <span className={cn('relative -mt-5 flex size-[3.6rem] items-center justify-center rounded-full bg-[#ff6600] text-white ring-4 ring-surface', 'shadow-[0_10px_22px_-10px_rgb(255_102_0/0.8)]')}>
-        <Siren className="size-7" strokeWidth={2.2} />
+      <span className={cn('sos-center-fab relative -mt-[1.05rem] flex items-center justify-center rounded-full bg-[#ff6600] text-white ring-4 ring-surface', 'shadow-[0_10px_22px_-10px_rgb(255_102_0/0.8)] max-[360px]:-mt-3')}>
+        <Siren className="size-[1.55rem]" strokeWidth={2.2} />
         {ativo && <span aria-hidden className="absolute -top-0.5 -right-0.5 size-3.5 rounded-full bg-white ring-[3px] ring-[#ff6600] sos-piscar" />}
       </span>
       <span className="text-[11px] font-bold text-crit">{ativo ? 'Ao vivo' : 'SOS'}</span>
@@ -128,7 +128,7 @@ function BotaoWhatsApp() {
   const link = linkWhatsApp(info.data?.whatsapp ?? WHATSAPP_SOS_PADRAO, 'Olá, Tecnoar! Vim pelo app SOS.')
   if (!link) return null
   return (
-    <div className="cli-fixo pointer-events-none fixed z-[45] flex justify-end px-4" style={{ bottom: 'calc(4.25rem + env(safe-area-inset-bottom) + 0.85rem)' }}>
+    <div className="cli-fixo pointer-events-none fixed z-[45] flex justify-end px-4" style={{ bottom: 'calc(var(--sos-nav-height) + var(--sos-nav-bottom) + 0.72rem + env(safe-area-inset-bottom))' }}>
       <a
         href={link}
         target="_blank"

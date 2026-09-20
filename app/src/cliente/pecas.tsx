@@ -39,7 +39,7 @@ export function IconeOcorrencia({ tipo, tamanho = 'md', className }: { tipo: Oco
   const t = tamanho === 'lg' ? 'size-14 rounded-2xl [&>svg]:size-7' : tamanho === 'sm' ? 'size-9 rounded-xl [&>svg]:size-[18px]' : 'size-11 rounded-2xl [&>svg]:size-[22px]'
   const grave = info.prioridade === 'emergencia'
   return (
-    <span className={cn('flex shrink-0 items-center justify-center', grave ? 'bg-crit-soft text-crit' : 'bg-surface-2 text-ink-2', t, className)}>
+    <span className={cn('flex shrink-0 items-center justify-center shadow-[0_10px_24px_-20px_rgb(8_24_48/0.5)]', grave ? 'bg-crit-soft text-crit' : 'bg-surface-2 text-ink-2', t, className)}>
       <Icone />
     </span>
   )
@@ -49,7 +49,7 @@ export function IconeOcorrencia({ tipo, tamanho = 'md', className }: { tipo: Oco
 export function ErroCarga({ erro, aoTentar, className }: { erro: unknown; aoTentar?: () => void; className?: string }) {
   const msg = (erro as Error)?.message || 'Não foi possível carregar agora.'
   return (
-    <div role="alert" className={cn('flex flex-col gap-3 rounded-[1.25rem] border border-crit/25 bg-crit-soft px-4 py-3.5 text-crit-ink', className)}>
+    <div role="alert" className={cn('flex flex-col gap-3 rounded-[1.35rem] border border-crit/25 bg-crit-soft px-4 py-3.5 text-crit-ink shadow-[0_14px_34px_-28px_rgb(255_102_0/0.45)]', className)}>
       <div className="flex items-start gap-2.5">
         <AlertTriangle className="mt-0.5 size-[18px] shrink-0" />
         <p className="min-w-0 flex-1 text-[14px] leading-snug">{msg}</p>
@@ -58,7 +58,7 @@ export function ErroCarga({ erro, aoTentar, className }: { erro: unknown; aoTent
         <button
           type="button"
           onClick={aoTentar}
-          className="flex min-h-11 items-center justify-center gap-2 self-start rounded-xl border border-line-strong bg-surface px-4 text-[14px] font-semibold text-ink active:scale-[0.98]"
+          className="sos-soft-action flex min-h-11 items-center justify-center gap-2 self-start rounded-[1rem] px-4 text-[14px] font-semibold text-ink active:scale-[0.98]"
         >
           <RefreshCw className="size-4" /> Tentar de novo
         </button>
@@ -100,8 +100,8 @@ export function Escolha<T extends string>({
               aria-checked={ativo}
               onClick={() => aoMudar(o.valor)}
               className={cn(
-                'flex min-h-12 items-center justify-center gap-2 rounded-xl border px-2 text-[14px] font-semibold transition-colors active:scale-[0.98]',
-                ativo ? 'border-accent bg-accent-soft text-accent-ink' : 'border-line-strong bg-surface text-ink-2',
+                'flex min-h-12 items-center justify-center gap-2 rounded-[1rem] border px-2 text-[14px] font-semibold transition-[transform,border-color,background-color,box-shadow] active:scale-[0.98]',
+                ativo ? 'border-accent bg-accent-soft text-accent-ink shadow-[0_10px_24px_-20px_rgb(255_102_0/0.55)]' : 'border-line-strong bg-surface text-ink-2',
               )}
             >
               {Icone && <Icone className="size-4 shrink-0" />}
@@ -129,7 +129,7 @@ export function Segmentado<T extends string>({
   className?: string
 }) {
   return (
-    <div role="tablist" aria-label={rotulo} className={cn('flex gap-1 rounded-2xl border border-line bg-surface-2 p-1', className)}>
+    <div role="tablist" aria-label={rotulo} className={cn('sos-soft-action flex gap-1 rounded-[1.35rem] p-1', className)}>
       {opcoes.map((o) => {
         const ativo = o.valor === valor
         return (
@@ -140,8 +140,8 @@ export function Segmentado<T extends string>({
             aria-selected={ativo}
             onClick={() => aoMudar(o.valor)}
             className={cn(
-              'flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl px-2 text-[13.5px] font-semibold transition-colors',
-              ativo ? 'bg-surface text-ink shadow-[0_1px_3px_rgb(11_28_51/0.12)]' : 'text-ink-3 hover:text-ink-2',
+              'flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-[1rem] px-2 text-[13.5px] font-semibold transition-colors',
+              ativo ? 'bg-surface text-ink shadow-[0_10px_24px_-22px_rgb(8_24_48/0.32)]' : 'text-ink-3 hover:text-ink-2',
             )}
           >
             <span className="truncate">{o.rotulo}</span>
@@ -188,7 +188,7 @@ export function LinhaLista({
       {Icone && (
         <span
           className={cn(
-            'flex size-10 shrink-0 items-center justify-center rounded-xl',
+            'flex size-10 shrink-0 items-center justify-center rounded-[1rem] shadow-[0_10px_24px_-20px_rgb(8_24_48/0.42)]',
             tomIcone === 'neutro' && 'bg-surface-2 text-ink-2',
             tomIcone === 'marca' && 'bg-accent-soft text-accent-ink',
             tomIcone === 'sos' && 'bg-crit-soft text-crit',
@@ -233,7 +233,7 @@ export function LinhaLista({
 /** Grupo de linhas num cartão branco, com divisórias finas. */
 export function GrupoLista({ children, className, rotulo }: { children: ReactNode; className?: string; rotulo?: string }) {
   return (
-    <div role={rotulo ? 'group' : undefined} aria-label={rotulo} className={cn('flex flex-col divide-y divide-line overflow-hidden rounded-[1.25rem] border border-line bg-surface', className)}>
+    <div role={rotulo ? 'group' : undefined} aria-label={rotulo} className={cn('sos-native-card flex flex-col divide-y divide-line overflow-hidden rounded-[1.55rem]', className)}>
       {children}
     </div>
   )

@@ -82,7 +82,7 @@ export function CascaMecanico() {
           <Outlet />
 
           {/* Espaço extra no fim da página para a pílula de atendimento não cobrir conteúdo. */}
-          {(mostrarPilula || mostrarAvisoSom) && <div aria-hidden className={mostrarPilula ? 'h-20' : 'h-14'} />}
+          {(mostrarPilula || mostrarAvisoSom) && <div aria-hidden className={mostrarPilula ? 'h-24' : 'h-16'} />}
 
           {mostrarPilula && chamadoAtual ? <PilulaAtendimento chamado={chamadoAtual} /> : mostrarAvisoSom ? <AvisoSom /> : null}
 
@@ -116,9 +116,9 @@ function BarraAbas({ itens }: { itens: ItemAba[] }) {
   return (
     <nav
       aria-label="Navegação"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/96 pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] backdrop-blur-xl"
+      className="mec-native-tabbar fixed right-[max(0.85rem,env(safe-area-inset-right))] bottom-[calc(var(--sos-nav-bottom)+env(safe-area-inset-bottom))] left-[max(0.85rem,env(safe-area-inset-left))] z-40 overflow-hidden rounded-[1.7rem] border border-line bg-surface/82 backdrop-blur-[26px] max-[360px]:right-[max(0.65rem,env(safe-area-inset-right))] max-[360px]:left-[max(0.65rem,env(safe-area-inset-left))]"
     >
-      <div className="mx-auto flex h-[4.25rem] max-w-xl items-stretch">
+      <div className="mx-auto flex h-[var(--sos-nav-height)] max-w-xl items-stretch px-1.5">
         {itens.map((i) => {
           const Icone = i.icone
           return (
@@ -128,15 +128,14 @@ function BarraAbas({ itens }: { itens: ItemAba[] }) {
               end={i.rota === '/'}
               className={({ isActive }) =>
                 cn(
-                  'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[11.5px] font-bold transition-colors',
+                  'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[11.5px] font-semibold transition-colors',
                   isActive ? 'text-accent-ink dark:text-accent' : 'text-ink-3 active:text-ink-2',
                 )
               }
             >
               {({ isActive }) => (
                 <>
-                  {isActive && <span aria-hidden className="absolute inset-x-5 top-0 h-[3px] rounded-b-full bg-accent" />}
-                  <span className="relative">
+                  <span className={cn('relative flex size-8 items-center justify-center rounded-full', isActive && 'bg-accent-soft text-accent-ink dark:text-accent')}>
                     <Icone className="size-6" strokeWidth={isActive ? 2.5 : 2} />
                     {!!i.contador && (
                       <span className="num absolute -top-1.5 -right-3 flex min-w-[19px] items-center justify-center rounded-full bg-[#ff6600] px-1 text-[10.5px] leading-[19px] font-bold text-white ring-2 ring-surface">
@@ -163,7 +162,7 @@ function PilulaAtendimento({ chamado }: { chamado: NonNullable<HomeMecanico['cha
   return (
     <Link
       to={`/chamado/${chamado.id}`}
-      className="entrada-suave sos-premium-action fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+5rem)] z-40 mx-auto flex max-w-[34rem] items-center gap-3 rounded-2xl py-2.5 pr-3 pl-3.5 text-white active:brightness-95"
+      className="entrada-suave sos-premium-action fixed inset-x-5 bottom-[calc(env(safe-area-inset-bottom)+var(--sos-nav-height)+var(--sos-nav-bottom)+0.85rem)] z-40 mx-auto flex max-w-[32rem] items-center gap-3 rounded-[1.35rem] py-2.5 pr-3 pl-3.5 text-white shadow-[0_18px_36px_-22px_rgb(255_102_0/0.9)] active:brightness-95"
     >
       <span className="relative flex size-3 shrink-0" aria-hidden>
         <span className="mec-pulso absolute inset-0 rounded-full bg-white" />
@@ -189,11 +188,10 @@ function AvisoSom() {
       onClick={() => void destravarAudio().then((ok) => ok && tocarAlerta({ tipo: 'aviso' }))}
       aria-label="Ativar som dos chamados"
       title="Ativar som dos chamados"
-      // Acima da barra de abas, centralizado: no topo cobria títulos e botões das telas.
-      className="entrada-suave fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+5rem)] z-40 mx-auto flex h-10 w-fit items-center gap-2 rounded-full border border-white/16 bg-[#002061]/92 px-4 text-[13px] font-semibold text-white shadow-[0_10px_24px_-16px_rgb(0_32_97/0.9)] backdrop-blur-md active:scale-95"
+      className="entrada-suave fixed left-5 bottom-[calc(env(safe-area-inset-bottom)+var(--sos-nav-height)+var(--sos-nav-bottom)+0.95rem)] z-40 grid size-11 place-items-center rounded-full border border-[#00afef]/28 bg-[#0D1C33]/92 text-[#00afef] shadow-[0_16px_32px_-20px_rgb(0_32_97/0.95)] backdrop-blur-md active:scale-95"
     >
-      <Volume2 className="size-[18px] text-[#00afef]" />
-      Toque para ativar o som dos chamados
+      <Volume2 className="size-5" />
+      <span className="sr-only">Toque para ativar o som dos chamados</span>
     </button>
   )
 }

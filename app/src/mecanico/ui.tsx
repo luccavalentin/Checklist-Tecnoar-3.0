@@ -29,7 +29,7 @@ export function TelaM({ children, className, comBarra = true }: { children: Reac
     <main
       className={cn(
         'mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pt-3',
-        comBarra ? 'pb-[calc(6.5rem+env(safe-area-inset-bottom))]' : 'pb-[calc(1.5rem+env(safe-area-inset-bottom))]',
+        comBarra ? 'pb-[calc(9rem+env(safe-area-inset-bottom))]' : 'pb-[calc(1.5rem+env(safe-area-inset-bottom))]',
         className,
       )}
     >
@@ -65,21 +65,21 @@ export function TopoM({
     else navegar('/')
   }
   return (
-    <header className={cn('sticky top-0 z-30 border-b border-line bg-canvas/92 pt-[env(safe-area-inset-top)] backdrop-blur-xl', className)}>
+    <header className={cn('mec-native-header sticky top-0 z-30 pt-[env(safe-area-inset-top)]', className)}>
       <div className="mx-auto flex min-h-16 max-w-xl items-center gap-2 px-3 py-2">
         {voltar && (
           <button
             type="button"
             aria-label="Voltar"
             onClick={aoVoltar}
-            className="flex size-12 shrink-0 items-center justify-center rounded-2xl text-ink active:bg-surface-2"
+            className="sos-icon-button flex size-12 shrink-0 items-center justify-center rounded-full text-ink"
           >
             <ChevronLeft className="size-7" />
           </button>
         )}
         <div className={cn('min-w-0 flex-1', !voltar && 'pl-1')}>
           {sobretitulo && <p className="truncate font-display text-[11px] font-extrabold tracking-[0.14em] text-accent-ink uppercase">{sobretitulo}</p>}
-          <h1 className="truncate font-display text-[20px] leading-tight font-extrabold tracking-tight text-ink">{titulo}</h1>
+          <h1 className="truncate font-display text-[20px] leading-tight font-semibold tracking-tight text-ink">{titulo}</h1>
           {sub && <p className="truncate text-[13px] text-ink-3">{sub}</p>}
         </div>
         {acao && <div className="flex shrink-0 items-center gap-1.5">{acao}</div>}
@@ -108,7 +108,7 @@ export function SecaoM({ titulo, acao, children, className }: { titulo: ReactNod
 
 /** Superfície lisa. */
 export function CartaoM({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn('rounded-[1.25rem] border border-line bg-surface p-4 mec-sombra', className)}>{children}</div>
+  return <div className={cn('sos-native-card rounded-[1.55rem] p-4', className)}>{children}</div>
 }
 
 /* ── botões ─────────────────────────────────────────────────────────────── */
@@ -118,19 +118,19 @@ export type TamanhoM = 'md' | 'lg' | 'xl' | 'xxl'
 
 const VARIANTE: Record<VarianteM, string> = {
   laranja: 'sos-premium-action text-white active:brightness-95 mec-sombra-laranja',
-  verde: 'bg-[#00afef] text-[#0D1C33] active:bg-[#009bd6] mec-sombra-verde',
-  vermelho: 'bg-[#ff6600] text-white active:bg-[#cc5200]',
-  escuro: 'bg-[#0D1C33] text-white active:bg-[#002061] dark:bg-white dark:text-[#0D1C33] dark:active:bg-white/85',
-  neutro: 'border border-line bg-surface-2 text-ink active:bg-line',
-  contorno: 'border-2 border-line-strong bg-transparent text-ink active:bg-surface-2',
+  verde: 'sos-operator-action text-[#0D1C33] active:bg-[#009bd6] mec-sombra-verde',
+  vermelho: 'sos-siren-action text-white active:bg-[#cc5200]',
+  escuro: 'sos-night-action text-white active:bg-[#002061] dark:bg-white dark:text-[#0D1C33] dark:active:bg-white/85',
+  neutro: 'sos-soft-action text-ink active:bg-line',
+  contorno: 'border border-line-strong bg-transparent text-ink active:bg-surface-2',
   fantasma: 'bg-transparent text-ink-2 active:bg-surface-2',
 }
 
 const TAMANHO: Record<TamanhoM, string> = {
-  md: 'min-h-12 gap-2 rounded-2xl px-4 text-[15px]',
-  lg: 'min-h-14 gap-2.5 rounded-2xl px-5 text-[16px]',
-  xl: 'min-h-16 gap-2.5 rounded-[1.25rem] px-4 text-[17px] tracking-[0.03em] uppercase max-[400px]:text-[16px]',
-  xxl: 'min-h-[4.5rem] gap-3 rounded-[1.35rem] px-4 text-[18px] tracking-[0.03em] uppercase max-[400px]:text-[16.5px]',
+  md: 'min-h-12 gap-2 rounded-[1.05rem] px-4 text-[15px]',
+  lg: 'min-h-14 gap-2.5 rounded-[1.2rem] px-5 text-[16px]',
+  xl: 'min-h-16 gap-2.5 rounded-[1.35rem] px-4 text-[17px] max-[400px]:text-[16px]',
+  xxl: 'min-h-[4.5rem] gap-3 rounded-[1.45rem] px-4 text-[18px] max-[400px]:text-[16.5px]',
 }
 
 export interface BotaoMProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -153,7 +153,7 @@ export const BotaoM = forwardRef<HTMLButtonElement, BotaoMProps>(function BotaoM
       disabled={disabled || carregando}
       aria-busy={carregando || undefined}
       className={cn(
-        'inline-flex items-center justify-center text-center font-display leading-tight font-extrabold transition-transform select-none active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100',
+        'inline-flex items-center justify-center text-center font-display leading-tight font-semibold tracking-tight transition-[transform,background-color,border-color,box-shadow] select-none active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100',
         VARIANTE[variante],
         TAMANHO[tamanho],
         largo && 'w-full',
@@ -294,7 +294,7 @@ export function LinhaTarefa({
 
 /** Moldura de lista (linhas separadas por fio). */
 export function ListaM({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn('flex flex-col divide-y divide-line overflow-hidden rounded-[1.25rem] border border-line bg-surface mec-sombra', className)}>{children}</div>
+  return <div className={cn('sos-native-card flex flex-col divide-y divide-line overflow-hidden rounded-[1.55rem]', className)}>{children}</div>
 }
 
 /* ── formulário ─────────────────────────────────────────────────────────── */
@@ -309,7 +309,7 @@ export const CampoM = forwardRef<
       <label htmlFor={idCampo} className="text-[13px] font-semibold text-ink-2">
         {rotulo}
       </label>
-      <div className={cn('flex min-h-14 items-center gap-2.5 rounded-2xl border-2 bg-inset px-3.5 focus-within:border-accent', erro ? 'border-crit' : 'border-line')}>
+      <div className={cn('sos-field flex min-h-14 items-center gap-2.5 rounded-[1.15rem] px-3.5 transition-[border-color,box-shadow,background-color] focus-within:border-accent focus-within:ring-4 focus-within:ring-accent/15', erro && '!border-crit')}>
         {Icone && <Icone className="size-5 shrink-0 text-ink-3" />}
         <input ref={ref} id={idCampo} className="min-w-0 flex-1 bg-transparent py-3 text-[16px] text-ink outline-none placeholder:text-ink-3" {...props} />
       </div>
@@ -340,8 +340,8 @@ export const AreaM = forwardRef<
         id={idCampo}
         rows={5}
         className={cn(
-          'min-h-36 w-full resize-y rounded-2xl border-2 bg-inset px-3.5 py-3 text-[16px] leading-relaxed text-ink outline-none placeholder:text-ink-3 focus:border-accent',
-          erro ? 'border-crit' : 'border-line',
+          'sos-field min-h-36 w-full resize-y rounded-[1.15rem] px-3.5 py-3 text-[16px] leading-relaxed text-ink outline-none transition-[border-color,box-shadow,background-color] placeholder:text-ink-3 focus:border-accent focus:ring-4 focus:ring-accent/15',
+          erro && '!border-crit',
         )}
         {...props}
       />
@@ -384,7 +384,7 @@ export function FolhaM({
   return createPortal(
     <div className="mec fixed inset-0 z-[85] flex items-end justify-center sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label={typeof titulo === 'string' ? titulo : undefined}>
       <div className="absolute inset-0 bg-[#020812]/70" onClick={aoFechar} aria-hidden />
-      <div className="sos-sobe relative flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[1.75rem] border border-line bg-surface text-ink sm:rounded-[1.75rem]">
+      <div className="sos-sheet sos-sobe relative flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[2rem] text-ink sm:rounded-[2rem]">
         <div className="flex justify-center pt-2.5 sm:hidden" aria-hidden>
           <span className="h-1.5 w-10 rounded-full bg-line-strong" />
         </div>
@@ -394,7 +394,7 @@ export function FolhaM({
               {titulo && <h2 className="font-display text-[20px] leading-tight font-extrabold text-ink">{titulo}</h2>}
               {descricao && <p className="mt-1 text-[14px] leading-relaxed text-ink-2">{descricao}</p>}
             </div>
-            <button type="button" aria-label="Fechar" onClick={aoFechar} className="flex size-11 shrink-0 items-center justify-center rounded-full bg-surface-2 text-ink-2">
+            <button type="button" aria-label="Fechar" onClick={aoFechar} className="sos-icon-button flex size-11 shrink-0 items-center justify-center rounded-full text-ink-2">
               <X className="size-5" />
             </button>
           </div>
@@ -433,8 +433,8 @@ export function EsqueletoM({ className }: { className?: string }) {
 /** Barra de ação fixa no rodapé — o botão da etapa sempre ao alcance do polegar. */
 export function RodapeAcao({ children, teclado = 0, className }: { children: ReactNode; teclado?: number; className?: string }) {
   return (
-    <div className={cn('fixed inset-x-0 z-40 border-t border-line bg-canvas/95 backdrop-blur-xl transition-[bottom] duration-150', className)} style={{ bottom: teclado }}>
-      <div className={cn('mx-auto flex max-w-xl flex-col gap-2 px-4 pt-3', teclado ? 'pb-3' : 'pb-[calc(0.85rem+env(safe-area-inset-bottom))]')}>{children}</div>
+    <div className={cn('fixed inset-x-0 z-40 bg-transparent transition-[bottom] duration-150', className)} style={{ bottom: teclado }}>
+      <div className={cn('mec-action-dock mx-auto flex max-w-xl flex-col gap-2 px-4 pt-3', teclado ? 'pb-3' : 'pb-[calc(0.85rem+env(safe-area-inset-bottom))]')}>{children}</div>
     </div>
   )
 }

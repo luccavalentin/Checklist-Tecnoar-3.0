@@ -36,17 +36,10 @@ export function HomeCliente() {
   return (
     <>
       <header className="cli-home-top z-30 pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))]">
-        {/* Uma linha só: marca, pessoa no centro, ações. O nome no meio da
-            barra identifica sem gastar uma faixa inteira da tela. */}
-        <div className="mx-auto grid h-[4.25rem] max-w-xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-4 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]">
-          <div className="justify-self-start">
-            <LogoSOS negativo altura={34} />
-          </div>
-          <div className="flex min-w-0 max-w-[11rem] flex-col items-center text-center">
-            <span className="text-[11px] leading-tight font-medium tracking-[0.04em] text-white/55">{saudacao()}</span>
-            <h1 className="w-full truncate font-display text-[18px] leading-tight font-semibold tracking-tight text-white">{nome || 'Bem-vindo'}</h1>
-          </div>
-          <div className="flex items-center gap-0.5 justify-self-end">
+        <div className="mx-auto flex max-w-xl flex-col gap-5 px-4 pt-4 pr-[max(1rem,env(safe-area-inset-right))] pb-14 pl-[max(1rem,env(safe-area-inset-left))]">
+          <div className="flex items-center justify-between gap-3">
+            <LogoSOS negativo altura={36} />
+            <div className="flex items-center gap-0.5">
             <button
               type="button"
               onClick={() => navegar('/notificacoes')}
@@ -63,11 +56,17 @@ export function HomeCliente() {
             <button type="button" onClick={() => navegar('/perfil')} aria-label="Minha conta" className="flex size-11 items-center justify-center rounded-full active:scale-95">
               <Avatar nome={d?.nome || conta.nome} tamanho="sm" className="ring-2 ring-white/18" />
             </button>
+            </div>
+          </div>
+          <div className="max-w-[19rem]">
+            <span className="text-[12px] leading-tight font-medium tracking-[0.02em] text-[#00afef]">{saudacao()}</span>
+            <h1 className="mt-1 truncate font-display text-[30px] leading-none font-semibold tracking-tight text-white">{nome || 'Bem-vindo'}</h1>
+            <p className="mt-2 text-[13.5px] leading-snug text-white/62">Socorro, revisões e acompanhamento com a Tecnoar sempre à mão.</p>
           </div>
         </div>
       </header>
 
-      <main className="entrada-suave mx-auto mt-4 flex w-full max-w-xl flex-col gap-5 px-4 pr-[max(1rem,env(safe-area-inset-right))] pb-[calc(6.5rem+env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
+      <main className="entrada-suave mx-auto -mt-10 flex w-full max-w-xl flex-col gap-5 px-4 pr-[max(1rem,env(safe-area-inset-right))] pb-[calc(9rem+env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
         {home.isError && <ErroCarga erro={home.error} aoTentar={() => void home.refetch()} />}
         {semVinculo(d) && <Faixa tom="info">Seu pedido de socorro já funciona. O histórico da Tecnoar aparece assim que a conta for ligada ao seu cadastro.</Faixa>}
 
@@ -86,7 +85,7 @@ export function HomeCliente() {
         <CartaoVeiculo dados={d} carregando={home.isLoading} />
 
         {naoLidas > 0 && (
-          <Link to="/notificacoes" className="flex min-h-12 items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-2.5 active:bg-surface-2">
+          <Link to="/notificacoes" className="sos-premium-row sos-native-card flex min-h-12 items-center gap-3 rounded-2xl px-4 py-2.5">
             <Bell className="size-5 shrink-0 text-accent-ink" />
             <span className="min-w-0 flex-1 text-[14.5px] font-semibold text-ink">
               {naoLidas === 1 ? '1 aviso novo' : `${naoLidas} avisos novos`}
@@ -114,16 +113,8 @@ function BotaoPrecisoDeAjuda() {
     <button
       type="button"
       onClick={() => navegar('/sos')}
-      className="cli-sos-stage flex w-full flex-col justify-between px-5 pt-5 pb-5 text-left transition-transform active:scale-[0.985]"
+      className="cli-sos-stage flex w-full flex-col justify-end px-5 pt-5 pb-5 text-left transition-transform active:scale-[0.985]"
     >
-      <span className="flex items-center gap-2 text-[12.5px] text-white/70">
-        <span className="relative flex size-2" aria-hidden>
-          <span className="mec-pulso absolute inset-0 rounded-full bg-[#00afef]" />
-          <span className="relative size-2 rounded-full bg-[#00afef]" />
-        </span>
-        Socorro 24 horas, onde você estiver
-      </span>
-
       <span className="flex items-end justify-between gap-4">
         <span className="min-w-0 flex-1">
           <span className="block font-display text-[28px] leading-[1.02] font-semibold tracking-tight text-white">Preciso de ajuda</span>
@@ -231,9 +222,9 @@ function ConviteAvaliar({ chamado }: { chamado: ChamadoSOS }) {
     <button
       type="button"
       onClick={() => navegar(`/chamado/${chamado.id}`)}
-      className="flex w-full items-center gap-3.5 rounded-[1.25rem] border border-line bg-surface p-4 text-left active:bg-surface-2"
+      className="sos-premium-row sos-native-card flex w-full items-center gap-3.5 rounded-[1.55rem] p-4 text-left"
     >
-      <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-accent-ink">
+      <span className="sos-subtle-chip flex size-11 shrink-0 items-center justify-center rounded-2xl text-accent-ink">
         <Star className="size-5 fill-current" />
       </span>
       <span className="min-w-0 flex-1">
@@ -257,9 +248,9 @@ function CartaoVeiculo({ dados, carregando }: { dados: DadosHome | undefined; ca
       <button
         type="button"
         onClick={() => navegar('/veiculos?novo=1')}
-        className="flex w-full items-center gap-4 rounded-[1.25rem] border border-dashed border-line-strong bg-surface p-4 text-left active:bg-surface-2"
+        className="sos-choice-card flex w-full items-center gap-4 rounded-[1.55rem] border-dashed p-4 text-left"
       >
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-accent-ink">
+        <span className="sos-subtle-chip flex size-12 shrink-0 items-center justify-center rounded-2xl text-accent-ink">
           <Plus className="size-6" />
         </span>
         <span className="min-w-0 flex-1">
@@ -278,7 +269,7 @@ function CartaoVeiculo({ dados, carregando }: { dados: DadosHome | undefined; ca
   const total = dados?.total_veiculos ?? 1
 
   return (
-    <section aria-label="Seu veículo" className="overflow-hidden rounded-[1.5rem] border border-line bg-surface mec-sombra">
+    <section aria-label="Seu veículo" className="cli-veiculo-card overflow-hidden rounded-[1.5rem]">
       <button type="button" onClick={() => navegar('/veiculos')} className="flex w-full flex-col gap-4 p-4 text-left active:bg-surface-2">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -356,9 +347,9 @@ function Atalho({
   return (
     <Link
       to={para}
-      className="relative flex min-w-0 flex-col gap-3 rounded-[1.5rem] border border-line bg-surface p-4 mec-sombra transition-transform active:scale-[0.98]"
+      className="sos-premium-row sos-native-card relative flex min-w-0 flex-col gap-3 rounded-[1.55rem] p-4"
     >
-      <span className="flex size-10 items-center justify-center rounded-full bg-accent-soft text-accent-ink">
+      <span className="sos-subtle-chip flex size-10 items-center justify-center rounded-full text-accent-ink">
         <Icone className="size-5" />
       </span>
       <span className="min-w-0">
