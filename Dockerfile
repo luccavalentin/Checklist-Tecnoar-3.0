@@ -26,6 +26,9 @@ RUN test -f dist/index.html && grep -q 'Tecnoar' dist/index.html  && test -f dis
 FROM nginx:1.27-alpine AS runtime
 COPY deploy/nginx-app.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /build/dist /usr/share/nginx/html
+# Página e service worker de manutenção. Ficam sempre na imagem, sem custo:
+# só são servidos quando o nginx está com um app em manutenção.
+COPY deploy/manutencao /usr/share/nginx/html/manutencao
 
 # Sobe como usuário sem privilégio: o container não precisa de root
 # para servir arquivos estáticos.

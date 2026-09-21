@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#0d1c33" />
+    <title>SOS Tecnoar — em manutenção</title>
+    <style>
+      :root {
+        --fundo: #0d1c33;
+        --fundo-2: #132744;
+        --linha: rgba(255, 255, 255, 0.12);
+        --texto: #f4f7fb;
+        --texto-2: rgba(244, 247, 251, 0.68);
+        --laranja: #ff6600;
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(120% 90% at 50% 0%, var(--fundo-2), var(--fundo));
+        color: var(--texto);
+        font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      main {
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+      }
+      .marca {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 14px;
+        border: 1px solid var(--linha);
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        color: var(--texto-2);
+      }
+      .ponto {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--laranja);
+        box-shadow: 0 0 0 0 rgba(255, 102, 0, 0.6);
+        animation: pulso 2s ease-out infinite;
+      }
+      @keyframes pulso {
+        70% { box-shadow: 0 0 0 10px rgba(255, 102, 0, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 102, 0, 0); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .ponto { animation: none; }
+      }
+      h1 {
+        margin: 28px 0 12px;
+        font-size: 27px;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+      }
+      p {
+        margin: 0 auto;
+        max-width: 34ch;
+        font-size: 15.5px;
+        line-height: 1.55;
+        color: var(--texto-2);
+      }
+      .cartao {
+        margin-top: 28px;
+        padding: 18px;
+        border: 1px solid var(--linha);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.04);
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--texto-2);
+      }
+      .cartao strong { color: var(--texto); font-weight: 600; }
+      button {
+        margin-top: 24px;
+        width: 100%;
+        min-height: 52px;
+        border: 0;
+        border-radius: 14px;
+        background: var(--laranja);
+        color: #fff;
+        font-family: inherit;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.12s ease, background 0.12s ease;
+      }
+      button:hover { background: #e65c00; }
+      button:active { transform: scale(0.99); }
+      footer {
+        margin-top: 26px;
+        font-size: 12.5px;
+        color: rgba(244, 247, 251, 0.45);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <span class="marca"><span class="ponto"></span> SOS Tecnoar</span>
+
+      <h1>Estamos em manutenção</h1>
+      <p>O aplicativo saiu do ar por pouco tempo para uma atualização. Ele volta em seguida, com tudo no lugar.</p>
+
+      <div class="cartao">
+        <strong>Precisa de socorro agora?</strong><br />
+        Fale direto com a Tecnoar pelo telefone de sempre. O atendimento continua normal — só o aplicativo está parado.
+      </div>
+
+      <button type="button" onclick="location.reload()">Tentar de novo</button>
+
+      <footer>Tecnoar Sistemas</footer>
+    </main>
+  </body>
+</html>
