@@ -6,8 +6,10 @@ import { useSessao } from './sessao'
  * Troca entre o app do mecânico e o do cliente, para quem é da equipe e
  * também usa a Tecnoar como cliente (a mesma conta, dois apps).
  *
- * Some sozinho para quem não pode trocar (cliente comum). Vai no perfil do
- * mecânico, no perfil do cliente e no cadastro de cliente.
+ * Some sozinho para quem não pode trocar (cliente comum). Vai só no perfil do
+ * mecânico: o app do cliente não mostra nada da equipe, nem para quem é dela.
+ * Quem está no modo cliente volta ao app do mecânico saindo e entrando de novo
+ * pela porta do mecânico (sair desfaz o modo).
  */
 export function CartaoModoApp({ escuro, className }: { escuro?: boolean; className?: string }) {
   const { podeTrocarModo, modo, trocarModo } = useSessao()

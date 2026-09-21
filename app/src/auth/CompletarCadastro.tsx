@@ -12,7 +12,6 @@ import { useSessao } from '../sessao'
 import { BotaoApp, CampoApp, Faixa } from '../comum/ui'
 import { FolhaLegal } from '../cliente/legal/DocumentoLegal'
 import type { TipoDocumentoLegal } from '../cliente/legal/textos'
-import { CartaoModoApp } from '../ModoApp'
 import { MolduraAcesso } from './Moldura'
 
 type Passo = 'dados' | 'veiculo' | 'permissoes'
@@ -114,8 +113,8 @@ export function CompletarCadastro() {
       }
       rodape={
         <div className="flex flex-col gap-3">
-          {/* Pessoa da equipe no "modo cliente" sem conta de cliente: caminho de volta. */}
-          <CartaoModoApp />
+          {/* Pessoa da equipe no "modo cliente" sem conta de cliente: sair volta
+              ao app do mecânico (o modo se desfaz ao sair). */}
           <button type="button" onClick={() => void sair()} className="flex min-h-11 w-full items-center justify-center gap-2 text-[14px] font-semibold text-ink-3">
             <LogOut className="size-4" /> Sair
           </button>

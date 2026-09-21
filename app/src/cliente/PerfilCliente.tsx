@@ -29,7 +29,6 @@ import { aplicarTema, lerTema, useCliente } from '../sessao'
 import { Avatar, BotaoApp, CabecalhoTela, CampoApp, Faixa, Folha, Tela } from '../comum/ui'
 import { useOnline } from '../comum/Pwa'
 import { CartaoAparelho } from '../comum/Aparelho'
-import { CartaoModoApp } from '../ModoApp'
 import { useAlturaTeclado, useCasca, useHomeCliente, useInfoPublica } from './dados'
 import { Escolha, GrupoLista, LinhaLista } from './pecas'
 
@@ -95,8 +94,6 @@ export function PerfilCliente() {
         {!conta.cliente_id && (
           <Faixa tom="info">Seu pedido de socorro já funciona. O histórico da Tecnoar aparece assim que a conta for ligada ao seu cadastro.</Faixa>
         )}
-
-        <CartaoModoApp />
 
         <section className="flex flex-col gap-3 rounded-[1.25rem] border border-line bg-surface p-4">
           <div className="flex items-center justify-between gap-3">
