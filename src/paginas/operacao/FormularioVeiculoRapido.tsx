@@ -12,6 +12,7 @@ import { REF_CLIENTE, SeletorRef } from '@/componentes/ui/SeletorRef'
 import { Aviso } from '@/componentes/ui/Aviso'
 import { useToast } from '@/componentes/ui/Toast'
 import { TIPOS_VEICULO } from '@/paginas/cadastros/Veiculos'
+import type { CamposVeiculoLidos } from '@/dados/ReconhecimentoPlaca'
 import type { TipoVeiculo } from '@/tipos/db'
 
 interface FormRapido {
@@ -21,7 +22,16 @@ interface FormRapido {
   tipo: TipoVeiculo | ''
   marca: string
   modelo: string
+  ano: string
+  cor: string
+  renavam: string
+  chassi: string
   numero_frota: string
+}
+
+const VAZIO: FormRapido = {
+  placa: '', descricao: '', cliente_id: '', tipo: '', marca: '', modelo: '',
+  ano: '', cor: '', renavam: '', chassi: '', numero_frota: '',
 }
 
 /**
@@ -29,41 +39,44 @@ interface FormRapido {
  *
  * Cria na MESMA tabela de Cadastros › Veículos — o registro nasce completo o
  * bastante para operar e pode ser detalhado depois, sem base paralela.
+ *
+ * Quando a entrada veio de uma foto do documento, os campos chegam prontos em
+ * `sugestao`. Prontos, não gravados: tudo fica editável e o operador salva.
  */
 export function FormularioVeiculoRapido({
   aberto,
   aoFechar,
   clienteIdSugerido,
-  placaSugerida,
+  sugestao,
   aoSalvar,
 }: {
   aberto: boolean
   aoFechar: () => void
   clienteIdSugerido?: string | null
-  placaSugerida?: string
+  sugestao?: Partial<CamposVeiculoLidos> | null
   aoSalvar?: (id: string, clienteId: string | null) => void
 }) {
   const qc = useQueryClient()
   const toast = useToast()
   const [erro, setErro] = useState<string | null>(null)
 
-  const form = useForm<FormRapido>({
-    defaultValues: { placa: '', descricao: '', cliente_id: '', tipo: '', marca: '', modelo: '', numero_frota: '' },
-  })
+  const form = useForm<FormRapido>({ defaultValues: VAZIO })
 
   useEffect(() => {
     if (!aberto) return
     form.reset({
-      placa: placaSugerida ? mascaraPlaca(placaSugerida) : '',
-      descricao: '',
+      ...VAZIO,
+      placa: sugestao?.placa ? mascaraPlaca(sugestao.placa) : '',
       cliente_id: clienteIdSugerido ?? '',
-      tipo: '',
-      marca: '',
-      modelo: '',
-      numero_frota: '',
+      marca: sugestao?.marca ?? '',
+      modelo: sugestao?.modelo ?? '',
+      ano: sugestao?.ano ?? '',
+      cor: sugestao?.cor ?? '',
+      renavam: sugestao?.renavam ?? '',
+      chassi: sugestao?.chassi ?? '',
     })
     setErro(null)
-  }, [aberto, clienteIdSugerido, placaSugerida, form])
+  }, [aberto, clienteIdSugerido, sugestao, form])
 
   const salvar = useMutation({
     mutationFn: async (d: FormRapido) => {
@@ -71,6 +84,9 @@ export function FormularioVeiculoRapido({
       if (placa.replace(/[^A-Z0-9]/g, '').length < 7) throw new Error('Informe a placa completa.')
       const descricao = d.descricao.trim() || [d.marca.trim(), d.modelo.trim()].filter(Boolean).join(' ')
       if (descricao.length < 2) throw new Error('Informe a descrição ou marca e modelo.')
+
+      const ano = d.ano.trim() ? Number(d.ano.trim()) : null
+      if (ano !== null && !Number.isInteger(ano)) throw new Error('Ano inválido.')
 
       const { data, error } = await supabase
         .from('veiculos')
@@ -81,6 +97,10 @@ export function FormularioVeiculoRapido({
           tipo: d.tipo || null,
           marca: d.marca.trim() || null,
           modelo: d.modelo.trim() || null,
+          ano,
+          cor: d.cor.trim() || null,
+          renavam: d.renavam.trim() || null,
+          chassi: d.chassi.trim().toUpperCase() || null,
           numero_frota: d.numero_frota.trim() || null,
         })
         .select('id, cliente_id')
@@ -120,6 +140,12 @@ export function FormularioVeiculoRapido({
       <form className="flex flex-col gap-4" onSubmit={form.handleSubmit((d) => salvar.mutate(d))}>
         {erro && <Aviso tom="critico">{erro}</Aviso>}
 
+        {sugestao?.marca && (
+          <Aviso tom="info" titulo="Preenchido pela foto do documento">
+            Confira campo a campo antes de cadastrar. Nada foi gravado ainda.
+          </Aviso>
+        )}
+
         <Grade>
           <Campo className="sm:col-span-5" rotulo="Placa" obrigatorio>
             {(p) => (
@@ -151,6 +177,27 @@ export function FormularioVeiculoRapido({
           </Campo>
           <Campo className="sm:col-span-6" rotulo="Modelo">
             {(p) => <Entrada {...p} {...form.register('modelo')} />}
+          </Campo>
+          <Campo className="sm:col-span-3" rotulo="Ano">
+            {(p) => <Entrada {...p} mono inputMode="numeric" maxLength={4} {...form.register('ano')} />}
+          </Campo>
+          <Campo className="sm:col-span-4" rotulo="Cor">
+            {(p) => <Entrada {...p} {...form.register('cor')} />}
+          </Campo>
+          <Campo className="sm:col-span-5" rotulo="Renavam">
+            {(p) => <Entrada {...p} mono inputMode="numeric" maxLength={11} {...form.register('renavam')} />}
+          </Campo>
+          <Campo className="sm:col-span-12" rotulo="Chassi">
+            {(p) => (
+              <Entrada
+                {...p}
+                mono
+                maxLength={17}
+                className="uppercase"
+                {...form.register('chassi')}
+                placeholder="17 caracteres"
+              />
+            )}
           </Campo>
           <Campo className="sm:col-span-12" rotulo="Descrição" dica="Se ficar vazio, usamos marca e modelo.">
             {(p) => <Entrada {...p} {...form.register('descricao')} placeholder="Ex.: Cavalo Scania R450 branco" />}

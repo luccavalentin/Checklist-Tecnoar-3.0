@@ -321,6 +321,17 @@ veículo (RPC `garantir_cliente_e_veiculo`, que cria ou reaproveita ambos numa
 operação só, evitando duplicidade de placa), consulta `ultimo_km_veiculo` e
 registra avarias e evidências fotográficas da chegada.
 
+A identificação pode começar por uma foto: a função de borda `placa` manda a
+imagem para a Tecnoar IA já configurada na central (`ia_config` +
+`integracoes` — sem chave nova nem fornecedor novo) e devolve campos. Foto da
+placa preenche a placa; foto do CRLV preenche também marca, modelo, ano, cor,
+renavam e chassi, e acha o proprietário pelo CPF/CNPJ em `documento_digitos`.
+Campo ilegível volta nulo: a função não chuta, e nada é gravado sem o operador
+conferir na tela. Ler foto exige modelo com visão: se a central estiver num
+modelo de texto, a resposta diz qual trocar, e `PLACA_MODELO` aponta um modelo
+com visão só para esta função. `PLACA_PROVEDOR=plate_recognizer` troca para um
+ALPR dedicado (só placa, sem documento).
+
 **02 Ordem de Serviço** — abre a OS ligada à entrada. Serviços, produtos,
 mecânicos e apontamentos de tempo entram em tabelas próprias. `recalcular_totais_os`
 consolida os valores; `encerrar_os` e `reabrir_os` controlam o ciclo, com

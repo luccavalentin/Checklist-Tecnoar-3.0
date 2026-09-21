@@ -3,21 +3,54 @@ import { supabase } from '@/lib/supabase'
 import { corrigirPorPosicao, normalizarPlaca, placaValida } from './placa'
 
 /**
- * Camada de reconhecimento de placa.
+ * Camada de reconhecimento de placa e do documento do veículo.
  *
  * A tela nunca fala com um provedor específico: ela pede uma leitura e recebe
- * uma sugestão com confiança. Trocar de provedor — Plate Recognizer,
- * OpenALPR/Rekor, Google Vision, AWS Rekognition/Textract, Azure AI Vision —
- * é trocar a implementação aqui, sem tocar em nenhuma tela.
+ * campos com um grau de confiança. Trocar de provedor — a Tecnoar IA, Plate
+ * Recognizer, Google Vision, AWS Rekognition, Azure AI Vision — é trocar a
+ * implementação aqui, sem tocar em nenhuma tela.
  *
  * Regra que não muda: a chave do provedor fica no servidor, numa função de
- * borda. O navegador manda a imagem e recebe o texto; nunca vê credencial.
+ * borda. O navegador manda a imagem e recebe os campos; nunca vê credencial.
+ * E nada é gravado sem uma pessoa confirmar.
  */
+
+/** O que uma foto de CRLV consegue preencher. Ilegível é sempre `null`. */
+export interface CamposVeiculoLidos {
+  placa: string | null
+  marca: string | null
+  modelo: string | null
+  ano: string | null
+  cor: string | null
+  renavam: string | null
+  chassi: string | null
+  municipio: string | null
+  uf: string | null
+}
+
+export interface ProprietarioLido {
+  nome: string | null
+  documento: string | null
+}
+
+export const CAMPOS_VAZIOS: CamposVeiculoLidos = {
+  placa: null, marca: null, modelo: null, ano: null, cor: null,
+  renavam: null, chassi: null, municipio: null, uf: null,
+}
 
 export type ResultadoLeitura =
   | { estado: 'indisponivel'; motivo: string }
   | { estado: 'sem_leitura'; motivo: string }
-  | { estado: 'lida'; placa: string; confianca: number; provedor: string }
+  | {
+      estado: 'lida'
+      /** `placa`: foto do veículo. `crlv`: foto do documento, com mais campos. */
+      tipo: 'placa' | 'crlv'
+      placa: string
+      campos: CamposVeiculoLidos
+      proprietario: ProprietarioLido
+      confianca: number
+      provedor: string
+    }
 
 export interface ProvedorPlaca {
   nome: string
@@ -58,7 +91,15 @@ export const provedorMock: ProvedorPlaca = {
     const corrigida = corrigirPorPosicao(candidata)
 
     if (placaValida(corrigida)) {
-      return { estado: 'lida', placa: corrigida, confianca: 0.86, provedor: 'mock-local' }
+      return {
+        estado: 'lida',
+        tipo: 'placa',
+        placa: corrigida,
+        campos: { ...CAMPOS_VAZIOS, placa: corrigida },
+        proprietario: { nome: null, documento: null },
+        confianca: 0.86,
+        provedor: 'mock-local',
+      }
     }
 
     return {
@@ -71,21 +112,24 @@ export const provedorMock: ProvedorPlaca = {
 /**
  * Provedor que chama a função de borda `placa`.
  *
- * A função de borda é quem guarda a chave e fala com o serviço externo. Se ela
- * não estiver publicada, a chamada falha e caímos no manual — sem travar nada.
+ * A função de borda é quem guarda a chave e fala com o serviço de leitura. Se
+ * ela não estiver publicada, a chamada falha e caímos no manual — sem travar
+ * nada: a digitação continua ali, e a busca do veículo funciona igual.
  */
 export function provedorBorda(): ProvedorPlaca {
   return {
-    nome: 'Servidor Tecnoar',
+    nome: 'Tecnoar IA',
     disponivel: true,
     ler: async (imagem) => {
       const base64 = await paraBase64(imagem)
       const { data, error } = await supabase.functions.invoke<{
-        placa?: string
+        tipo?: 'placa' | 'crlv'
+        campos?: Partial<CamposVeiculoLidos>
+        proprietario?: Partial<ProprietarioLido>
         confianca?: number
         provedor?: string
         erro?: string
-      }>('placa', { body: { imagem: base64 } })
+      }>('placa', { body: { imagem: base64, mime: imagem.type || 'image/jpeg' } })
 
       if (error) {
         return {
@@ -93,26 +137,44 @@ export function provedorBorda(): ProvedorPlaca {
           motivo: 'O serviço de leitura não respondeu. Digite a placa.',
         }
       }
-      if (data?.erro || !data?.placa) {
+      if (data?.erro) {
+        return { estado: 'sem_leitura', motivo: data.erro }
+      }
+
+      const campos = { ...CAMPOS_VAZIOS, ...(data?.campos ?? {}) }
+      const placa = campos.placa ? corrigirPorPosicao(campos.placa) : ''
+      if (!placaValida(placa)) {
+        /* O documento pode ter vindo legível com a placa borrada. Os campos não
+           se perdem: quem digita a placa é o operador, e o resto já está lido. */
         return {
           estado: 'sem_leitura',
-          motivo: data?.erro ?? 'Não foi possível identificar a placa nesta foto.',
+          motivo: 'Não consegui ler a placa nesta foto. Digite a placa para seguir.',
         }
       }
 
-      const corrigida = corrigirPorPosicao(data.placa)
       return {
         estado: 'lida',
-        placa: corrigida,
-        confianca: typeof data.confianca === 'number' ? data.confianca : 0,
-        provedor: data.provedor ?? 'externo',
+        tipo: data?.tipo === 'crlv' ? 'crlv' : 'placa',
+        placa,
+        campos: { ...campos, placa },
+        proprietario: {
+          nome: data?.proprietario?.nome ?? null,
+          documento: data?.proprietario?.documento ?? null,
+        },
+        confianca: typeof data?.confianca === 'number' ? data.confianca : 0,
+        provedor: data?.provedor ?? 'externo',
       }
     },
   }
 }
 
+/**
+ * Em produção vale o servidor; o mock é só para desenvolver sem gastar
+ * chamada de IA (`VITE_PLACA_PROVIDER=mock`). O padrão precisa ser o que
+ * funciona de verdade: esquecer uma variável não pode virar leitura falsa.
+ */
 export function provedorPadrao(): ProvedorPlaca {
-  return import.meta.env.VITE_PLACA_PROVIDER === 'edge' ? provedorBorda() : provedorMock
+  return import.meta.env.VITE_PLACA_PROVIDER === 'mock' ? provedorMock : provedorBorda()
 }
 
 async function paraBase64(b: Blob): Promise<string> {
@@ -132,6 +194,15 @@ interface Contexto {
   ler: (imagem: Blob) => Promise<ResultadoLeitura>
   /** Busca veículo, cliente e OS aberta pela placa normalizada. */
   buscarPorPlaca: (placa: string) => Promise<VeiculoEncontrado | null>
+  /** Acha o cliente pelo CPF/CNPJ lido no documento. Null quando não existe. */
+  buscarClientePorDocumento: (documento: string) => Promise<ClienteEncontrado | null>
+}
+
+export interface ClienteEncontrado {
+  id: string
+  nome_razao: string
+  documento: string | null
+  situacao: 'ativo' | 'inativo'
 }
 
 export interface VeiculoEncontrado {
@@ -196,9 +267,26 @@ export function ReconhecimentoPlacaProvider({
     }
   }, [])
 
+  const buscarClientePorDocumento = useCallback(async (documento: string): Promise<ClienteEncontrado | null> => {
+    const digitos = (documento ?? '').replace(/\D/g, '')
+    if (digitos.length !== 11 && digitos.length !== 14) return null
+
+    /* Sem filtrar por situação de propósito: o documento é único na base, e
+       dizer "inativo" é melhor do que mandar cadastrar de novo e esbarrar na
+       chave única. */
+    const { data, error } = await supabase
+      .from('clientes')
+      .select('id, nome_razao, documento, situacao')
+      .eq('documento_digitos', digitos)
+      .limit(1)
+      .maybeSingle()
+    if (error) throw error
+    return (data as ClienteEncontrado | null) ?? null
+  }, [])
+
   const valor = useMemo<Contexto>(
-    () => ({ provedor, ler: provedor.ler, buscarPorPlaca }),
-    [provedor, buscarPorPlaca],
+    () => ({ provedor, ler: provedor.ler, buscarPorPlaca, buscarClientePorDocumento }),
+    [provedor, buscarPorPlaca, buscarClientePorDocumento],
   )
 
   return <ContextoPlaca.Provider value={valor}>{children}</ContextoPlaca.Provider>

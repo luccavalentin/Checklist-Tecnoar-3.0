@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { AlertTriangle, ArrowRightLeft, ClipboardList, Gauge, History, Plus, ScanLine, Truck, User, Clock, MapPin } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { cn, mensagemErro, tempoRelativo } from '@/lib/utils'
-import { mascaraTelefone } from '@/lib/formatos'
+import { mascaraDocumento, mascaraTelefone } from '@/lib/formatos'
 import { useAuth } from '@/auth/AuthProvider'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
 import { Painel, CabecalhoPainel } from '@/componentes/ui/Painel'
@@ -14,7 +14,7 @@ import { Botao } from '@/componentes/ui/Botao'
 import { AreaTexto, Campo, Entrada } from '@/componentes/ui/Campo'
 import { Grade, Secao } from '@/componentes/ui/Secao'
 import { REF_CLIENTE, REF_VEICULO, SeletorRef } from '@/componentes/ui/SeletorRef'
-import { LeitorPlaca } from '@/componentes/ui/LeitorPlaca'
+import { LeitorPlaca, type LeituraConfirmada } from '@/componentes/ui/LeitorPlaca'
 import { formatarPlaca } from '@/dados/placa'
 import { Evidencias } from '@/componentes/ui/Evidencias'
 import { Selo } from '@/componentes/ui/Selo'
@@ -145,6 +145,24 @@ export function Recepcao() {
   const [criandoVeiculo, setCriandoVeiculo] = useState(false)
   const [lendoPlaca, setLendoPlaca] = useState(false)
   const [avisoPlaca, setAvisoPlaca] = useState<string | null>(null)
+  /* O que a última foto leu: alimenta o cadastro de veículo e o de cliente. */
+  const [lidoNaFoto, setLidoNaFoto] = useState<LeituraConfirmada | null>(null)
+
+  /**
+   * O proprietário do CRLV só interessa quando ele ainda não é cliente ativo:
+   * cliente ativo já foi vinculado sozinho, e não há o que avisar.
+   */
+  const avisoProprietario = useMemo(() => {
+    const p = lidoNaFoto?.proprietario
+    if (!p?.nome && !p?.documento) return null
+    const cliente = lidoNaFoto?.cliente ?? null
+    if (cliente?.situacao === 'ativo') return null
+
+    const quem = [p.nome, p.documento ? mascaraDocumento(p.documento) : null].filter(Boolean).join(' · ')
+    return cliente
+      ? { texto: `${quem} está na base, mas inativo. Reative o cliente em Cadastros para usá-lo nesta entrada.`, oferecerCadastro: false }
+      : { texto: `${quem} ainda não é cliente.`, oferecerCadastro: true }
+  }, [lidoNaFoto])
   const [entradaSalva, setEntradaSalva] = useState<{ id: string; numero: number } | null>(null)
   const [erro, setErro] = useState<string | null>(null)
   const [aba, setAba] = useState<'nova' | 'historico'>('nova')
@@ -251,6 +269,9 @@ export function Recepcao() {
     setEntradaSalva(null)
     form.reset(VAZIO)
     setErro(null)
+    setAvisoPlaca(null)
+    /* Foto da entrada anterior não pode preencher a próxima. */
+    setLidoNaFoto(null)
   }
 
   if (!podeVer) {
@@ -382,14 +403,14 @@ export function Recepcao() {
                             valor={veiculoId || null}
                             aoSelecionar={(o) => form.setValue('veiculo_id', o?.id ?? '', { shouldDirty: true })}
                             placeholder="Buscar veículo pela placa"
-                            aoCriar={() => setCriandoVeiculo(true)}
+                            aoCriar={() => { setLidoNaFoto(null); setCriandoVeiculo(true) }}
                             rotuloCriar="Cadastrar veículo"
                           />
                         </div>
                         <Botao
                           variante="neutro"
                           iconeInicio={<ScanLine />}
-                          onClick={() => setLendoPlaca(true)}
+                          onClick={() => { setLidoNaFoto(null); setLendoPlaca(true) }}
                           className="shrink-0"
                         >
                           <span className="sr-only sm:not-sr-only">Ler placa</span>
@@ -406,7 +427,7 @@ export function Recepcao() {
                         valor={clienteId || null}
                         aoSelecionar={(o) => form.setValue('cliente_id', o?.id ?? '', { shouldDirty: true })}
                         placeholder="Buscar por nome ou CPF/CNPJ"
-                        aoCriar={() => setCriandoCliente(true)}
+                        aoCriar={() => { setLidoNaFoto(null); setCriandoCliente(true) }}
                         rotuloCriar="Cadastrar cliente"
                       />
                     )}
@@ -550,6 +571,20 @@ export function Recepcao() {
                 </Botao>
               </div>
               {avisoPlaca && <Aviso tom="atencao" titulo="Placa lida">{avisoPlaca}</Aviso>}
+              {avisoProprietario && (
+                <Aviso tom="info" titulo="Proprietário no documento">
+                  {avisoProprietario.texto}{' '}
+                  {avisoProprietario.oferecerCadastro && (
+                    <button
+                      type="button"
+                      onClick={() => { setLidoNaFoto(null); setCriandoCliente(true) }}
+                      className="font-semibold underline underline-offset-2"
+                    >
+                      Cadastrar com esses dados
+                    </button>
+                  )}
+                </Aviso>
+              )}
             </form>
           )}
         </div>
@@ -593,6 +628,18 @@ export function Recepcao() {
       <FormularioCliente
         aberto={criandoCliente}
         clienteId={null}
+        valoresIniciais={
+          lidoNaFoto?.proprietario.nome || lidoNaFoto?.proprietario.documento
+            ? {
+                nome_razao: lidoNaFoto.proprietario.nome ?? '',
+                documento: lidoNaFoto.proprietario.documento
+                  ? mascaraDocumento(lidoNaFoto.proprietario.documento)
+                  : '',
+                /* 14 dígitos é CNPJ; o resto entra como pessoa física. */
+                tipo_pessoa: lidoNaFoto.proprietario.documento?.length === 14 ? 'juridica' : 'fisica',
+              }
+            : undefined
+        }
         aoFechar={() => setCriandoCliente(false)}
         aoSalvar={(id) => form.setValue('cliente_id', id, { shouldDirty: true })}
       />
@@ -601,6 +648,7 @@ export function Recepcao() {
         aberto={criandoVeiculo}
         aoFechar={() => setCriandoVeiculo(false)}
         clienteIdSugerido={clienteId || null}
+        sugestao={lidoNaFoto?.campos ?? null}
         aoSalvar={(id, cliente) => {
           form.setValue('veiculo_id', id, { shouldDirty: true })
           if (cliente) form.setValue('cliente_id', cliente, { shouldDirty: true })
@@ -610,17 +658,30 @@ export function Recepcao() {
       <LeitorPlaca
         aberto={lendoPlaca}
         aoFechar={() => setLendoPlaca(false)}
-        aoConfirmar={(placa, encontrado) => {
+        aoConfirmar={(placa, encontrado, lido) => {
           setAvisoPlaca(null)
+          setLidoNaFoto(lido)
+
+          /* O proprietário do documento só vira cliente da OS se já estiver na
+             base. Cliente novo é decisão de gente, não de foto. */
+          const cliente = lido?.cliente ?? null
+          if (cliente && cliente.situacao === 'ativo') {
+            form.setValue('cliente_id', cliente.id, { shouldDirty: true })
+          }
+
           if (!encontrado) {
             /* Placa válida sem veículo cadastrado não é erro: é um veículo novo.
                A recepção segue e o operador cadastra na hora. */
             setAvisoPlaca(
-              `Nenhum veículo cadastrado com a placa ${formatarPlaca(placa)}. Cadastre o veículo para seguir.`,
+              `Nenhum veículo cadastrado com a placa ${formatarPlaca(placa)}. ` +
+                (lido?.tipo === 'crlv'
+                  ? 'Preenchi o cadastro com o que estava no documento — confira e salve.'
+                  : 'Cadastre o veículo para seguir.'),
             )
             setCriandoVeiculo(true)
             return
           }
+
           form.setValue('veiculo_id', encontrado.id, { shouldDirty: true })
           if (encontrado.cliente) {
             form.setValue('cliente_id', encontrado.cliente.id, { shouldDirty: true })
