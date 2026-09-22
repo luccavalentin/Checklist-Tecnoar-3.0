@@ -9,9 +9,18 @@
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "dev:app": "vite -c vite.app.config.ts",
+    "nativo": "vite build -c vite.app.config.ts && cap sync",
+    "nativo:android": "npm run nativo && cap open android",
+    "nativo:ios": "npm run nativo && cap open ios",
     "test:sos": "node scripts/testes-sos/teste-sos.mjs && node scripts/testes-sos/impressao.mjs"
   },
   "dependencies": {
+    "@capacitor-community/background-geolocation": "^1.2.26",
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/geolocation": "^8.2.2",
+    "@capacitor/ios": "^8.5.2",
     "@hookform/resolvers": "^3.9.1",
     "@supabase/supabase-js": "^2.47.10",
     "@tanstack/react-query": "^5.62.7",
@@ -29,6 +38,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
     "@tailwindcss/vite": "^4.0.0",
     "@types/leaflet": "^1.9.12",
     "@types/react": "^18.3.17",

@@ -10,6 +10,8 @@
  *   e a previsão usa a velocidade média configurada na central. Nunca trava.
  */
 
+import { ehAppNativo, observarNativo, permissaoNativa, type AvisoSegundoPlano } from './geoNativo'
+
 export interface Ponto {
   lat: number
   lng: number
@@ -52,6 +54,28 @@ function leitura(p: GeolocationPosition): LeituraGPS {
     rumo: p.coords.heading ?? null,
     em: p.timestamp,
   }
+}
+
+/**
+ * Liga o GPS e repassa cada leitura. No navegador, `navigator.geolocation`;
+ * no app nativo, o serviço de localização do sistema (ver `geoNativo.ts`).
+ */
+function observar(
+  aoLer: (l: LeituraGPS) => void,
+  aoErro: (e: ErroGPS) => void,
+  opcoes: { timeoutMs: number; segundoPlano?: AvisoSegundoPlano },
+): () => void {
+  if (ehAppNativo()) return observarNativo(aoLer, aoErro, opcoes)
+  const id = navigator.geolocation.watchPosition(
+    (p) => aoLer(leitura(p)),
+    (e) => aoErro(converterErro(e)),
+    { enableHighAccuracy: true, maximumAge: 0, timeout: opcoes.timeoutMs },
+  )
+  return () => navigator.geolocation.clearWatch(id)
+}
+
+function temGPS(): boolean {
+  return ehAppNativo() || 'geolocation' in navigator
 }
 
 /**
@@ -116,7 +140,7 @@ export function posicaoPrecisa(
   const tempoMax = opcoes.tempoMaxMs ?? 30000
   let cancelar = () => {}
   const promessa = new Promise<LeituraGPS>((resolve, reject) => {
-    if (!('geolocation' in navigator)) return reject('sem_suporte' satisfies ErroGPS)
+    if (!temGPS()) return reject('sem_suporte' satisfies ErroGPS)
     const inicio = Date.now()
     let melhor: LeituraGPS | null = null
     let ultimoErro: ErroGPS = 'tempo'
@@ -124,7 +148,7 @@ export function posicaoPrecisa(
     const encerrar = () => {
       if (fim) return
       fim = true
-      navigator.geolocation.clearWatch(id)
+      parar()
       window.clearTimeout(limite)
       window.clearInterval(checagem)
     }
@@ -133,9 +157,8 @@ export function posicaoPrecisa(
       if (melhor) resolve(melhor)
       else reject(ultimoErro)
     }
-    const id = navigator.geolocation.watchPosition(
-      (p) => {
-        const l = leitura(p)
+    const parar = observar(
+      (l) => {
         // Leitura em cache de antes do pedido: pode ser de outro lugar.
         if (leituraAntiga(l, inicio)) return
         guardarSeBoa(l)
@@ -145,11 +168,11 @@ export function posicaoPrecisa(
         if (l.precisao != null && l.precisao <= alvo) concluir()
       },
       (e) => {
-        ultimoErro = converterErro(e)
+        ultimoErro = e
         // Permissão negada não melhora esperando.
         if (ultimoErro === 'negado') concluir()
       },
-      { enableHighAccuracy: true, maximumAge: 0, timeout: tempoMax },
+      { timeoutMs: tempoMax },
     )
     const checagem = window.setInterval(() => {
       if (Date.now() - inicio >= bomBastante && melhor?.precisao != null && melhor.precisao <= aceitavel) concluir()
@@ -165,13 +188,16 @@ export function posicaoPrecisa(
  * `minMetros` ou passou `maxIntervaloMs` desde o último envio. O GPS do
  * celular dispara várias vezes por segundo; mandar tudo ao servidor gastaria
  * bateria e dados do motorista parado na estrada.
+ *
+ * `segundoPlano`: no app nativo, continua com a tela desligada ou o app
+ * minimizado, com uma notificação fixa (título e texto) avisando.
  */
 export function acompanharPosicao(
   aoMudar: (l: LeituraGPS) => void,
   aoErro?: (e: ErroGPS) => void,
-  opcoes: { minMetros?: number; maxIntervaloMs?: number; minIntervaloMs?: number } = {},
+  opcoes: { minMetros?: number; maxIntervaloMs?: number; minIntervaloMs?: number; segundoPlano?: AvisoSegundoPlano } = {},
 ): () => void {
-  if (!('geolocation' in navigator)) {
+  if (!temGPS()) {
     aoErro?.('sem_suporte')
     return () => {}
   }
@@ -179,9 +205,8 @@ export function acompanharPosicao(
   const maxIntervalo = opcoes.maxIntervaloMs ?? 20000
   const minIntervalo = opcoes.minIntervaloMs ?? 4000
   let ultima: LeituraGPS | null = null
-  const id = navigator.geolocation.watchPosition(
-    (p) => {
-      const l = leitura(p)
+  return observar(
+    (l) => {
       const agora = Date.now()
       guardarSeBoa(l)
       if (ultima) {
@@ -204,14 +229,14 @@ export function acompanharPosicao(
       ultima = { ...l, em: agora }
       aoMudar(l)
     },
-    (e) => aoErro?.(converterErro(e)),
-    { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 },
+    (e) => aoErro?.(e),
+    { timeoutMs: 30000, segundoPlano: opcoes.segundoPlano },
   )
-  return () => navigator.geolocation.clearWatch(id)
 }
 
 /** Estado da permissão sem disparar o pedido (Safari antigo não informa). */
 export async function permissaoLocalizacao(): Promise<'granted' | 'denied' | 'prompt' | 'desconhecida'> {
+  if (ehAppNativo()) return permissaoNativa()
   try {
     const r = await navigator.permissions?.query({ name: 'geolocation' as PermissionName })
     return (r?.state as 'granted' | 'denied' | 'prompt') ?? 'desconhecida'

@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { WifiOff } from 'lucide-react'
 import { registerSW } from 'virtual:pwa-register'
 import { ConviteInstalacao, configurarInstalacao } from '@/layout/ConviteInstalacao'
+import { ehAppNativo } from '@/sos/geoNativo'
 import { useSessao } from '../sessao'
 import { ConviteNotificacoesApp } from './Aparelho'
 
@@ -44,7 +45,8 @@ function tentarAtualizar() {
 
 /** Registra o service worker do app. Chamado uma vez, no main. */
 export function registrarServiceWorker() {
-  if (!import.meta.env.PROD || !('serviceWorker' in navigator)) return
+  // No app da loja os arquivos vêm dentro do app e a versão nova chega pela loja.
+  if (!import.meta.env.PROD || !('serviceWorker' in navigator) || ehAppNativo()) return
   aplicar = registerSW({
     immediate: true,
     onNeedRefresh() {
@@ -87,6 +89,8 @@ export function ConviteApp() {
   // Telas cheias sem a barra inferior: o convite cobriria o campo de
   // mensagem da TECNO IA; na despedida, a conta acabou de ser apagada.
   const semConvite = telaCritica(pathname) || pathname.startsWith('/acompanhar') || /^\/(tecno-ia|conta-excluida)(\/|$)/.test(pathname)
+  // Instalado pela loja: não há o que instalar, e o aviso do navegador não existe lá.
+  if (ehAppNativo()) return null
   return (
     <>
       {!semConvite && <ConviteInstalacao />}

@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SOS Tecnoar</string>
+    <string name="title_activity_main">SOS Tecnoar</string>
+    <string name="package_name">br.com.tecnoarsistemas.sos</string>
+    <string name="custom_url_scheme">br.com.tecnoarsistemas.sos</string>
+    <!-- Notificação fixa do rastreio em segundo plano. -->
+    <string name="capacitor_background_geolocation_notification_channel_name">Localização do atendimento</string>
+    <string name="capacitor_background_geolocation_notification_color">#F26B1D</string>
+</resources>

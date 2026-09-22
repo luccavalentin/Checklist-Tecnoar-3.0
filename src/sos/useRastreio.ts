@@ -50,9 +50,20 @@ export function useRastreioChamado(
       (e) => setErroGps(e),
       // Mecânico: a cada 8 s no máximo — o cliente vê o carrinho andar e cada
       // ponto é uma gravação no banco e um aviso em tempo real para a central.
+      // No app nativo segue com a tela desligada, com aviso fixo na notificação.
       papel === 'mecanico'
-        ? { minMetros: 25, maxIntervaloMs: 15000, minIntervaloMs: 8000 }
-        : { minMetros: 50, maxIntervaloMs: 60000, minIntervaloMs: 10000 },
+        ? {
+            minMetros: 25,
+            maxIntervaloMs: 15000,
+            minIntervaloMs: 8000,
+            segundoPlano: { titulo: 'Atendimento em andamento', mensagem: 'O cliente acompanha sua chegada pelo SOS Tecnoar.' },
+          }
+        : {
+            minMetros: 50,
+            maxIntervaloMs: 60000,
+            minIntervaloMs: 10000,
+            segundoPlano: { titulo: 'Socorro em andamento', mensagem: 'O mecânico da Tecnoar acompanha onde você está.' },
+          },
     )
 
     // Tela acesa enquanto dirige / espera — e de novo quando o app volta.
@@ -90,7 +101,12 @@ export function useRastreioDisponivel(ativo: boolean): { posicao: LeituraGPS | n
         void sosAtualizarPosicaoMecanico(l.lat, l.lng, l.precisao).catch(() => {})
       },
       (e) => setErroGps(e),
-      { minMetros: 150, maxIntervaloMs: 120000, minIntervaloMs: 20000 },
+      {
+        minMetros: 150,
+        maxIntervaloMs: 120000,
+        minIntervaloMs: 20000,
+        segundoPlano: { titulo: 'Você está disponível', mensagem: 'A central vê sua posição para mandar o chamado mais perto.' },
+      },
     )
     return parar
   }, [ativo])
