@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useMemo, useState, type ReactNode } from 'react'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { Bell, ChevronRight, ClipboardList, House, UserRound, Volume2, type LucideIcon } from 'lucide-react'
+import { BellRing, ChevronRight, House, Package, Phone, UserRound, Volume2, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { sosDetalhe } from '@/sos/api'
 import { destravarAudio, tocarAlerta } from '@/sos/alerta'
@@ -11,13 +11,15 @@ import { useRastreioDisponivel } from '@/sos/useRastreio'
 import type { HomeMecanico, SituacaoMecanico } from '@/sos/tipos'
 import { useMecanico } from '../sessao'
 import { useNaoLidasApp } from '../comum/Notificacoes'
-import { ProvedorAlertaSOS } from './AlertaNovoSOS'
+import { ProvedorAlertaSOS, useAlertaSOS } from './AlertaNovoSOS'
 import { ContextoCasca, type ValorCasca } from './contexto'
 import { useHomeMecanico, usePulsoApp, useSomLiberado } from './dados'
 import { aplicarNoChamado, useFila, useProcessadorFila } from './filaOffline'
 import { Placa } from './pecas'
 import { FolhaSituacao } from './Situacao'
 import { useTemaMecanico } from './tema'
+// A barra de abas (mi-abas) vive aqui: o estilo dela vale em todas as telas.
+import './inicioMecanico.css'
 
 /**
  * Casca do app do mecânico: abas, alerta de SOS e envio de posição.
@@ -64,16 +66,18 @@ export function CascaMecanico() {
   const mostrarAvisoSom = !mostrarPilula && !telaCheia && disponivel && !somLiberado
 
   const valor = useMemo<ValorCasca>(
-    () => ({ gps: { posicao: gps.posicao, erroGps: gps.erroGps, ativo: disponivel }, abrirSituacao: () => setFolhaSituacao(true) }),
-    [gps.posicao, gps.erroGps, disponivel],
+    () => ({ gps: { posicao: gps.posicao, erroGps: gps.erroGps, ativo: disponivel }, abrirSituacao: () => setFolhaSituacao(true), naoLidas }),
+    [gps.posicao, gps.erroGps, disponivel, naoLidas],
   )
 
+  // Avisos ficam no sino do Início (e no Perfil); o meio é o atendimento.
   const itens: ItemAba[] = [
     { rota: '/', rotulo: 'Início', icone: House, contador: naFila || undefined },
-    { rota: '/chamados', rotulo: 'Chamados', icone: ClipboardList },
-    { rota: '/notificacoes', rotulo: 'Avisos', icone: Bell, contador: naoLidas || undefined },
-    { rota: '/perfil', rotulo: 'Perfil', icone: UserRound },
+    { rota: '/chamados', rotulo: 'Chamados', icone: Phone },
+    { rota: '/catalogo/produtos', rotulo: 'Produtos', icone: Package },
+    { rota: '/perfil', rotulo: 'Perfil', icone: UserRound, contador: naoLidas || undefined },
   ]
+  const primeiroDaFila = (home.data?.aguardando ?? []).find((c) => !c.recusei) ?? null
 
   return (
     <ContextoCasca.Provider value={valor}>
@@ -86,7 +90,7 @@ export function CascaMecanico() {
 
           {mostrarPilula && chamadoAtual ? <PilulaAtendimento chamado={chamadoAtual} /> : mostrarAvisoSom ? <AvisoSom /> : null}
 
-          {!telaCheia && <BarraAbas itens={itens} />}
+          {!telaCheia && <BarraAbas itens={itens} centro={<BotaoAtendimento chamadoId={chamadoAtual?.id ?? null} fila={primeiroDaFila} />} />}
         </div>
 
         <FolhaSituacao
@@ -111,46 +115,75 @@ interface ItemAba {
   contador?: number
 }
 
-/** Barra de abas encostada no rodapé, como a de um app de motorista. */
-function BarraAbas({ itens }: { itens: ItemAba[] }) {
+/** Barra de abas encostada no rodapé, com o atendimento elevado no meio. */
+function BarraAbas({ itens, centro }: { itens: ItemAba[]; centro: ReactNode }) {
+  const metade = Math.ceil(itens.length / 2)
   return (
     <nav
       aria-label="Navegação"
-      className="mec-native-tabbar fixed right-[max(0.85rem,env(safe-area-inset-right))] bottom-[calc(var(--sos-nav-bottom)+env(safe-area-inset-bottom))] left-[max(0.85rem,env(safe-area-inset-left))] z-40 overflow-hidden rounded-[1.7rem] border border-line bg-surface/82 backdrop-blur-[26px] max-[360px]:right-[max(0.65rem,env(safe-area-inset-right))] max-[360px]:left-[max(0.65rem,env(safe-area-inset-left))]"
+      className="mec-native-tabbar mi-abas fixed right-[max(0.85rem,env(safe-area-inset-right))] bottom-[calc(var(--sos-nav-bottom)+env(safe-area-inset-bottom))] left-[max(0.85rem,env(safe-area-inset-left))] z-40 rounded-[1.7rem] border border-line bg-surface/82 backdrop-blur-[26px] max-[360px]:right-[max(0.65rem,env(safe-area-inset-right))] max-[360px]:left-[max(0.65rem,env(safe-area-inset-left))]"
     >
       <div className="mx-auto flex h-[var(--sos-nav-height)] max-w-xl items-stretch px-1.5">
-        {itens.map((i) => {
-          const Icone = i.icone
-          return (
-            <NavLink
-              key={i.rota}
-              to={i.rota}
-              end={i.rota === '/'}
-              className={({ isActive }) =>
-                cn(
-                  'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[11.5px] font-semibold transition-colors',
-                  isActive ? 'text-accent-ink dark:text-accent' : 'text-ink-3 active:text-ink-2',
-                )
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <span className={cn('relative flex size-8 items-center justify-center rounded-full', isActive && 'bg-accent-soft text-accent-ink dark:text-accent')}>
-                    <Icone className="size-6" strokeWidth={isActive ? 2.5 : 2} />
-                    {!!i.contador && (
-                      <span className="num absolute -top-1.5 -right-3 flex min-w-[19px] items-center justify-center rounded-full bg-[#ff6600] px-1 text-[10.5px] leading-[19px] font-bold text-white ring-2 ring-surface">
-                        {i.contador > 99 ? '99+' : i.contador}
-                      </span>
-                    )}
-                  </span>
-                  <span className="max-w-full truncate">{i.rotulo}</span>
-                </>
-              )}
-            </NavLink>
-          )
-        })}
+        {itens.slice(0, metade).map((i) => (
+          <Aba key={i.rota} item={i} />
+        ))}
+        <div className="relative flex w-[5.4rem] shrink-0 justify-center max-[360px]:w-[4.6rem]">{centro}</div>
+        {itens.slice(metade).map((i) => (
+          <Aba key={i.rota} item={i} />
+        ))}
       </div>
     </nav>
+  )
+}
+
+function Aba({ item: i }: { item: ItemAba }) {
+  const Icone = i.icone
+  return (
+    <NavLink
+      to={i.rota}
+      end={i.rota === '/'}
+      className={({ isActive }) =>
+        cn('mi-aba relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-0.5 text-[10.5px] font-semibold transition-colors', isActive ? 'mi-aba-ativa' : 'text-ink-3 active:text-ink-2')
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <span className="relative flex size-8 items-center justify-center">
+            <Icone className="size-6" strokeWidth={isActive ? 2.3 : 1.8} />
+            {!!i.contador && (
+              <span className="num absolute -top-1.5 -right-3 flex min-w-[19px] items-center justify-center rounded-full bg-[#ff6600] px-1 text-[10.5px] leading-[19px] font-bold text-white ring-2 ring-surface">
+                {i.contador > 99 ? '99+' : i.contador}
+              </span>
+            )}
+          </span>
+          <span className="max-w-full truncate">{i.rotulo}</span>
+        </>
+      )}
+    </NavLink>
+  )
+}
+
+/**
+ * O meio da barra: com chamado em andamento, volta a ele; com chamado
+ * esperando resposta, abre o alerta; sem nada, abre um chamado novo.
+ */
+function BotaoAtendimento({ chamadoId, fila }: { chamadoId: string | null; fila: HomeMecanico['aguardando'][number] | null }) {
+  const navegar = useNavigate()
+  const { abrir } = useAlertaSOS()
+  const rotulo = chamadoId ? 'Continuar o atendimento' : fila ? 'Ver o chamado esperando' : 'Abrir um chamado novo'
+  return (
+    <button
+      type="button"
+      aria-label={rotulo}
+      onClick={() => (chamadoId ? navegar(`/chamado/${chamadoId}`) : fila ? abrir(fila.id, fila) : navegar('/novo-chamado'))}
+      className="flex h-full w-full flex-col items-center justify-end gap-0.5 pb-1.5 active:scale-95"
+    >
+      <span className="mi-atendimento-fab">
+        <BellRing className="size-[1.6rem]" strokeWidth={2} />
+        {(chamadoId || fila) && <span aria-hidden className="mi-atendimento-ponto" />}
+      </span>
+      <span className="mi-atendimento-rotulo">Atendimento</span>
+    </button>
   )
 }
 

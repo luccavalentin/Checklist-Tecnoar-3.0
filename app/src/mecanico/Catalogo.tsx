@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AlertTriangle, Brain, Headset, Info, Loader2, Minus, Package, Plus, RefreshCw, Search, Trash2, Wrench, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { moeda } from '@/lib/formatos'
 import { useToast } from '@/componentes/ui/Toast'
-import { sosAdicionarItem, sosAlterarItem, sosCatalogo, sosRemoverItem } from '@/sos/api'
+import { sosAdicionarItem, sosAlterarItem, sosCatalogo, sosProdutoAoVivo, sosRemoverItem } from '@/sos/api'
 import { AVISO_SEM_ESTOQUE, faltouEstoque, quantidadeBR, textoDisponivel, textoEstoqueEm, tomDisponivel } from '@/sos/estoque'
 import { linkTelefone } from '@/sos/rotulos'
 import type { DetalheChamado, ItemCatalogo, ItemSOS } from '@/sos/tipos'
@@ -320,6 +320,18 @@ export function classeDisponivel(disponivel: number | null | undefined): string 
   return tom === 'sem' ? 'text-crit-ink' : tom === 'baixo' ? 'text-warn-ink' : tom === 'ok' ? 'text-ok-ink' : 'text-ink-3'
 }
 
+/** O disponível como pílula: verde em estoque, âmbar baixo, vermelho zerado. */
+function classeDisponivelPilula(disponivel: number | null | undefined): string {
+  const tom = tomDisponivel(disponivel)
+  return tom === 'sem'
+    ? 'bg-crit-soft text-crit-ink'
+    : tom === 'baixo'
+      ? 'bg-warn-soft text-warn-ink'
+      : tom === 'ok'
+        ? 'bg-ok-soft text-ok-ink'
+        : 'bg-surface-2 text-ink-3'
+}
+
 /** Resultado da lista: nome, código, preço, disponível e a ação. */
 function LinhaCatalogo({
   item: i,
@@ -353,13 +365,11 @@ function LinhaCatalogo({
 
   const corpo = (
     <>
-      <div className="flex items-start gap-3">
-        <span className={cn('sos-subtle-chip mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl', produto ? 'text-accent-ink' : 'text-cyan-ink')}>
-          {produto ? <Package className="size-5" /> : <Wrench className="size-5" />}
-        </span>
+      <div className="flex items-start gap-3.5">
+        <Miniatura id={i.id} produto={produto} descricao={i.descricao} />
         <div className="min-w-0 flex-1">
-          <p className="line-clamp-2 text-[16px] leading-snug font-bold text-ink">{i.descricao}</p>
-          <p className="num mt-0.5 truncate text-[12.5px] text-ink-3">Código: {i.codigo ?? '—'}</p>
+          <p className="line-clamp-2 text-[15.5px] leading-snug font-semibold tracking-[-0.01em] text-ink">{i.descricao}</p>
+          <p className="num mt-1 inline-flex max-w-full truncate rounded-md bg-surface-2 px-1.5 py-0.5 text-[11.5px] font-medium text-ink-3">{i.codigo ?? 'sem código'}</p>
           {aoVerFicha && (editavel || (aoEscolher && toqueLanca)) && (
             <button
               type="button"
@@ -379,11 +389,15 @@ function LinhaCatalogo({
           )}
         </div>
       </div>
-      <div className="flex items-end justify-between gap-3 pl-[3.25rem]">
+      <div className="flex items-end justify-between gap-3 pl-[4.05rem]">
         <div className="min-w-0">
-          <p className="num text-[19px] leading-none font-semibold text-ink">{i.preco != null ? moeda(Number(i.preco)) : 'sem preço'}</p>
-          {estoque && <p className={cn('num mt-1.5 text-[13.5px] font-bold', classeDisponivel(disponivel))}>{estoque}</p>}
-          {estoqueEm && <p className="num mt-0.5 text-[11.5px] whitespace-nowrap text-ink-3">{estoqueEm}</p>}
+          <p className="num text-[20px] leading-none font-semibold tracking-[-0.01em] text-ink">{i.preco != null ? moeda(Number(i.preco)) : 'sem preço'}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+            {estoque && (
+              <span className={cn('num rounded-full px-2 py-0.5 text-[12.5px] font-semibold', classeDisponivelPilula(disponivel))}>{estoque}</span>
+            )}
+            {estoqueEm && <span className="num text-[11.5px] whitespace-nowrap text-ink-3">{estoqueEm}</span>}
+          </div>
         </div>
         {aoEscolher ? (
           <button
@@ -443,6 +457,60 @@ function LinhaCatalogo({
       </li>
     )
   return <li className="sos-premium-row flex flex-col gap-2.5 px-3.5 py-3.5">{corpo}</li>
+}
+
+/**
+ * Miniatura do item: a foto do produto (a mesma da ficha, vinda da Omie)
+ * quando existe. A busca só acontece quando a linha aparece na tela e o
+ * resultado fica guardado — a lista não dispara nada ao rolar depressa.
+ */
+function Miniatura({ id, produto, descricao }: { id: string; produto: boolean; descricao: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const [visivel, setVisivel] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || !produto || visivel) return
+    const obs = new IntersectionObserver(
+      (entradas) => {
+        if (entradas.some((e) => e.isIntersecting)) {
+          setVisivel(true)
+          obs.disconnect()
+        }
+      },
+      { rootMargin: '150px' },
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [produto, visivel])
+
+  const foto = useQuery({
+    queryKey: ['sos', 'produto-omie', id],
+    queryFn: () => sosProdutoAoVivo(id),
+    enabled: produto && visivel,
+    staleTime: 10 * 60_000,
+    gcTime: 60 * 60_000,
+    retry: false,
+  })
+  const url = foto.data?.imagens?.[0]
+
+  return (
+    <span
+      ref={ref}
+      className={cn(
+        'mt-0.5 flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-line',
+        url ? 'bg-white' : 'sos-subtle-chip',
+        !url && (produto ? 'text-accent-ink' : 'text-cyan-ink'),
+      )}
+    >
+      {url ? (
+        <img src={url} alt={descricao} loading="lazy" className="size-full object-contain" />
+      ) : produto ? (
+        <Package className="size-6" />
+      ) : (
+        <Wrench className="size-6" />
+      )}
+    </span>
+  )
 }
 
 /** Item já lançado: quantidade e remover, com o valor da linha. */

@@ -1,16 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import { ChevronRight, History, House, Siren, Truck, UserRound, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { tocarAlerta, vibrarAlerta } from '@/sos/alerta'
 import { STATUS_SOS, WHATSAPP_SOS_PADRAO, linkWhatsApp } from '@/sos/rotulos'
-import { useTempoRealCliente } from '@/sos/tempoReal'
+import { sosDetalhe } from '@/sos/api'
+import { CHAVES_SOS, useTempoRealCliente } from '@/sos/tempoReal'
 import type { ChamadoSOS, StatusSOS } from '@/sos/tipos'
 import { aplicarTema, lerTema, useCliente } from '../sessao'
 import { BarraNavegacao } from '../comum/ui'
 import { useNaoLidasApp } from '../comum/Notificacoes'
 import { useHomeCliente, useInfoPublica, type CtxCascaCliente } from './dados'
 import { useEnvioPendenteSOS } from './filaSOS'
+import { TelaAvaliacao } from './chamado/Avaliacao'
+// A barra inferior (cli-nav) vive aqui: o estilo dela vale em todas as telas.
+import './inicio/inicio.css'
 
 /**
  * Moldura das telas do cliente: conteúdo + barra inferior com o SOS no meio.
@@ -30,6 +35,25 @@ export function CascaCliente() {
   const naoLidas = useNaoLidasApp(usuarioId)
   const ativo = home.data?.chamado_ativo ?? null
   const [aviso, setAviso] = useState<Pick<ChamadoSOS, 'id' | 'protocolo' | 'status'> | null>(null)
+
+  // Terminou um socorro: o pedido de avaliação abre sozinho, em qualquer tela
+  // do app (a tela do próprio chamado tem o dela). Fechar adia até a próxima
+  // abertura do app; avaliar tira o pendente do servidor.
+  const pendenteAvaliacao = home.data?.pendente_avaliacao ?? null
+  const [avaliacaoAdiada, setAvaliacaoAdiada] = useState<string | null>(() => {
+    try {
+      return sessionStorage.getItem(CHAVE_AVALIACAO_ADIADA)
+    } catch {
+      return null
+    }
+  })
+  const pedirAvaliacao = !!pendenteAvaliacao && avaliacaoAdiada !== pendenteAvaliacao.id
+  const detalheAvaliacao = useQuery({
+    queryKey: CHAVES_SOS.detalhe(pendenteAvaliacao?.id ?? ''),
+    queryFn: () => sosDetalhe(pendenteAvaliacao?.id ?? ''),
+    enabled: pedirAvaliacao,
+    staleTime: 60_000,
+  })
 
   useEnvioPendenteSOS(usuarioId, (c) => navegar(`/chamado/${c.id}`))
 
@@ -81,9 +105,23 @@ export function CascaCliente() {
         <Outlet context={contexto} />
       </div>
       {aviso && <AvisoChamado aviso={aviso} aoFechar={() => setAviso(null)} />}
+      {pedirAvaliacao && detalheAvaliacao.data && (
+        <TelaAvaliacao
+          detalhe={detalheAvaliacao.data}
+          aoFechar={() => {
+            const id = pendenteAvaliacao?.id ?? ''
+            try {
+              sessionStorage.setItem(CHAVE_AVALIACAO_ADIADA, id)
+            } catch {
+              /* sem armazenamento */
+            }
+            setAvaliacaoAdiada(id)
+          }}
+        />
+      )}
       <BotaoWhatsApp />
       <BarraNavegacao
-        className="cli-fixo"
+        className="cli-fixo cli-nav"
         itens={[
           { rota: '/', rotulo: 'Início', icone: House },
           { rota: '/veiculos', rotulo: 'Veículos', icone: Truck },
@@ -95,6 +133,8 @@ export function CascaCliente() {
     </div>
   )
 }
+
+const CHAVE_AVALIACAO_ADIADA = 'sos.avaliacao.adiada'
 
 /**
  * O botão do meio da barra. Sem chamado: pede socorro. Com chamado: leva ao
@@ -114,7 +154,7 @@ function BotaoCentralSOS({ chamadoAtivoId }: { chamadoAtivoId: string | null }) 
         <Siren className="size-[1.55rem]" strokeWidth={2.2} />
         {ativo && <span aria-hidden className="absolute -top-0.5 -right-0.5 size-3.5 rounded-full bg-white ring-[3px] ring-[#ff6600] sos-piscar" />}
       </span>
-      <span className="text-[11px] font-bold text-crit">{ativo ? 'Ao vivo' : 'SOS'}</span>
+      <span className={cn('text-[11px] font-bold', ativo ? 'text-crit' : 'text-[#536781] dark:text-white')}>{ativo ? 'Ao vivo' : 'SOS'}</span>
     </button>
   )
 }
