@@ -59,11 +59,11 @@
     />
 
     <script>
-      // O app do cliente é claro por padrão (ao sol, na estrada, claro lê
-      // melhor); quem escolher escuro no perfil tem a escolha respeitada.
+      // O app é escuro por padrão; quem escolher claro no perfil tem a
+      // escolha respeitada.
       (function () {
         try {
-          var t = localStorage.getItem('sos.tema') || 'claro'
+          var t = localStorage.getItem('sos.tema') || 'escuro'
           var escuro = t === 'escuro' || (t === 'sistema' && window.matchMedia('(prefers-color-scheme: dark)').matches)
           document.documentElement.classList.toggle('dark', escuro)
         } catch (e) {}

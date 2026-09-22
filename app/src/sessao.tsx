@@ -273,7 +273,7 @@ export function lerTema(): Tema {
   } catch {
     /* sem armazenamento */
   }
-  return 'claro'
+  return 'escuro'
 }
 
 export function aplicarTema(t: Tema) {

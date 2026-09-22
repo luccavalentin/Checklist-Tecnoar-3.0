@@ -45,7 +45,7 @@ registrarServiceWorker()
 destravarNoPrimeiroToque()
 
 {
-  const tema = localStorage.getItem('sos.tema')
+  const tema = localStorage.getItem('sos.tema') || 'escuro'
   const escuro = tema === 'escuro' || (tema === 'sistema' && window.matchMedia('(prefers-color-scheme: dark)').matches)
   document.documentElement.classList.toggle('dark', escuro)
 }

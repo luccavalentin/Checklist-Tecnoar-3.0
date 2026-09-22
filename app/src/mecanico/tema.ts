@@ -18,7 +18,7 @@ export function lerTemaMecanico(): TemaMecanico {
   } catch {
     /* sem armazenamento */
   }
-  return 'claro'
+  return 'escuro'
 }
 
 function ehEscuro(t: TemaMecanico): boolean {

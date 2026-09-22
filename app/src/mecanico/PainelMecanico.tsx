@@ -1,20 +1,25 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   AlertTriangle,
+  Bell,
   BellRing,
   Brain,
   ChevronRight,
+  CircleCheck,
   ClipboardList,
   Clock,
   FileText,
   Loader2,
   MapPin,
+  Moon,
   Package,
-  Plus,
-  Power,
+  Pause,
+  Phone,
+  PhoneCall,
   RefreshCw,
   Star,
+  Sun,
   Wrench,
   type LucideIcon,
 } from 'lucide-react'
@@ -22,6 +27,7 @@ import { cn } from '@/lib/utils'
 import { useToast } from '@/componentes/ui/Toast'
 import { ativarNotificacoes, permissaoAtual } from '@/notificacoes/sistema'
 import { destravarAudio } from '@/sos/alerta'
+import { enderecoDoPonto } from '@/sos/geo'
 import { STATUS_SOS, formatarDistancia, haQuanto } from '@/sos/rotulos'
 import type { HomeMecanico, SituacaoMecanico } from '@/sos/tipos'
 import { useMecanico } from '../sessao'
@@ -33,23 +39,28 @@ import { FaixaFila } from './FilaPendente'
 import { aplicarNoChamado, useFila } from './filaOffline'
 import { IconeOcorrencia, Placa } from './pecas'
 import { modeloVeiculo } from './PecasAtendimento'
-import { BotaoM, EsqueletoM, FolhaM, RotuloM, SecaoM, SeloM, TelaM } from './ui'
+import { aplicarTemaMecanico } from './tema'
+import { BotaoM, EsqueletoM, FolhaM, RotuloM, SecaoM, SeloM } from './ui'
+import './inicioMecanico.css'
 
 /**
  * Início do mecânico — extremamente operacional.
  *
- * De cima para baixo: quem é, o status (um controle grande: DISPONÍVEL em
- * azul Tecnoar quando recebe SOS, laranja oficial quando está indisponível, os números do dia, o chamado atual com
- * "Continuar atendimento", os chamados esperando resposta e os atalhos.
+ * De cima para baixo: quem é (com a foto de campo), o status com a chave
+ * liga/desliga (DISPONÍVEL recebe chamados; INDISPONÍVEL não), a área de
+ * atendimento, os números do dia, o chamado atual com "Continuar
+ * atendimento", o novo chamado, os que esperam resposta, os acessos rápidos
+ * e os últimos chamados. Claro e escuro têm o mesmo desenho.
  */
 export function PainelMecanico() {
   const { perfil, usuarioId } = useMecanico()
   const home = useHomeMecanico()
-  const { gps, abrirSituacao } = useCasca()
+  const { gps, abrirSituacao, naoLidas } = useCasca()
   const { abrir } = useAlertaSOS()
   const definir = useDefinirSituacao()
   const agora = useAgora(30_000)
   const online = useOnline()
+  const navegar = useNavigate()
 
   const h = home.data
   const ficha = h?.ficha ?? perfil.mecanico
@@ -70,26 +81,55 @@ export function PainelMecanico() {
   }
 
   return (
-    <>
-      <header className="mec-command-top pt-[calc(env(safe-area-inset-top)+0.8rem)]">
-        <div className="mx-auto flex max-w-xl flex-col gap-3 px-4 pb-5">
-          <div className="flex items-center justify-between gap-3">
-            <LogoSOS negativo altura={38} />
-            <Link to="/perfil" aria-label="Seu perfil" className="rounded-full ring-2 ring-white/18 active:scale-95">
-              <Avatar nome={perfil.nome} url={perfil.avatar_url} tamanho="sm" />
+    <div className="mi">
+      <header className="mi-topo pt-[calc(env(safe-area-inset-top)+0.6rem)]">
+        <div aria-hidden className="mi-foto" />
+        <img aria-hidden src="/brand/tecnoar-negativo.svg" alt="" className="mi-logo-camisa" draggable={false} />
+        <p aria-hidden className="mi-lema">
+          Você
+          <br />
+          sempre em
+          <br />
+          movimento
+        </p>
+
+        <div className="mi-barra">
+          <span className="hidden dark:block">
+            <LogoSOS negativo altura={52} />
+          </span>
+          <span className="dark:hidden">
+            <LogoSOS altura={52} />
+          </span>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={alternarTema} aria-label="Trocar entre modo claro e escuro" className="mi-redondo">
+              <Moon className="size-[19px] dark:hidden" strokeWidth={1.8} />
+              <Sun className="hidden size-[19px] dark:block" strokeWidth={1.8} />
+            </button>
+            <button
+              type="button"
+              onClick={() => navegar('/notificacoes')}
+              aria-label={naoLidas ? `Avisos, ${naoLidas} não lidos` : 'Avisos'}
+              className="mi-redondo mi-sino relative"
+            >
+              <Bell className="size-[20px]" strokeWidth={1.8} />
+              {naoLidas > 0 && <span aria-hidden className="mi-sino-ponto" />}
+            </button>
+            <Link to="/perfil" aria-label="Seu perfil" className="mi-redondo mi-avatar active:scale-95">
+              <Avatar nome={perfil.nome} url={perfil.avatar_url} className="size-full bg-transparent text-[14px] dark:bg-transparent" />
             </Link>
           </div>
-          <div>
-            <p className="text-[12px] font-medium text-[#00afef] first-letter:uppercase">
-              {new Date(agora).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
-            </p>
-            <h1 className="font-display text-[26px] leading-[1.05] font-semibold tracking-tight text-white">Olá, {nome}</h1>
-            <p className="mt-1 max-w-[18rem] text-[13px] leading-snug text-white/64">Chamados, rota, OS e peças no fluxo de campo.</p>
-          </div>
+        </div>
+
+        <div className="mi-saudacao">
+          <p className="mi-data">{new Date(agora).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}</p>
+          <h1 className="mi-ola">
+            Olá, <span className="text-[#FF6A00]">{nome || 'mecânico'}!</span>
+          </h1>
+          <p className="mi-sub">Pronto para o próximo atendimento?</p>
         </div>
       </header>
 
-      <TelaM className="-mt-3">
+      <main className="mi-conteudo">
         {home.isError && !h ? (
           <ErroPainel mensagem={(home.error as Error).message} tentando={home.isFetching} aoTentar={() => void home.refetch()} />
         ) : (
@@ -97,36 +137,26 @@ export function PainelMecanico() {
             {/* Ações de campo feitas sem sinal, esperando para sair. */}
             <FaixaFila />
 
-            {/* O status é o controle principal: azul, no centro da tela. */}
-            <ControleStatus
-              situacao={situacao}
-              carregando={carregando}
-              aceitaSos={aceitaSos}
-              chamadoId={chamadoAtual?.id ?? null}
-              mudando={definir.isPending}
-              online={online}
-              aoFicarDisponivel={ficarDisponivel}
-              aoFicarIndisponivel={() => definir.mutate({ situacao: 'indisponivel' })}
-            />
+            <div className="mi-linha-status">
+              <ControleStatus
+                situacao={situacao}
+                carregando={carregando}
+                aceitaSos={aceitaSos}
+                chamadoId={chamadoAtual?.id ?? null}
+                mudando={definir.isPending}
+                online={online}
+                aoFicarDisponivel={ficarDisponivel}
+                aoFicarIndisponivel={() => definir.mutate({ situacao: 'indisponivel' })}
+              />
+              <CartaoArea />
+            </div>
 
-            <section className="mec-metrics-sheet overflow-hidden rounded-[1.55rem]">
-              <NumerosDoDia h={h} emAndamento={chamadoAtual ? 1 : 0} />
-              {!chamadoAtual && (
-                <button
-                  type="button"
-                  onClick={abrirSituacao}
-                  className="flex min-h-11 w-full items-center justify-between border-t border-line px-4 text-[13.5px] font-medium text-ink-2 active:bg-surface-2"
-                >
-                  Pausa e outras opções
-                  <ChevronRight className="size-4 text-ink-3" />
-                </button>
-              )}
-            </section>
+            {chamadoAtual && <CartaoChamadoAtual chamado={chamadoAtual} />}
+
+            <NumerosDoDia h={h} emAndamento={chamadoAtual ? 1 : 0} />
 
             {/* Além de aceitar da fila, o mecânico abre o próprio chamado. */}
             <AbrirChamado atual={chamadoAtual} />
-
-            {chamadoAtual && <CartaoChamadoAtual chamado={chamadoAtual} />}
 
             {fila.length > 0 && (
               <SecaoM
@@ -148,24 +178,21 @@ export function PainelMecanico() {
 
             <AvisoNotificacoes usuarioId={usuarioId} />
 
-            <Atalhos />
+            <AcessosRapidos aoPausa={abrirSituacao} />
+
+            <UltimosChamados h={h} agora={agora} />
           </>
         )}
-      </TelaM>
-    </>
+      </main>
+    </div>
   )
 }
 
-/* ── status: o controle grande ──────────────────────────────────────────── */
-
-function PontoStatus() {
-  return (
-    <span className="relative flex size-2 shrink-0" aria-hidden>
-      <span className="mec-pulso absolute inset-0 rounded-full bg-white" />
-      <span className="relative size-2 rounded-full bg-white" />
-    </span>
-  )
+function alternarTema() {
+  aplicarTemaMecanico(document.documentElement.classList.contains('dark') ? 'claro' : 'escuro')
 }
+
+/* ── status: a chave liga/desliga ───────────────────────────────────────── */
 
 function ControleStatus({
   situacao,
@@ -187,23 +214,19 @@ function ControleStatus({
   aoFicarIndisponivel: () => void
 }) {
   const navegar = useNavigate()
-  if (carregando) return <EsqueletoM className="mx-auto h-12 w-60 rounded-full" />
+  if (carregando) return <EsqueletoM className="mi-status h-[5.4rem] rounded-[1.2rem]" />
 
   // Em atendimento: o status é do chamado, não da mão do mecânico.
   if (chamadoId || situacao === 'em_atendimento') {
     return (
-      <button
-        type="button"
-        onClick={() => chamadoId && navegar(`/chamado/${chamadoId}`)}
-        className="mec-status mec-status-online mx-auto flex h-12 w-fit max-w-full items-center gap-2.5 rounded-full pr-5 pl-4 text-left text-white active:scale-[0.99]"
-      >
-        <PontoStatus />
-        <span className="min-w-0">
-          <span className="block truncate text-[10px] leading-none font-semibold tracking-[0.12em] text-white/75 uppercase">
-            Status · Chamado em campo
-          </span>
-          <span className="mt-1 block font-display text-[14.5px] leading-none font-bold tracking-[0.02em]">EM ATENDIMENTO</span>
+      <button type="button" onClick={() => chamadoId && navegar(`/chamado/${chamadoId}`)} className="mi-cartao mi-status mi-status-campo text-left">
+        <span aria-hidden className="mi-status-ponto" />
+        <span className="min-w-0 flex-1">
+          <span className="mi-status-rotulo">Status atual</span>
+          <span className="mi-status-titulo">EM ATENDIMENTO</span>
+          <span className="mi-status-sub">Chamado em campo</span>
         </span>
+        <ChevronRight className="size-5 shrink-0 opacity-70" />
       </button>
     )
   }
@@ -215,14 +238,9 @@ function ControleStatus({
   let sub: string
   if (!online) sub = 'Sem internet'
   else if (disponivel && !aceitaSos) sub = 'SOS desligado'
-  else if (recebendo) sub = 'Recebendo SOS'
+  else if (recebendo) sub = 'Recebendo chamados'
   else if (pausa) sub = 'Toque para voltar'
-  else sub = 'Toque para ficar disponível'
-
-  function alternar() {
-    if (recebendo) aoFicarIndisponivel()
-    else aoFicarDisponivel()
-  }
+  else sub = 'Não recebe chamados'
 
   return (
     <button
@@ -230,38 +248,56 @@ function ControleStatus({
       role="switch"
       aria-checked={recebendo}
       aria-label={`Status: ${titulo}. Tocar para ${recebendo ? 'ficar indisponível' : 'ficar disponível'}`}
-      onClick={alternar}
+      onClick={() => (recebendo ? aoFicarIndisponivel() : aoFicarDisponivel())}
       disabled={mudando || !online}
-      className={cn(
-        /* Pílula baixa e contida: o status é o controle principal e continua no
-           centro, mas não precisa ser o maior objeto da tela para ser achado. */
-        'mec-status mx-auto flex h-12 w-fit max-w-full items-center gap-3 rounded-full pr-1.5 pl-4 text-left text-white transition-colors active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70',
-        // Online (recebendo SOS): azul Tecnoar. Fora do ar: laranja oficial.
-        recebendo ? 'mec-status-online' : 'mec-status-offline',
-      )}
+      className={cn('mi-cartao mi-status text-left disabled:cursor-not-allowed disabled:opacity-70', recebendo ? 'mi-status-on' : 'mi-status-off')}
     >
-      <PontoStatus />
-      <span className="min-w-0">
-        <span className="block truncate text-[10px] leading-none font-semibold tracking-[0.12em] text-white/75 uppercase">
-          Status · {sub}
-        </span>
-        <span className="mt-1 block font-display text-[14.5px] leading-none font-bold tracking-[0.02em]">{titulo}</span>
+      <span aria-hidden className="mi-status-ponto" />
+      <span className="min-w-0 flex-1">
+        <span className="mi-status-rotulo">Status atual</span>
+        <span className="mi-status-titulo">{titulo}</span>
+        <span className="mi-status-sub">{sub}</span>
       </span>
-
-      <span
-        aria-hidden
-        className={cn('relative ml-1 h-9 w-[3.75rem] shrink-0 rounded-full transition-colors', recebendo ? 'bg-white/28' : 'bg-black/15')}
-      >
-        <span
-          className={cn(
-            'absolute top-1 flex size-7 items-center justify-center rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.25)] transition-all',
-            recebendo ? 'left-[calc(100%-2rem)] text-[#0096d6]' : 'left-1 text-[#d92d2d]',
-          )}
-        >
-          {mudando ? <Loader2 className="size-3.5 animate-spin" /> : <Power className="size-3.5" strokeWidth={2.6} />}
-        </span>
+      <span aria-hidden className="mi-chave">
+        <span className="mi-chave-bola">{mudando && <Loader2 className="size-3.5 animate-spin text-[#536781]" />}</span>
       </span>
     </button>
+  )
+}
+
+/** Onde o mecânico está recebendo chamados agora (cidade pela posição do GPS). */
+function CartaoArea() {
+  const { gps } = useCasca()
+  const [cidade, setCidade] = useState<string | null>(null)
+  // Arredondado (~1 km): a cidade não muda a cada metro andado.
+  const lat = gps.posicao ? Number(gps.posicao.lat.toFixed(2)) : null
+  const lng = gps.posicao ? Number(gps.posicao.lng.toFixed(2)) : null
+  useEffect(() => {
+    if (lat == null || lng == null) return
+    let vivo = true
+    void enderecoDoPonto({ lat, lng }).then((e) => {
+      const ultimo = e?.split(' — ').pop() ?? null
+      if (vivo && ultimo) setCidade(ultimo.replace('/', ' - '))
+    })
+    return () => {
+      vivo = false
+    }
+  }, [lat, lng])
+  return (
+    <Link to="/perfil" className="mi-cartao mi-area">
+      <span className="mi-area-icone">
+        <MapPin className="size-5" strokeWidth={1.9} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="mi-area-titulo">
+          Minha área{' '}
+          <br />
+          de atendimento
+        </span>
+        {cidade && <span className="mi-area-cidade">{cidade}</span>}
+      </span>
+      <ChevronRight className="size-4 shrink-0 opacity-70" />
+    </Link>
   )
 }
 
@@ -270,27 +306,25 @@ function ControleStatus({
 function NumerosDoDia({ h, emAndamento }: { h: HomeMecanico | undefined; emAndamento: number }) {
   const nota = h?.hoje.nota_media
   return (
-    <dl className="grid grid-cols-4 divide-x divide-line">
-      <Estatistica rotulo="Hoje" valor={h ? h.hoje.atendimentos : '–'} />
-      <Estatistica rotulo="Em curso" valor={h ? emAndamento : '–'} destaque={!!emAndamento} />
-      <Estatistica rotulo="Finalizados" valor={h ? h.hoje.concluidos : '–'} />
+    <dl className="mi-numeros">
+      <Estatistica icone={Phone} rotulo="Hoje" valor={h ? h.hoje.atendimentos : '–'} />
+      <Estatistica icone={Clock} rotulo="Em andamento" valor={h ? emAndamento : '–'} />
+      <Estatistica icone={CircleCheck} rotulo="Finalizados" valor={h ? h.hoje.concluidos : '–'} />
       <Estatistica
+        icone={Star}
         rotulo="Avaliação"
         valor={nota != null ? Number(nota).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '–'}
-        icone={nota != null}
       />
     </dl>
   )
 }
 
-function Estatistica({ rotulo, valor, destaque, icone }: { rotulo: string; valor: ReactNode; destaque?: boolean; icone?: boolean }) {
+function Estatistica({ icone: Icone, rotulo, valor }: { icone: LucideIcon; rotulo: string; valor: ReactNode }) {
   return (
-    <div className="flex min-w-0 flex-col items-center gap-0.5 px-1 py-3">
-      <dd className={cn('num flex items-center gap-1 text-[21px] leading-none font-semibold', destaque ? 'text-cyan-ink' : 'text-ink')}>
-        {valor}
-        {icone && <Star className="size-3.5 fill-[#ff9a3d] text-[#ff9a3d]" />}
-      </dd>
-      <dt className="truncate text-[11.5px] text-ink-3">{rotulo}</dt>
+    <div className="mi-cartao mi-numero">
+      <Icone className="mi-numero-icone" strokeWidth={1.7} />
+      <dd className="mi-numero-valor num">{valor}</dd>
+      <dt className="mi-numero-rotulo">{rotulo}</dt>
     </div>
   )
 }
@@ -303,7 +337,7 @@ function CartaoChamadoAtual({ chamado }: { chamado: NonNullable<HomeMecanico['ch
   const detalhe = useDetalheChamado(chamado.id)
   const veiculo = detalhe.data ? modeloVeiculo(detalhe.data) : null
   return (
-    <section className="entrada-suave sos-native-card overflow-hidden rounded-[1.55rem]">
+    <section className="entrada-suave sos-native-card overflow-hidden rounded-[1.4rem]">
       <div className="flex flex-col gap-1 p-4 pb-3">
         <div className="flex items-center justify-between gap-2">
           <RotuloM className="text-accent-ink">Chamado atual</RotuloM>
@@ -341,26 +375,17 @@ function AbrirChamado({ atual }: { atual: { id: string; protocolo: string; clien
   const ocupado = !!atual
   return (
     <>
-      <button
-        type="button"
-        onClick={() => (ocupado ? setAviso(true) : navegar('/novo-chamado'))}
-        className={cn(
-          'mec-new-call flex min-h-[4.35rem] w-full items-center gap-3 rounded-[1.35rem] px-3.5 py-3 text-left transition-transform active:scale-[0.99]',
-          ocupado ? 'border-2 border-line bg-surface' : 'text-white',
-        )}
-      >
-        <span className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', ocupado ? 'bg-surface-2 text-ink-3' : 'bg-[#ff6600] text-white')}>
-          <Plus className="size-6" strokeWidth={2.6} />
+      <button type="button" onClick={() => (ocupado ? setAviso(true) : navegar('/novo-chamado'))} className={cn('mi-novo', ocupado && 'mi-novo-ocupado')}>
+        <span className="mi-novo-icone">
+          <BellRing className="size-7" strokeWidth={1.9} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className={cn('block font-display text-[17px] leading-tight font-bold tracking-normal', ocupado ? 'text-ink-2' : 'text-white')}>
-            Novo chamado
-          </span>
-          <span className={cn('mt-0.5 block text-[13px] leading-snug', ocupado ? 'text-ink-3' : 'text-white/75')}>
-            {ocupado ? 'Termine o atendimento atual primeiro' : 'Cliente na sua frente ou que ligou direto'}
-          </span>
+          <span className="mi-novo-titulo">Novo chamado</span>
+          <span className="mi-novo-sub">{ocupado ? 'Termine o atendimento atual primeiro' : 'Cliente na sua frente ou que ligou direto'}</span>
         </span>
-        <ChevronRight className={cn('size-5 shrink-0', ocupado ? 'text-ink-3' : 'text-white/70')} />
+        <span className="mi-novo-seta">
+          <ChevronRight className="size-6" strokeWidth={2.2} />
+        </span>
       </button>
 
       <FolhaM
@@ -391,7 +416,7 @@ function CartaoFila({ chamado: c, agora, aoAbrir }: { chamado: HomeMecanico['agu
       type="button"
       onClick={aoAbrir}
       className={cn(
-          'sos-choice-card flex w-full items-center gap-3 rounded-[1.25rem] p-3.5 text-left transition-transform active:scale-[0.99]',
+        'sos-choice-card flex w-full items-center gap-3 rounded-[1.25rem] p-3.5 text-left transition-transform active:scale-[0.99]',
         c.para_mim ? 'border-2 border-accent' : c.prioridade === 'emergencia' ? 'border-2 border-crit/60' : 'border-line',
         c.recusei && 'opacity-70',
       )}
@@ -422,40 +447,131 @@ function CartaoFila({ chamado: c, agora, aoAbrir }: { chamado: HomeMecanico['agu
   )
 }
 
-/* ── atalhos ────────────────────────────────────────────────────────────── */
+/* ── acessos rápidos ────────────────────────────────────────────────────── */
 
-function Atalhos() {
-  const itens: Array<{ rotulo: string; icone: LucideIcon; para: string }> = [
-    { rotulo: 'Histórico de chamados', icone: ClipboardList, para: '/chamados' },
-    // Todas as OS do mecânico; a do chamado atual está no próprio atendimento.
-    { rotulo: 'Ordens de serviço', icone: FileText, para: '/os' },
-    { rotulo: 'Produtos e estoque', icone: Package, para: '/catalogo/produtos' },
-    { rotulo: 'Serviços', icone: Wrench, para: '/catalogo/servicos' },
-    { rotulo: 'Tecno IA', icone: Brain, para: '/tecno-ia' },
-  ]
+const TODOS_ATALHOS: Array<{ rotulo: string; icone: LucideIcon; para: string }> = [
+  { rotulo: 'Histórico de chamados', icone: ClipboardList, para: '/chamados' },
+  // Todas as OS do mecânico; a do chamado atual está no próprio atendimento.
+  { rotulo: 'Ordens de serviço', icone: Wrench, para: '/os' },
+  { rotulo: 'Produtos e estoque', icone: Package, para: '/catalogo/produtos' },
+  { rotulo: 'Serviços', icone: FileText, para: '/catalogo/servicos' },
+  { rotulo: 'Tecno IA', icone: Brain, para: '/tecno-ia' },
+  { rotulo: 'Avisos', icone: Bell, para: '/notificacoes' },
+]
+
+function AcessosRapidos({ aoPausa }: { aoPausa: () => void }) {
+  const [todos, setTodos] = useState(false)
   return (
-    <SecaoM titulo="Atalhos">
-      <nav aria-label="Atalhos" className="sos-premium-list">
-        {itens.map((i) => {
-          const Icone = i.icone
+    <section className="flex flex-col gap-3">
+      <div className="mi-secao-topo">
+        <h2 className="mi-secao-titulo">Acessos rápidos</h2>
+        <button type="button" onClick={() => setTodos(true)} className="mi-ver-todos">
+          Ver todos <ChevronRight className="size-4" />
+        </button>
+      </div>
+      <nav aria-label="Acessos rápidos" className="mi-acessos">
+        <Acesso para="/chamados" icone={ClipboardList} rotulo={['Histórico', 'de chamados']} />
+        <Acesso para="/os" icone={Wrench} rotulo={['Ordens', 'de serviço']} />
+        <Acesso para="/catalogo/produtos" icone={Package} rotulo={['Produtos', 'e estoque']} />
+        <Acesso aoTocar={aoPausa} icone={Pause} rotulo={['Pausa e', 'outras opções']} />
+      </nav>
+      <FolhaM aberta={todos} aoFechar={() => setTodos(false)} titulo="Acessos">
+        <nav className="flex flex-col gap-1.5 pb-2">
+          {TODOS_ATALHOS.map((i) => {
+            const Icone = i.icone
+            return (
+              <Link
+                key={i.para}
+                to={i.para}
+                onClick={() => setTodos(false)}
+                className="flex min-h-12 items-center gap-3 rounded-2xl px-2 text-[15px] font-medium text-ink active:bg-surface-2"
+              >
+                <span className="sos-subtle-chip flex size-9 shrink-0 items-center justify-center rounded-full text-accent-ink">
+                  <Icone className="size-[18px]" />
+                </span>
+                <span className="min-w-0 flex-1 truncate">{i.rotulo}</span>
+                <ChevronRight className="size-4 text-ink-3" />
+              </Link>
+            )
+          })}
+        </nav>
+      </FolhaM>
+    </section>
+  )
+}
+
+function Acesso({ para, aoTocar, icone: Icone, rotulo }: { para?: string; aoTocar?: () => void; icone: LucideIcon; rotulo: [string, string] }) {
+  const miolo = (
+    <>
+      <span className="mi-acesso-icone">
+        <Icone className="size-[19px]" strokeWidth={1.8} />
+      </span>
+      <span className="mi-acesso-rotulo">
+        {rotulo[0]}
+        <br />
+        {rotulo[1]}
+      </span>
+      <ChevronRight className="mi-acesso-seta" strokeWidth={2} />
+    </>
+  )
+  if (para)
+    return (
+      <Link to={para} className="mi-cartao mi-acesso">
+        {miolo}
+      </Link>
+    )
+  return (
+    <button type="button" onClick={aoTocar} className="mi-cartao mi-acesso text-left">
+      {miolo}
+    </button>
+  )
+}
+
+/* ── últimos chamados ───────────────────────────────────────────────────── */
+
+function quando(iso: string, agora: number): string {
+  const d = new Date(iso)
+  const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  const hoje = new Date(agora).toDateString() === d.toDateString()
+  return `${hoje ? 'Hoje' : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} • ${hora}`
+}
+
+function UltimosChamados({ h, agora }: { h: HomeMecanico | undefined; agora: number }) {
+  const lista = (h?.historico ?? []).slice(0, 3)
+  if (!lista.length) return null
+  return (
+    <section className="flex flex-col gap-3">
+      <div className="mi-secao-topo">
+        <h2 className="mi-secao-titulo">Últimos chamados</h2>
+        <Link to="/chamados" className="mi-ver-todos">
+          Ver todos <ChevronRight className="size-4" />
+        </Link>
+      </div>
+      <ul className="flex flex-col gap-2.5">
+        {lista.map((c) => {
+          const tom = c.status === 'concluido' || c.status === 'servico_finalizado' ? 'ok' : c.status === 'cancelado' ? 'neutro' : 'andamento'
           return (
-            <Link
-              key={i.rotulo}
-              to={i.para}
-              className="sos-premium-row group flex min-h-[3.4rem] items-center gap-3.5 px-4 [&:not(:last-child)>span:last-child]:border-b [&:not(:last-child)>span:last-child]:border-line"
-            >
-              <span className="sos-subtle-chip flex size-8 shrink-0 items-center justify-center rounded-[0.7rem] text-accent-ink">
-                <Icone className="size-[18px]" />
-              </span>
-              <span className="flex min-h-[3.4rem] min-w-0 flex-1 items-center justify-between gap-2">
-                <span className="truncate text-[15.5px] font-medium text-ink">{i.rotulo}</span>
-                <ChevronRight className="size-4 shrink-0 text-ink-3" />
-              </span>
-            </Link>
+            <li key={c.id}>
+              <Link to={`/chamado/${c.id}`} className="mi-cartao mi-ultimo">
+                <span className={cn('mi-ultimo-icone', `mi-tom-${tom}`)}>
+                  <Phone className="size-5" strokeWidth={2} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                    <span className="mi-ultimo-protocolo num">{c.protocolo}</span>
+                    <span className={cn('mi-selo', `mi-selo-${tom}`)}>{c.status_rotulo}</span>
+                  </span>
+                  <span className="mi-ultimo-cliente">Cliente: {c.cliente_nome}</span>
+                  <span className="mi-ultimo-extra">{[c.placa, c.ocorrencia_rotulo].filter(Boolean).join(' · ')}</span>
+                </span>
+                <span className="mi-ultimo-quando">{quando(c.recebido_em, agora)}</span>
+                <ChevronRight className="size-4 shrink-0 opacity-60" />
+              </Link>
+            </li>
           )
         })}
-      </nav>
-    </SecaoM>
+      </ul>
+    </section>
   )
 }
 
@@ -477,15 +593,13 @@ function AvisoNotificacoes({ usuarioId }: { usuarioId: string | null }) {
   }
 
   return (
-    <section className="sos-native-card flex items-center gap-3 rounded-[1.5rem] p-3.5">
-      <span className="sos-subtle-chip flex size-10 shrink-0 items-center justify-center rounded-full text-warn-ink">
-        <BellRing className="size-5" />
+    <section className="mi-cartao mi-aviso">
+      <span className="mi-aviso-icone">
+        <PhoneCall className="size-6" strokeWidth={1.7} />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="font-display text-[15px] leading-tight font-semibold text-ink">
-          {permissao === 'denied' ? 'Notificações bloqueadas' : 'Receba SOS com o app fechado'}
-        </p>
-        <p className="text-[13px] leading-snug text-ink-2">
+        <p className="mi-aviso-titulo">{permissao === 'denied' ? 'Notificações bloqueadas' : 'Receba SOS com o app fechado'}</p>
+        <p className="mi-aviso-texto">
           {permissao === 'denied'
             ? 'Libere nas configurações do aparelho para não perder chamados.'
             : permissao === 'indisponivel'
@@ -494,9 +608,9 @@ function AvisoNotificacoes({ usuarioId }: { usuarioId: string | null }) {
         </p>
       </div>
       {permissao === 'default' && (
-        <BotaoM variante="escuro" tamanho="md" onClick={() => void ativar()}>
+        <button type="button" onClick={() => void ativar()} className="mi-aviso-botao">
           Ativar
-        </BotaoM>
+        </button>
       )}
     </section>
   )

@@ -1,0 +1,204 @@
+/* Meus veículos (vei-*): topo com a foto de campo e o vazio convidando a
+   cadastrar. Mesmo desenho nos dois temas. */
+
+.vei {
+  --v-texto: #101f38;
+  --v-texto-2: #3c4b63;
+  --v-texto-3: #66758d;
+  --v-cartao: #fff;
+  --v-borda: rgb(16 31 56 / 0.07);
+  --v-sombra: 0 1px 2px rgb(16 31 56 / 0.05), 0 14px 30px -20px rgb(16 31 56 / 0.3);
+  --v-chip: #f1f4fa;
+  --v-veu: linear-gradient(95deg, rgb(243 246 251 / 0.96) 0%, rgb(243 246 251 / 0.9) 32%, rgb(243 246 251 / 0.5) 52%, transparent 74%);
+  --v-foto: url('/sos/home/mecanico-claro.webp');
+  color: var(--v-texto);
+}
+
+.dark .vei {
+  --v-texto: #fff;
+  --v-texto-2: rgb(214 226 244 / 0.8);
+  --v-texto-3: rgb(214 226 244 / 0.6);
+  --v-cartao: rgb(255 255 255 / 0.04);
+  --v-borda: rgb(148 178 214 / 0.18);
+  --v-sombra: 0 16px 34px -26px rgb(0 0 0 / 0.9);
+  --v-chip: rgb(255 255 255 / 0.06);
+  --v-veu: linear-gradient(95deg, rgb(7 17 31 / 0.94) 0%, rgb(7 17 31 / 0.86) 34%, rgb(7 17 31 / 0.45) 55%, transparent 76%);
+  --v-foto: url('/sos/home/mecanico-escuro.webp');
+}
+
+.vei-topo {
+  position: relative;
+  container-type: inline-size;
+  max-width: 430px;
+  margin-inline: auto;
+  padding-bottom: 0.9rem;
+  overflow: hidden;
+}
+
+.vei-foto {
+  position: absolute;
+  top: -0.7cqw;
+  left: -1cqw;
+  width: 104cqw;
+  aspect-ratio: 1672 / 941;
+  background: var(--v-foto) center / 100% 100% no-repeat;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 55%, transparent 92%);
+  mask-image: linear-gradient(to bottom, #000 0, #000 55%, transparent 92%);
+  pointer-events: none;
+}
+
+.vei-foto::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--v-veu);
+}
+
+.vei-barra {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem 0;
+}
+
+.vei-adicionar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.6rem;
+  padding: 0 1rem;
+  border: 1px solid var(--v-borda);
+  border-radius: 999px;
+  font-size: 14.5px;
+  font-weight: 650;
+  color: var(--v-texto);
+  background: var(--v-cartao);
+  box-shadow: var(--v-sombra);
+  backdrop-filter: blur(10px);
+}
+
+.vei-adicionar:active {
+  transform: scale(0.97);
+}
+
+.vei-titulo {
+  position: relative;
+  margin-top: 1rem;
+  padding: 0 1rem;
+  max-width: 70%;
+  font-size: clamp(23px, 6.6cqw, 30px);
+  font-weight: 760;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--v-texto);
+}
+
+.vei-sub {
+  position: relative;
+  margin-top: 0.35rem;
+  padding: 0 1rem;
+  max-width: 62%;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--v-texto-2);
+}
+
+.vei-conteudo {
+  max-width: 430px;
+  margin-inline: auto;
+  padding: 0.9rem max(1rem, env(safe-area-inset-right)) calc(8.5rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+}
+
+/* vazio */
+
+.vei-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 2rem 1.25rem 1.5rem;
+  border: 1px solid var(--v-borda);
+  border-radius: 1.5rem;
+  text-align: center;
+  background: var(--v-cartao);
+  box-shadow: var(--v-sombra);
+}
+
+.dark .vei-vazio {
+  backdrop-filter: blur(10px);
+}
+
+.vei-vazio-icone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 5.2rem;
+  height: 5.2rem;
+  border-radius: 1.4rem;
+  color: var(--v-texto);
+  background: #fff3ea;
+}
+
+.dark .vei-vazio-icone {
+  background: rgb(255 106 0 / 0.12);
+}
+
+.vei-vazio-mais {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  color: #fff;
+  background: #ff6a00;
+  box-shadow: 0 0 0 3px var(--v-cartao);
+}
+
+.dark .vei-vazio-mais {
+  box-shadow: 0 0 0 3px #0e1d33;
+}
+
+.vei-vazio-titulo {
+  font-size: 19px;
+  font-weight: 750;
+  line-height: 1.2;
+  color: var(--v-texto);
+}
+
+.vei-vazio-texto {
+  max-width: 21rem;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--v-texto-2);
+}
+
+.vei-botao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 3.4rem;
+  margin-top: 0.4rem;
+  border-radius: 999px;
+  font-size: 16.5px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(95deg, #ff7a14 0%, #ff5a0a 55%, #f24a05 100%);
+  box-shadow:
+    0 16px 30px -18px rgb(255 90 10 / 0.9),
+    inset 0 1px 0 rgb(255 255 255 / 0.25);
+  transition: transform 0.15s;
+}
+
+.vei-botao:active {
+  transform: scale(0.985);
+}

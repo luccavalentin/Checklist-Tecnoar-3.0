@@ -1,0 +1,842 @@
+/* Início do mecânico (mi-*): o mesmo desenho no claro e no escuro, só as
+   cores e a foto de campo mudam. O topo usa unidades do contêiner (cqw):
+   foto, logo na camisa e o lema na porta da van escalam juntos. */
+
+.mi {
+  --mi-fundo: #f3f6fb;
+  --mi-texto: #101f38;
+  --mi-texto-2: #3c4b63;
+  --mi-texto-3: #66758d;
+  --mi-cartao: #fff;
+  --mi-borda: rgb(16 31 56 / 0.06);
+  --mi-sombra: 0 1px 2px rgb(16 31 56 / 0.05), 0 12px 28px -18px rgb(16 31 56 / 0.28);
+  --mi-icone-fundo: #eef2f8;
+  --mi-anel: #fff;
+  --mi-azul: #1d6fd8;
+  min-height: 100dvh;
+  color: var(--mi-texto);
+  background: var(--mi-fundo);
+}
+
+.dark .mi {
+  --mi-fundo: #07111f;
+  --mi-texto: #fff;
+  --mi-texto-2: rgb(214 226 244 / 0.85);
+  --mi-texto-3: rgb(214 226 244 / 0.6);
+  --mi-cartao: rgb(255 255 255 / 0.035);
+  --mi-borda: rgb(148 178 214 / 0.16);
+  --mi-sombra: 0 16px 34px -26px rgb(0 0 0 / 0.9);
+  --mi-icone-fundo: rgb(255 255 255 / 0.06);
+  --mi-anel: #0b1a31;
+  --mi-azul: #4ea1ff;
+  background: linear-gradient(180deg, #0a1628 0%, #07111f 60%, #060e1a 100%);
+}
+
+/* ── topo ───────────────────────────────────────────────────────────────── */
+
+.mi-topo {
+  position: relative;
+  container-type: inline-size;
+  max-width: 430px;
+  margin-inline: auto;
+  padding-bottom: 0.9rem;
+  overflow: hidden;
+}
+
+.mi-foto {
+  position: absolute;
+  top: -0.7cqw;
+  left: -1cqw;
+  width: 104cqw;
+  aspect-ratio: 1672 / 941;
+  background: url('/sos/home/mecanico-claro.webp') center / 100% 100% no-repeat;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 62%, transparent 94%);
+  mask-image: linear-gradient(to bottom, #000 0, #000 62%, transparent 94%);
+  pointer-events: none;
+}
+
+.dark .mi-foto {
+  background-image: url('/sos/home/mecanico-escuro.webp');
+}
+
+/* Véu do lado do texto: a saudação lê bem sobre a foto. */
+.mi-foto::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(95deg, rgb(243 246 251 / 0.97) 0%, rgb(243 246 251 / 0.92) 34%, rgb(243 246 251 / 0.55) 52%, transparent 72%);
+}
+
+.dark .mi-foto::after {
+  background: linear-gradient(95deg, rgb(7 17 31 / 0.94) 0%, rgb(7 17 31 / 0.86) 34%, rgb(7 17 31 / 0.45) 55%, transparent 74%);
+}
+
+.mi-logo-camisa {
+  position: absolute;
+  top: 22.4cqw;
+  left: 55.2cqw;
+  width: 8.6cqw;
+  opacity: 0.92;
+  pointer-events: none;
+  user-select: none;
+}
+
+.mi-lema {
+  position: absolute;
+  top: 17cqw;
+  left: 78.5cqw;
+  font-size: 2.75cqw;
+  font-weight: 800;
+  font-style: italic;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: rgb(16 31 56 / 0.82);
+  transform: rotate(-7deg) skewX(-10deg) scaleX(0.82);
+  transform-origin: left top;
+  pointer-events: none;
+}
+
+.dark .mi-lema {
+  color: rgb(255 255 255 / 0.62);
+}
+
+.mi-barra {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.1rem 1rem 0;
+}
+
+.mi-redondo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  overflow: hidden;
+  border: 1px solid rgb(16 31 56 / 0.1);
+  border-radius: 999px;
+  color: var(--mi-texto);
+  background: rgb(255 255 255 / 0.85);
+  box-shadow: 0 8px 18px -12px rgb(16 31 56 / 0.4);
+  backdrop-filter: blur(8px);
+}
+
+.dark .mi-redondo {
+  border-color: rgb(148 178 214 / 0.3);
+  background: rgb(7 17 31 / 0.45);
+  box-shadow: none;
+}
+
+.mi-sino {
+  overflow: visible;
+}
+
+.mi-sino-ponto {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.6rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: #ff6a00;
+  box-shadow: 0 0 0 2px var(--mi-anel);
+}
+
+.mi-avatar {
+  color: var(--mi-texto);
+  background: transparent;
+  border-color: rgb(16 31 56 / 0.3);
+}
+
+.mi-avatar span {
+  color: var(--mi-texto);
+}
+
+.mi-saudacao {
+  position: relative;
+  margin-top: 0.9rem;
+  padding: 0 1rem;
+  max-width: 62%;
+}
+
+.mi-data {
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--mi-texto-2);
+}
+
+.mi-data::first-letter {
+  text-transform: uppercase;
+}
+
+.mi-ola {
+  margin-top: 0.3rem;
+  font-size: clamp(21px, 6.2cqw, 28px);
+  font-weight: 760;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--mi-texto);
+}
+
+.mi-sub {
+  margin-top: 0.25rem;
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: var(--mi-texto-2);
+}
+
+/* ── conteúdo ───────────────────────────────────────────────────────────── */
+
+.mi-conteudo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-width: 430px;
+  margin-inline: auto;
+  padding: 0 max(1rem, env(safe-area-inset-right)) calc(8.5rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+}
+
+.mi-cartao {
+  position: relative;
+  border: 1px solid var(--mi-borda);
+  border-radius: 1.15rem;
+  color: var(--mi-texto);
+  background: var(--mi-cartao);
+  box-shadow: var(--mi-sombra);
+  transition: transform 0.15s;
+}
+
+.dark .mi-cartao {
+  backdrop-filter: blur(10px);
+}
+
+a.mi-cartao:active,
+button.mi-cartao:active {
+  transform: scale(0.985);
+}
+
+/* status + área */
+
+.mi-linha-status {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 0.6rem;
+}
+
+.mi-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 4.5rem;
+  padding: 0.6rem 0.55rem 0.6rem 0.6rem;
+}
+
+.mi-status-ponto {
+  position: relative;
+  flex-shrink: 0;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  background: rgb(18 185 94 / 0.16);
+}
+
+.mi-status-ponto::after {
+  content: '';
+  position: absolute;
+  inset: 30%;
+  border-radius: 999px;
+  background: #12b95e;
+  box-shadow: 0 0 10px rgb(18 185 94 / 0.8);
+}
+
+.mi-status-off .mi-status-ponto {
+  background: rgb(255 106 0 / 0.14);
+}
+
+.mi-status-off .mi-status-ponto::after {
+  background: #ff6a00;
+  box-shadow: 0 0 10px rgb(255 106 0 / 0.7);
+}
+
+.mi-status-campo .mi-status-ponto {
+  background: rgb(0 175 239 / 0.16);
+}
+
+.mi-status-campo .mi-status-ponto::after {
+  background: #00afef;
+  box-shadow: 0 0 10px rgb(0 175 239 / 0.8);
+}
+
+.dark .mi-status-on {
+  border-color: rgb(18 185 94 / 0.35);
+  background: linear-gradient(120deg, rgb(18 185 94 / 0.12), rgb(255 255 255 / 0.02) 60%);
+}
+
+.mi-status-rotulo {
+  display: block;
+  overflow: hidden;
+  font-size: 10.5px;
+  line-height: 1.2;
+  color: var(--mi-texto-2);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mi-status-titulo {
+  display: block;
+  margin-top: 0.1rem;
+  overflow: hidden;
+  font-size: clamp(13px, 3.8vw, 15.5px);
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: var(--mi-texto);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mi-status-sub {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 10.5px;
+  line-height: 1.2;
+  color: var(--mi-texto-2);
+}
+
+/* A chave: verde ligada (recebe chamados), cinza desligada. */
+.mi-chave {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.7rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  background: #c9d2df;
+  transition: background 0.2s;
+}
+
+.dark .mi-chave {
+  background: rgb(148 178 214 / 0.28);
+}
+
+.mi-status-on .mi-chave {
+  background: #12a454;
+  box-shadow: 0 0 14px -2px rgb(18 185 94 / 0.6);
+}
+
+.mi-chave-bola {
+  position: absolute;
+  top: 0.18rem;
+  left: 0.18rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.26rem;
+  height: 1.26rem;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+  transition: left 0.2s;
+}
+
+.mi-status-on .mi-chave-bola {
+  left: calc(100% - 1.44rem);
+}
+
+.mi-area {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 4.5rem;
+  padding: 0.6rem 0.45rem 0.6rem 0.55rem;
+}
+
+.mi-area-icone {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 999px;
+  color: #ff6a00;
+  background: rgb(255 106 0 / 0.12);
+}
+
+.dark .mi-area-icone {
+  color: #fff;
+  background: rgb(255 255 255 / 0.06);
+  box-shadow: 0 0 0 1px rgb(148 178 214 / 0.22) inset;
+}
+
+.mi-area-titulo {
+  display: block;
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--mi-texto);
+}
+
+.mi-area-cidade {
+  display: block;
+  margin-top: 0.1rem;
+  overflow: hidden;
+  font-size: 10.5px;
+  color: var(--mi-texto-3);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 400px) {
+  .mi-linha-status {
+    grid-template-columns: 1fr;
+  }
+
+  .mi-area {
+    min-height: 3.6rem;
+  }
+
+  .mi-area-titulo br {
+    display: none;
+  }
+}
+
+/* números */
+
+.mi-numeros {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.mi-numero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: 0;
+  padding: 0.55rem 0.25rem 0.5rem;
+}
+
+.mi-numero-icone {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--mi-azul);
+}
+
+.mi-numero-valor {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--mi-texto);
+}
+
+.mi-numero-rotulo {
+  max-width: 100%;
+  font-size: 10.5px;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--mi-texto-3);
+}
+
+/* novo chamado */
+
+.mi-novo {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  min-height: 4rem;
+  padding: 0.55rem 0.6rem 0.55rem 0.6rem;
+  border-radius: 1.2rem;
+  text-align: left;
+  color: #fff;
+  background: linear-gradient(95deg, #ff7a14 0%, #ff5a0a 55%, #f24a05 100%);
+  box-shadow:
+    0 16px 30px -18px rgb(255 90 10 / 0.85),
+    inset 0 1px 0 rgb(255 255 255 / 0.25);
+  transition: transform 0.15s;
+}
+
+.dark .mi-novo {
+  box-shadow:
+    0 0 26px -6px rgb(255 106 0 / 0.65),
+    inset 0 1px 0 rgb(255 255 255 / 0.25);
+}
+
+.mi-novo:active {
+  transform: scale(0.985);
+}
+
+.mi-novo-icone {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.18);
+}
+
+.mi-novo-titulo {
+  display: block;
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.mi-novo-sub {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 12px;
+  line-height: 1.3;
+  color: rgb(255 255 255 / 0.9);
+}
+
+.mi-novo-seta {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 999px;
+  background: linear-gradient(160deg, #ff8a20, #ff5a00);
+  box-shadow:
+    0 6px 14px -6px rgb(150 40 0 / 0.7),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
+.mi-novo-ocupado {
+  color: var(--mi-texto);
+  background: var(--mi-cartao);
+  border: 1px solid var(--mi-borda);
+  box-shadow: var(--mi-sombra);
+}
+
+.mi-novo-ocupado .mi-novo-icone {
+  color: var(--mi-texto-3);
+  background: var(--mi-icone-fundo);
+}
+
+.mi-novo-ocupado .mi-novo-sub {
+  color: var(--mi-texto-3);
+}
+
+.mi-novo-ocupado .mi-novo-seta {
+  color: var(--mi-texto-3);
+  background: var(--mi-icone-fundo);
+  box-shadow: none;
+}
+
+/* aviso de notificações */
+
+.mi-aviso {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.75rem 0.75rem 0.8rem;
+}
+
+.mi-aviso-icone {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  color: var(--mi-texto);
+  background: var(--mi-icone-fundo);
+}
+
+.mi-aviso-titulo {
+  font-size: 13.5px;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.mi-aviso-texto {
+  margin-top: 0.1rem;
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--mi-texto-3);
+}
+
+.mi-aviso-botao {
+  flex-shrink: 0;
+  min-height: 2.35rem;
+  padding: 0 0.9rem;
+  border: 1px solid rgb(16 31 56 / 0.18);
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--mi-texto);
+}
+
+.dark .mi-aviso-botao {
+  border-color: rgb(148 178 214 / 0.4);
+}
+
+/* seções */
+
+.mi-secao-topo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+}
+
+.mi-secao-titulo {
+  font-size: 15.5px;
+  font-weight: 650;
+  color: var(--mi-texto);
+}
+
+.mi-ver-todos {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  min-height: 2.5rem;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--mi-azul);
+}
+
+.mi-acessos {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.mi-acesso {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 0;
+  min-height: 5rem;
+  padding: 0.55rem 0.45rem 0.55rem 0.55rem;
+}
+
+.mi-acesso-icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  color: var(--mi-texto);
+  background: var(--mi-icone-fundo);
+}
+
+.mi-acesso-rotulo {
+  padding-right: 0.6rem;
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.3;
+  color: var(--mi-texto);
+}
+
+.mi-acesso-seta {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.85rem;
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--mi-texto-3);
+}
+
+@media (max-width: 359px) {
+  .mi-acessos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* últimos chamados */
+
+.mi-ultimo {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.5rem 0.6rem 0.6rem;
+}
+
+.mi-ultimo-icone {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 999px;
+}
+
+.mi-tom-ok {
+  color: #0e9f55;
+  background: rgb(18 185 94 / 0.14);
+}
+
+.mi-tom-andamento {
+  color: #ff6a00;
+  background: rgb(255 106 0 / 0.14);
+}
+
+.mi-tom-neutro {
+  color: var(--mi-texto-3);
+  background: var(--mi-icone-fundo);
+}
+
+.dark .mi-tom-ok {
+  color: #fff;
+  background: #12a454;
+}
+
+.dark .mi-tom-andamento {
+  color: #fff;
+  background: #e8620c;
+}
+
+.mi-ultimo-protocolo {
+  font-size: 14.5px;
+  font-weight: 650;
+  color: var(--mi-texto);
+}
+
+.mi-selo {
+  padding: 0.12rem 0.45rem;
+  border-radius: 0.35rem;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.mi-selo-ok {
+  color: #fff;
+  background: #0e9f55;
+}
+
+.mi-selo-andamento {
+  color: #fff;
+  background: #1d6fd8;
+}
+
+.mi-selo-neutro {
+  color: var(--mi-texto-2);
+  background: var(--mi-icone-fundo);
+}
+
+.mi-ultimo-cliente,
+.mi-ultimo-extra {
+  display: block;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.mi-ultimo-cliente {
+  margin-top: 0.2rem;
+  color: var(--mi-texto-2);
+}
+
+.mi-ultimo-extra {
+  color: var(--mi-texto-3);
+}
+
+.mi-ultimo-quando {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 0.2rem;
+  font-size: 12px;
+  color: var(--mi-texto-3);
+  white-space: nowrap;
+}
+
+/* ── barra inferior ─────────────────────────────────────────────────────── */
+
+.mi-abas .mi-aba-ativa {
+  color: #ff6a00;
+}
+
+.mi-abas .mi-aba-ativa::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 1.9rem;
+  height: 3px;
+  translate: -50% 0;
+  border-radius: 3px 3px 0 0;
+  background: #ff6a00;
+  box-shadow: 0 0 12px 1px rgb(255 106 0 / 0.7);
+}
+
+.mi-atendimento-fab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.7rem;
+  height: 3.7rem;
+  margin-top: -1.35rem;
+  border-radius: 999px;
+  color: #fff;
+  background: radial-gradient(circle at 50% 38%, #ff8d24 0%, #ff6a00 58%, #f05000 100%);
+  box-shadow:
+    0 0 0 4px var(--c-surface, #fff),
+    0 12px 26px -10px rgb(255 90 10 / 0.8);
+  animation: mi-brilho 1.8s ease-in-out infinite;
+}
+
+.dark .mi-atendimento-fab {
+  box-shadow:
+    0 0 0 4px #0b1a31,
+    0 0 24px rgb(255 106 0 / 0.55);
+}
+
+.mi-atendimento-ponto {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0 0 3px #ff6a00;
+}
+
+.mi-atendimento-rotulo {
+  max-width: 5.2rem;
+  overflow: hidden;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--c-ink-3, #66758d);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@keyframes mi-brilho {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgb(255 106 0 / 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgb(255 106 0 / 0.75));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mi-atendimento-fab {
+    animation: none;
+  }
+}

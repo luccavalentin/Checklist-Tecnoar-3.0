@@ -187,6 +187,44 @@ body {
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.035);
   }
 
+  .sos-app-action {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--c-line) 78%, transparent);
+    background:
+      linear-gradient(135deg, rgb(0 175 239 / 0.08), transparent 48%),
+      linear-gradient(180deg, color-mix(in srgb, var(--c-surface) 98%, white 2%), color-mix(in srgb, var(--c-surface) 94%, transparent)),
+      var(--c-surface);
+    box-shadow:
+      0 1px 2px rgb(8 24 48 / 0.035),
+      0 16px 36px -32px rgb(8 24 48 / 0.34);
+  }
+
+  .sos-app-action::after {
+    content: '';
+    position: absolute;
+    top: 1rem;
+    right: -1.2rem;
+    width: 2.8rem;
+    height: 0.2rem;
+    border-radius: 999px;
+    pointer-events: none;
+    background: #00afef;
+    transform: rotate(-35deg);
+    box-shadow: 0 0.62rem 0 #ff6600;
+    opacity: 0.34;
+  }
+
+  .dark .sos-app-action {
+    border-color: rgb(0 175 239 / 0.14);
+    background:
+      linear-gradient(135deg, rgb(0 175 239 / 0.08), transparent 48%),
+      linear-gradient(180deg, rgb(12 30 56 / 0.96), rgb(7 20 42 / 0.94));
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.035),
+      0 16px 36px -30px rgb(0 0 0 / 0.78);
+  }
+
   .sos-icon-button {
     transition:
       transform 140ms ease,
@@ -311,13 +349,13 @@ body {
     right: max(0.85rem, env(safe-area-inset-right));
     bottom: calc(var(--sos-nav-bottom) + env(safe-area-inset-bottom));
     overflow: visible;
-    border: 1px solid rgb(13 28 51 / 0.08);
+    border: 1px solid rgb(13 28 51 / 0.075);
     border-radius: 1.7rem;
-    background: rgb(255 255 255 / 0.82);
+    background: rgb(255 255 255 / 0.94);
     box-shadow:
-      0 18px 50px -28px rgb(8 24 48 / 0.42),
-      0 1px 0 rgb(255 255 255 / 0.8) inset;
-    backdrop-filter: blur(26px) saturate(1.25);
+      0 18px 50px -28px rgb(8 24 48 / 0.34),
+      0 1px 0 rgb(255 255 255 / 0.92) inset;
+    backdrop-filter: blur(20px) saturate(1.12);
   }
 
   .sos-bottom-nav::before {
@@ -331,7 +369,7 @@ body {
 
   .dark .sos-bottom-nav {
     border-color: rgb(0 175 239 / 0.14);
-    background: rgb(6 18 38 / 0.78);
+    background: rgb(6 18 38 / 0.94);
     box-shadow:
       0 18px 50px -28px rgb(0 0 0 / 0.9),
       0 1px 0 rgb(255 255 255 / 0.06) inset;
@@ -632,13 +670,18 @@ body {
    */
   .cli-palco {
     min-height: 100dvh;
-    background: var(--c-canvas);
+    background:
+      radial-gradient(70% 44rem at 50% -18rem, rgb(0 32 97 / 0.2), transparent 70%),
+      linear-gradient(180deg, color-mix(in srgb, var(--c-canvas) 94%, white 6%) 0%, var(--c-canvas) 56%);
   }
 
   .cli-coluna {
     position: relative;
     min-height: 100dvh;
-    background: var(--c-canvas);
+    background:
+      linear-gradient(180deg, transparent 0 32rem, var(--c-canvas) 32rem),
+      radial-gradient(18rem 15rem at 100% 18rem, rgb(0 175 239 / 0.08), transparent 74%),
+      var(--c-canvas);
   }
 
   .cli-home-top {
@@ -646,11 +689,27 @@ body {
     overflow: hidden;
     color: #fff;
     background:
-      linear-gradient(138deg, rgb(13 28 51 / 0.98) 0%, rgb(0 32 97 / 0.98) 64%, rgb(0 175 239 / 0.18) 100%),
-      linear-gradient(90deg, transparent 0 78%, rgb(255 102 0 / 0.82) 78.3% 79.3%, transparent 79.6%);
-    border-bottom-right-radius: 1.9rem;
-    border-bottom-left-radius: 1.9rem;
-    box-shadow: 0 24px 52px -34px rgb(0 32 97 / 0.86);
+      linear-gradient(180deg, rgb(4 14 30 / 0.54) 0%, rgb(4 14 30 / 0.78) 62%, #0d1c33 100%),
+      linear-gradient(120deg, rgb(13 28 51 / 0.98) 0%, rgb(0 32 97 / 0.84) 56%, rgb(0 175 239 / 0.16) 100%),
+      url('/sos/hero-cliente.png') center 34% / cover no-repeat;
+    border-bottom-right-radius: 2.35rem;
+    border-bottom-left-radius: 2.35rem;
+    box-shadow:
+      0 28px 70px -42px rgb(0 32 97 / 0.95),
+      inset 0 -1px 0 rgb(255 255 255 / 0.08);
+  }
+
+  .cli-home-top::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(118deg, transparent 0 72%, rgb(0 175 239 / 0.7) 72.25% 73.35%, transparent 73.65%),
+      linear-gradient(118deg, transparent 0 79.5%, rgb(255 102 0 / 0.72) 79.75% 80.65%, transparent 80.95%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.08), transparent 32%);
+    mix-blend-mode: screen;
+    opacity: 0.92;
   }
 
   /* Fio de marca na base: laranja no centro, some nas pontas. */
@@ -663,7 +722,7 @@ body {
     height: 2px;
     pointer-events: none;
     background: linear-gradient(90deg, transparent, #ff6600 50%, transparent);
-    opacity: 0.7;
+    opacity: 0.86;
   }
 
   .cli-home-top > * {
@@ -726,14 +785,31 @@ body {
   }
 
   .cli-veiculo-card {
-    border: 1px solid rgb(13 28 51 / 0.07);
+    position: relative;
+    border: 1px solid rgb(13 28 51 / 0.075);
     background:
-      linear-gradient(115deg, rgb(255 102 0 / 0.09) 0 0.55rem, transparent 0.6rem),
-      linear-gradient(180deg, rgb(255 255 255 / 0.98), rgb(255 255 255 / 0.91));
+      linear-gradient(135deg, rgb(0 32 97 / 0.08), transparent 46%),
+      linear-gradient(115deg, rgb(255 102 0 / 0.12) 0 0.45rem, transparent 0.5rem),
+      linear-gradient(180deg, rgb(255 255 255 / 0.98), rgb(255 255 255 / 0.9));
     box-shadow:
       0 1px 2px rgb(11 28 51 / 0.05),
-      0 20px 44px -34px rgb(11 28 51 / 0.42);
+      0 24px 58px -38px rgb(11 28 51 / 0.55);
     backdrop-filter: blur(18px);
+  }
+
+  .cli-veiculo-card::after {
+    content: '';
+    position: absolute;
+    top: 0.9rem;
+    right: -1.15rem;
+    width: 3.2rem;
+    height: 0.26rem;
+    border-radius: 999px;
+    pointer-events: none;
+    background: #00afef;
+    transform: rotate(-35deg);
+    box-shadow: 0 0.75rem 0 #ff6600;
+    opacity: 0.5;
   }
 
   .dark .cli-veiculo-card {
@@ -747,11 +823,16 @@ body {
     position: relative;
     overflow: hidden;
     color: #fff;
-    background: linear-gradient(135deg, #0D1C33 0%, #002061 100%);
+    background:
+      linear-gradient(180deg, rgb(2 8 18 / 0.3), rgb(2 8 18 / 0.8)),
+      linear-gradient(126deg, #0D1C33 0%, #002061 68%, rgb(0 175 239 / 0.2) 100%),
+      url('/sos/hero-mecanico.png') center 36% / cover no-repeat;
     border-bottom: 1px solid rgb(0 175 239 / 0.16);
     border-bottom-right-radius: 1.45rem;
     border-bottom-left-radius: 1.45rem;
-    box-shadow: 0 20px 42px -34px rgb(0 32 97 / 0.82);
+    box-shadow:
+      0 26px 64px -42px rgb(0 32 97 / 0.92),
+      inset 0 -1px 0 rgb(255 255 255 / 0.08);
   }
 
   .mec-command-top::after {
@@ -788,17 +869,18 @@ body {
 
   .cli-sos-stage {
     position: relative;
-    min-height: 15.2rem;
+    min-height: 17.2rem;
     overflow: hidden;
     border: 1px solid rgb(255 255 255 / 0.1);
-    border-radius: 1.75rem;
+    border-radius: 2rem;
     color: #fff;
     background:
-      linear-gradient(180deg, rgb(13 28 51 / 0.4), rgb(13 28 51 / 0.7) 44%, rgb(13 28 51 / 0.98) 100%),
+      radial-gradient(12rem 9rem at 78% 28%, rgb(0 175 239 / 0.18), transparent 70%),
+      linear-gradient(180deg, rgb(13 28 51 / 0.22), rgb(13 28 51 / 0.58) 44%, rgb(13 28 51 / 0.98) 100%),
       url('/sos/hero-cliente.png') center / cover no-repeat;
     box-shadow:
       0 1px 2px rgb(8 24 48 / 0.12),
-      0 28px 56px -34px rgb(8 24 48 / 0.82);
+      0 32px 70px -38px rgb(8 24 48 / 0.9);
   }
 
   .cli-sos-stage::before {
@@ -807,8 +889,9 @@ body {
     inset: 0;
     pointer-events: none;
     background:
-      linear-gradient(115deg, transparent 0 73%, rgb(0 175 239 / 0.72) 73.3% 74.2%, transparent 74.6%),
-      linear-gradient(115deg, transparent 0 79%, rgb(255 102 0 / 0.72) 79.2% 80.1%, transparent 80.4%);
+      linear-gradient(115deg, transparent 0 72%, rgb(0 175 239 / 0.82) 72.3% 73.2%, transparent 73.55%),
+      linear-gradient(115deg, transparent 0 78.5%, rgb(255 102 0 / 0.78) 78.7% 79.6%, transparent 79.95%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.08), transparent 38%);
     opacity: 0.9;
   }
 
@@ -827,9 +910,9 @@ body {
   .cli-sos-orb {
     position: relative;
     display: flex;
-    width: min(25vw, 6.55rem);
+    width: min(28vw, 7.15rem);
     aspect-ratio: 1;
-    min-width: 5.75rem;
+    min-width: 5.9rem;
     align-items: center;
     justify-content: center;
     border-radius: 999px;
@@ -838,8 +921,8 @@ body {
     box-shadow:
       inset 0 2px 10px rgb(255 255 255 / 0.28),
       inset 0 -10px 18px rgb(96 36 0 / 0.24),
-      0 0 0 7px rgb(255 255 255 / 0.13),
-      0 18px 38px -18px rgb(255 102 0 / 0.92);
+      0 0 0 8px rgb(255 255 255 / 0.13),
+      0 22px 44px -18px rgb(255 102 0 / 0.96);
   }
 
   .cli-sos-orb::before {

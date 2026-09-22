@@ -10,9 +10,10 @@ import { ROTULO_TIPO_VEICULO } from '@/sos/rotulos'
 import { CHAVES_SOS } from '@/sos/tempoReal'
 import type { LembreteSOS } from '@/sos/tipos'
 import { useCliente } from '../sessao'
-import { BotaoApp, CabecalhoTela, CampoApp, Esqueleto, Faixa, Folha, Tela, VazioApp } from '../comum/ui'
+import { BotaoApp, CampoApp, Esqueleto, Faixa, Folha, LogoSOS } from '../comum/ui'
 import { dataNumerica, kmTexto, nomeVeiculo, useLembretes, useMeusVeiculos, venceu, type EstadoAgendar, type VeiculoCliente } from './dados'
 import { ErroCarga, PlacaVeiculo, Rotulo } from './pecas'
+import './veiculos.css'
 
 const TIPOS = ['cavalo', 'truck', 'toco', 'carreta', 'onibus', 'utilitario']
 
@@ -53,17 +54,30 @@ export function MeusVeiculos() {
   const ordenados = [...lista].sort((a, b) => Number(b.id === principalId) - Number(a.id === principalId))
 
   return (
-    <>
-      <CabecalhoTela
-        titulo="Meus veículos"
-        subtitulo={lista.length ? `${lista.length} veículo${lista.length > 1 ? 's' : ''} · manutenção preventiva` : undefined}
-        acao={
-          <button type="button" onClick={() => setNovo(true)} className="flex min-h-11 items-center gap-1.5 rounded-full px-3 text-[14px] font-bold text-accent-ink hover:bg-accent-soft">
-            <Plus className="size-5" /> Adicionar
+    <div className="vei">
+      <header className="vei-topo pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))]">
+        <div aria-hidden className="vei-foto" />
+        <div className="vei-barra">
+          <span className="hidden dark:block">
+            <LogoSOS negativo altura={44} />
+          </span>
+          <span className="dark:hidden">
+            <LogoSOS altura={44} />
+          </span>
+          <button type="button" onClick={() => setNovo(true)} className="vei-adicionar">
+            <Plus className="size-5 text-[#ff6a00]" strokeWidth={2.4} /> Adicionar
           </button>
-        }
-      />
-      <Tela className="entrada-suave">
+        </div>
+        <h1 className="vei-titulo">
+          Meus <span className="text-[#ff6a00]">veículos</span>
+        </h1>
+        <p className="vei-sub">
+          {lista.length
+            ? `${lista.length} veículo${lista.length > 1 ? 's' : ''} cadastrado${lista.length > 1 ? 's' : ''} na sua conta, com a manutenção preventiva de cada um.`
+            : 'Gerencie os veículos cadastrados na sua conta.'}
+        </p>
+      </header>
+      <main className="vei-conteudo entrada-suave">
         {veiculos.isLoading ? (
           <div className="flex flex-col gap-3">
             {[0, 1].map((i) => (
@@ -73,16 +87,21 @@ export function MeusVeiculos() {
         ) : veiculos.isError ? (
           <ErroCarga erro={veiculos.error} aoTentar={() => void veiculos.refetch()} />
         ) : lista.length === 0 ? (
-          <VazioApp
-            icone={Truck}
-            titulo="Nenhum veículo cadastrado"
-            descricao="Cadastre a placa: o pedido de socorro sai mais rápido e o histórico de serviços aparece aqui."
-            acao={
-              <BotaoApp tamanho="lg" icone={Plus} onClick={() => setNovo(true)}>
-                Cadastrar veículo
-              </BotaoApp>
-            }
-          />
+          <section className="vei-vazio">
+            <span className="vei-vazio-icone">
+              <Truck className="size-10" strokeWidth={1.6} />
+              <span aria-hidden className="vei-vazio-mais">
+                <Plus className="size-4" strokeWidth={3} />
+              </span>
+            </span>
+            <h2 className="vei-vazio-titulo">Nenhum veículo cadastrado</h2>
+            <p className="vei-vazio-texto">
+              Cadastre a placa: o pedido de socorro sai mais rápido e o histórico de manutenções do veículo passa a aparecer aqui.
+            </p>
+            <button type="button" onClick={() => setNovo(true)} className="vei-botao">
+              <Plus className="size-5" strokeWidth={2.6} /> Cadastrar veículo
+            </button>
+          </section>
         ) : (
           <ul className="flex flex-col gap-4">
             {ordenados.map((v) => (
@@ -99,11 +118,11 @@ export function MeusVeiculos() {
             ))}
           </ul>
         )}
-      </Tela>
+      </main>
 
       <FolhaNovoVeiculo aberta={novo} aoFechar={() => setNovo(false)} />
       <FolhaKm veiculo={editandoKm} aoFechar={() => setEditandoKm(null)} />
-    </>
+    </div>
   )
 }
 

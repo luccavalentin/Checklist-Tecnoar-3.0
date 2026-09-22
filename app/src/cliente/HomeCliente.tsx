@@ -1,27 +1,25 @@
-import type { ComponentType, ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Bell, CalendarCheck, ChevronRight, CloudOff, MapPin, PhoneCall, Plus, Siren, Brain, Star, Wrench } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useNavigate } from 'react-router-dom'
+import { ChevronRight, CloudOff, MapPin, PhoneCall, Siren, Star } from 'lucide-react'
 import { formatarCoordenadas } from '@/sos/geo'
-import { OCORRENCIAS, ROTULO_TIPO_VEICULO, STATUS_SOS, formatarEta, haQuanto, linkTelefone } from '@/sos/rotulos'
-import type { ChamadoSOS, HomeCliente as DadosHome } from '@/sos/tipos'
+import { OCORRENCIAS, STATUS_SOS, formatarEta, haQuanto, linkTelefone } from '@/sos/rotulos'
+import type { ChamadoSOS } from '@/sos/tipos'
 import { useCliente } from '../sessao'
-import { Avatar, BotaoApp, Esqueleto, Faixa, LogoSOS } from '../comum/ui'
+import { BotaoApp, Faixa } from '../comum/ui'
 import { useOnline } from '../comum/Pwa'
-import { dataNumerica, kmTexto, nomeVeiculo, primeiroNome, saudacao, semVinculo, useCasca, useHomeCliente, useInfoPublica, venceu } from './dados'
+import { semVinculo, useCasca, useHomeCliente, useInfoPublica } from './dados'
 import { pendenteExpirou, useEnvioPendenteSOS, type PedidoPendente } from './filaSOS'
-import { ErroCarga, PlacaVeiculo, Rotulo } from './pecas'
+import { ErroCarga } from './pecas'
+import { Inicio, type PropsInicio } from './inicio/Inicio'
 
 /**
- * Início do cliente — três níveis, nesta ordem de importância:
+ * Início do cliente, com a mesma composição nos dois temas (só as cores e a
+ * foto do cartão mudam), nesta ordem de importância:
  *
- * 1. SOS: um botão grande, "PRECISO DE AJUDA". Nunca depende dos dados
- *    carregarem — sem internet ou com erro no banco, continua a um toque.
- * 2. O veículo: modelo, placa, último serviço, próxima revisão e km.
- * 3. Atalhos: Meus veículos, Histórico, Tecno IA, Revisões.
- *
- * Nada além disso. Com um socorro em andamento, o nível 1 vira o
- * acompanhamento dele.
+ * 1. SOS. Nunca depende dos dados carregarem — sem internet ou com erro no
+ *    banco, continua a um toque. Com um socorro em andamento, vira o
+ *    acompanhamento dele.
+ * 2. O veículo (e revisão vencida ou veículo na oficina).
+ * 3. Atalhos.
  */
 export function HomeCliente() {
   const { conta, usuarioId } = useCliente()
@@ -29,107 +27,36 @@ export function HomeCliente() {
   const navegar = useNavigate()
   const home = useHomeCliente()
   const d = home.data
-  const nome = primeiroNome(d?.nome || conta.nome)
   const ativo = d?.chamado_ativo ?? null
   const { pendente, enviarAgora, descartar } = useEnvioPendenteSOS(usuarioId, (c) => navegar(`/chamado/${c.id}`))
 
-  return (
-    <>
-      <header className="cli-home-top z-30 pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))]">
-        <div className="mx-auto flex max-w-xl flex-col gap-5 px-4 pt-4 pr-[max(1rem,env(safe-area-inset-right))] pb-14 pl-[max(1rem,env(safe-area-inset-left))]">
-          <div className="flex items-center justify-between gap-3">
-            <LogoSOS negativo altura={36} />
-            <div className="flex items-center gap-0.5">
-            <button
-              type="button"
-              onClick={() => navegar('/notificacoes')}
-              aria-label={naoLidas ? `Notificações, ${naoLidas} não lidas` : 'Notificações'}
-              className="relative flex size-11 items-center justify-center rounded-full text-white transition-colors hover:bg-white/10 active:bg-white/10"
-            >
-              <Bell className="size-[22px]" />
-              {naoLidas > 0 && (
-                <span className="num absolute top-1 right-0.5 flex min-w-[18px] items-center justify-center rounded-full bg-[#ff6600] px-1 text-[10px] leading-[18px] font-bold text-white ring-2 ring-canvas">
-                  {naoLidas > 99 ? '99+' : naoLidas}
-                </span>
-              )}
-            </button>
-            <button type="button" onClick={() => navegar('/perfil')} aria-label="Minha conta" className="flex size-11 items-center justify-center rounded-full active:scale-95">
-              <Avatar nome={d?.nome || conta.nome} tamanho="sm" className="ring-2 ring-white/18" />
-            </button>
-            </div>
-          </div>
-          <div className="max-w-[19rem]">
-            <span className="text-[12px] leading-tight font-medium tracking-[0.02em] text-[#00afef]">{saudacao()}</span>
-            <h1 className="mt-1 truncate font-display text-[30px] leading-none font-semibold tracking-tight text-white">{nome || 'Bem-vindo'}</h1>
-            <p className="mt-2 text-[13.5px] leading-snug text-white/62">Socorro, revisões e acompanhamento com a Tecnoar sempre à mão.</p>
-          </div>
-        </div>
-      </header>
-
-      <main className="entrada-suave mx-auto -mt-10 flex w-full max-w-xl flex-col gap-5 px-4 pr-[max(1rem,env(safe-area-inset-right))] pb-[calc(9rem+env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
+  const props: PropsInicio = {
+    nome: d?.nome || conta.nome || '',
+    naoLidas,
+    d,
+    carregando: home.isLoading,
+    avisos: (
+      <>
         {home.isError && <ErroCarga erro={home.error} aoTentar={() => void home.refetch()} />}
         {semVinculo(d) && <Faixa tom="info">Seu pedido de socorro já funciona. O histórico da Tecnoar aparece assim que a conta for ligada ao seu cadastro.</Faixa>}
+      </>
+    ),
+    socorro:
+      pendente && !ativo ? (
+        <CartaoPendente pendente={pendente} aoEnviar={() => void enviarAgora()} aoDescartar={descartar} />
+      ) : ativo ? (
+        <CartaoSocorroAtivo chamado={ativo} />
+      ) : null,
+    avaliar: d?.pendente_avaliacao && !ativo ? <ConviteAvaliar chamado={d.pendente_avaliacao} /> : null,
+    chamadoAtivo: !!ativo,
+    // Igual ao SOS da barra: com chamado aberto, leva ao acompanhamento — nunca a um segundo pedido.
+    aoSOS: () => navegar(ativo ? `/chamado/${ativo.id}` : '/sos'),
+  }
 
-        {/* ── nível 1: socorro ── */}
-        {pendente && !ativo ? (
-          <CartaoPendente pendente={pendente} aoEnviar={() => void enviarAgora()} aoDescartar={descartar} />
-        ) : ativo ? (
-          <CartaoSocorroAtivo chamado={ativo} />
-        ) : (
-          <BotaoPrecisoDeAjuda />
-        )}
-
-        {d?.pendente_avaliacao && !ativo && <ConviteAvaliar chamado={d.pendente_avaliacao} />}
-
-        {/* ── nível 2: veículo ── */}
-        <CartaoVeiculo dados={d} carregando={home.isLoading} />
-
-        {naoLidas > 0 && (
-          <Link to="/notificacoes" className="sos-premium-row sos-native-card flex min-h-12 items-center gap-3 rounded-2xl px-4 py-2.5">
-            <Bell className="size-5 shrink-0 text-accent-ink" />
-            <span className="min-w-0 flex-1 text-[14.5px] font-semibold text-ink">
-              {naoLidas === 1 ? '1 aviso novo' : `${naoLidas} avisos novos`}
-            </span>
-            <ChevronRight className="size-5 shrink-0 text-ink-3" />
-          </Link>
-        )}
-
-        {/* ── nível 3: atalhos ── */}
-        <nav aria-label="Atalhos" className="grid grid-cols-2 gap-3">
-          <Atalho para="/tecno-ia" icone={Brain} rotulo="Tecno IA" sub="Tire dúvidas do seu veículo" />
-          <Atalho para="/revisoes" icone={CalendarCheck} rotulo="Revisões" sub="Agende a preventiva" contador={d?.lembretes} />
-        </nav>
-      </main>
-    </>
-  )
+  return <Inicio {...props} />
 }
 
-/* ── nível 1 ────────────────────────────────────────────────────────────── */
-
-/** Ação principal da home: imediata, mas com acabamento de app premium. */
-function BotaoPrecisoDeAjuda() {
-  const navegar = useNavigate()
-  return (
-    <button
-      type="button"
-      onClick={() => navegar('/sos')}
-      className="cli-sos-stage flex w-full flex-col justify-end px-5 pt-5 pb-5 text-left transition-transform active:scale-[0.985]"
-    >
-      <span className="flex items-end justify-between gap-4">
-        <span className="min-w-0 flex-1">
-          <span className="block font-display text-[28px] leading-[1.02] font-semibold tracking-tight text-white">Preciso de ajuda</span>
-          <span className="mt-1.5 block text-[14px] leading-snug text-white/70">Toque e a Tecnoar localiza você.</span>
-        </span>
-        <span className="cli-sos-orb sos-respira shrink-0">
-          <span className="flex flex-col items-center justify-center gap-0.5">
-            <Siren className="sos-sirene size-7" />
-            <span className="font-display text-[19px] leading-none font-semibold">SOS</span>
-          </span>
-        </span>
-      </span>
-    </button>
-  )
-}
+/* ── estados do socorro ─────────────────────────────────────────────────── */
 
 function CartaoSocorroAtivo({ chamado }: { chamado: ChamadoSOS }) {
   const navegar = useNavigate()
@@ -233,134 +160,5 @@ function ConviteAvaliar({ chamado }: { chamado: ChamadoSOS }) {
       </span>
       <ChevronRight className="size-5 shrink-0 text-ink-3" />
     </button>
-  )
-}
-
-/* ── nível 2 ────────────────────────────────────────────────────────────── */
-
-function CartaoVeiculo({ dados, carregando }: { dados: DadosHome | undefined; carregando: boolean }) {
-  const navegar = useNavigate()
-  if (carregando) return <Esqueleto className="h-[13.5rem] rounded-[1.25rem]" />
-  const v = dados?.veiculo ?? null
-
-  if (!v) {
-    return (
-      <button
-        type="button"
-        onClick={() => navegar('/veiculos?novo=1')}
-        className="sos-choice-card flex w-full items-center gap-4 rounded-[1.55rem] border-dashed p-4 text-left"
-      >
-        <span className="sos-subtle-chip flex size-12 shrink-0 items-center justify-center rounded-2xl text-accent-ink">
-          <Plus className="size-6" />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-display text-[16px] font-bold text-ink">Cadastre seu veículo</span>
-          <span className="block text-[13px] leading-snug text-ink-3">Com a placa salva, o socorro sai com um toque.</span>
-        </span>
-        <ChevronRight className="size-5 shrink-0 text-ink-3" />
-      </button>
-    )
-  }
-
-  const u = dados?.ultimo_servico ?? null
-  const r = dados?.proxima_revisao ?? null
-  const revisaoVencida = venceu(r?.vence_em)
-  const detalhes = [v.tipo ? (ROTULO_TIPO_VEICULO[v.tipo] ?? v.tipo) : null, v.ano].filter(Boolean).join(' · ')
-  const total = dados?.total_veiculos ?? 1
-
-  return (
-    <section aria-label="Seu veículo" className="cli-veiculo-card overflow-hidden rounded-[1.5rem]">
-      <button type="button" onClick={() => navegar('/veiculos')} className="flex w-full flex-col gap-4 p-4 text-left active:bg-surface-2">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <Rotulo>{total > 1 ? `Veículo principal · ${total} veículos` : 'Seu veículo'}</Rotulo>
-            <p className="mt-0.5 font-display text-[22px] leading-tight font-semibold tracking-tight break-words text-ink">{nomeVeiculo(v)}</p>
-            {detalhes && <p className="mt-0.5 text-[13px] text-ink-3">{detalhes}</p>}
-          </div>
-          <PlacaVeiculo placa={v.placa} className="mt-1" />
-        </div>
-
-        <dl className="-mx-4 -mb-4 grid grid-cols-3 divide-x divide-line border-t border-line">
-          <Dado rotulo="Último serviço" valor={u ? (u.encerrada ? dataNumerica(u.em) : 'Na oficina') : '—'} />
-          <Dado
-            rotulo="Próxima revisão"
-            valor={r ? (r.vence_em ? dataNumerica(r.vence_em) : r.vence_km != null ? kmTexto(r.vence_km) : 'Pendente') : 'Em dia'}
-            tom={r ? (revisaoVencida ? 'crit' : 'warn') : 'ok'}
-          />
-          <Dado rotulo="Quilometragem" valor={kmTexto(v.km_atual) ?? '—'} />
-        </dl>
-      </button>
-
-      {(r || dados?.veiculo_na_oficina) && (
-        <div className="flex flex-col divide-y divide-line border-t border-line">
-          {dados?.veiculo_na_oficina && (
-            <Link to="/historico?tipo=os" className="flex min-h-12 items-center gap-3 px-4 text-[14px] active:bg-surface-2">
-              <Wrench className="size-[18px] shrink-0 text-cyan" />
-              <span className="min-w-0 flex-1 font-semibold text-ink">Seu veículo está na oficina</span>
-              <ChevronRight className="size-5 shrink-0 text-ink-3" />
-            </Link>
-          )}
-          {r && (
-            <Link to="/revisoes" className="flex min-h-12 items-center gap-3 px-4 text-[14px] active:bg-surface-2">
-              <CalendarCheck className={cn('size-[18px] shrink-0', revisaoVencida ? 'text-crit' : 'text-warn')} />
-              <span className="min-w-0 flex-1 truncate font-semibold text-ink">{revisaoVencida ? 'Revisão vencida' : r.titulo || 'Revisão chegando'}</span>
-              <span className="shrink-0 font-semibold text-accent-ink">Agendar</span>
-            </Link>
-          )}
-        </div>
-      )}
-    </section>
-  )
-}
-
-function Dado({ rotulo, valor, tom }: { rotulo: string; valor: ReactNode; tom?: 'ok' | 'warn' | 'crit' }) {
-  return (
-    <div className="flex min-w-0 flex-col items-center gap-1 px-2 py-3.5 text-center">
-      <dd
-        className={cn(
-          'num max-w-full truncate text-[15px] leading-tight font-semibold',
-          tom === 'crit' ? 'text-crit-ink' : tom === 'warn' ? 'text-warn-ink' : tom === 'ok' ? 'text-ok-ink' : 'text-ink',
-        )}
-      >
-        {valor}
-      </dd>
-      <dt className="max-w-full truncate text-[11.5px] leading-tight text-ink-3">{rotulo}</dt>
-    </div>
-  )
-}
-
-/* ── nível 3 ────────────────────────────────────────────────────────────── */
-
-function Atalho({
-  para,
-  icone: Icone,
-  rotulo,
-  sub,
-  contador,
-}: {
-  para: string
-  icone: ComponentType<{ className?: string }>
-  rotulo: string
-  sub: string
-  contador?: number
-}) {
-  return (
-    <Link
-      to={para}
-      className="sos-premium-row sos-native-card relative flex min-w-0 flex-col gap-3 rounded-[1.55rem] p-4"
-    >
-      <span className="sos-subtle-chip flex size-10 items-center justify-center rounded-full text-accent-ink">
-        <Icone className="size-5" />
-      </span>
-      <span className="min-w-0">
-        <span className="block truncate text-[15.5px] leading-tight font-semibold text-ink">{rotulo}</span>
-        <span className="mt-0.5 block text-[12.5px] leading-snug text-ink-3">{sub}</span>
-      </span>
-      {!!contador && (
-        <span className="num absolute top-3.5 right-3.5 flex min-w-[20px] items-center justify-center rounded-full bg-[#ff6600] px-1.5 text-[11px] leading-5 font-semibold text-white">
-          {contador > 99 ? '99+' : contador}
-        </span>
-      )}
-    </Link>
   )
 }

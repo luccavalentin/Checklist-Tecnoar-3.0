@@ -39,4 +39,14 @@ export const ROTAS = [
   { id: '29b-mecanico-servicos', nome: 'Mecânico · Serviços', persona: 'mecanico', path: '/catalogo/servicos', tema: 'claro' },
   { id: '30-mecanico-tecno-ia', nome: 'Mecânico · Tecno IA', persona: 'mecanico', path: '/tecno-ia', tema: 'claro' },
   { id: '31-mecanico-historico', nome: 'Mecânico · Histórico', persona: 'mecanico', path: '/historico', tema: 'claro' },
+  { id: '03b-publico-nova-senha', nome: 'Nova senha', persona: 'anonimo', path: '/nova-senha' },
+  { id: '12b-cliente-chamado-finalizado', nome: 'Cliente · Chamado finalizado', persona: 'cliente', path: `/chamado/${IDS.chamadoFinalizado}` },
+  // Telas de dentro do atendimento (?tela=…), cada uma é uma tela inteira.
+  ...['os', 'diagnostico', 'observacoes', 'fotos', 'produtos', 'servicos', 'orcamento', 'ia', 'finalizar'].map((t) => ({
+    id: `22-mecanico-atendimento-${t}`,
+    nome: `Mecânico · Atendimento · ${t}`,
+    persona: 'mecanico',
+    path: `/chamado/${IDS.chamado}?tela=${t}`,
+    tema: 'claro',
+  })),
 ]
