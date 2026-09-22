@@ -23,7 +23,7 @@ tar --exclude=node_modules --exclude=dist --exclude=.git --exclude='*.log' \
     -czf - src public index.html package.json package-lock.json \
            app vite.app.config.ts \
            vite.config.ts tsconfig*.json Dockerfile .dockerignore \
-           docker-compose.yml deploy/nginx-app.conf deploy/manutencao \
+           docker-compose.yml deploy/nginx-app.conf \
   | "${SSH[@]}" "tar -xzf - -C $APP"
 
 echo "==> Enviando variáveis de ambiente"

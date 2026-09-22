@@ -5,9 +5,7 @@ dist
 design
 supabase
 *.log
-# O conteúdo de deploy/ não entra na imagem, com duas exceções: a config do
-# nginx e a página de manutenção, que o estágio de runtime copia.
+# O conteúdo de deploy/ não entra na imagem, com uma exceção:
+# a config do nginx que o estágio de runtime copia.
 deploy
 !deploy/nginx-app.conf
-!deploy/manutencao
-!deploy/manutencao/*
