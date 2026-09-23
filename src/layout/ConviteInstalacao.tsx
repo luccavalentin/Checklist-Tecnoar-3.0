@@ -313,15 +313,20 @@ function BotaoDoIPhone({ glifo, tamanho = 'md' }: { glifo: Glifo; tamanho?: 'sm'
   )
 }
 
-function IconeDoApp({ className = 'size-11' }: { className?: string }) {
-  /* O mesmo ícone que vai para a tela do iPhone: mostra o que vai aparecer. */
+function IconeDoApp({ className = 'size-14' }: { className?: string }) {
+  /* O mesmo ícone que vai para a tela do celular: mostra o que vai aparecer. */
   return (
     <img
       src={marca.icone}
       alt=""
-      className={`${className} shrink-0 rounded-[22%] shadow-e1 ring-1 ring-black/5`}
+      className={`${className} shrink-0 rounded-[22%] shadow-e2 ring-1 ring-black/10`}
     />
   )
+}
+
+/** Fio da marca no topo do convite: laranja e ciano da Tecnoar. */
+function FioDaMarca() {
+  return <span aria-hidden className="absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-[linear-gradient(90deg,#FF6A00,#FF8A1F_45%,#00AFEF)]" />
 }
 
 /* ── Convite ───────────────────────────────────────────────────────────── */
@@ -376,7 +381,7 @@ export function ConviteInstalacao() {
 
 /** Cartão flutuante: acima da barra de ações da OS e do indicador de início. */
 const CARTAO =
-  'entrada-suave fixed inset-x-3 z-[60] mx-auto max-w-md rounded-2xl border border-line-strong bg-surface shadow-e3 lg:hidden'
+  'entrada-suave fixed inset-x-3 z-[60] mx-auto max-w-md overflow-hidden rounded-2xl border border-line-strong bg-surface shadow-e3 lg:hidden'
 const POSICAO = { bottom: 'calc(max(var(--barra-acoes, 0px), env(safe-area-inset-bottom)) + 0.75rem)' }
 
 function BotaoFechar({ aoClicar }: { aoClicar: () => void }) {
@@ -394,11 +399,12 @@ function BotaoFechar({ aoClicar }: { aoClicar: () => void }) {
 
 function ConviteAndroid({ aoInstalar, aoDispensar }: { aoInstalar: () => void; aoDispensar: () => void }) {
   return (
-    <div role="dialog" aria-label="Instalar aplicativo" className={`${CARTAO} flex items-center gap-3 p-3`} style={POSICAO}>
+    <div role="dialog" aria-label="Instalar aplicativo" className={`${CARTAO} flex items-center gap-3 p-3.5`} style={POSICAO}>
+      <FioDaMarca />
       <IconeDoApp />
       <div className="min-w-0 flex-1">
-        <p className="font-display text-[14px] font-semibold text-ink">Instale o app {marca.nome}</p>
-        <p className="text-[12px] leading-snug text-ink-3">Ícone na tela e abre em tela cheia.</p>
+        <p className="font-display text-[15px] leading-tight font-bold text-ink">{marca.nome}</p>
+        <p className="mt-0.5 text-[12.5px] leading-snug text-ink-3">Ícone na tela e abre em tela cheia.</p>
       </div>
       <Botao tamanho="sm" variante="primario" iconeInicio={<Download aria-hidden />} onClick={aoInstalar}>
         Instalar
@@ -417,11 +423,12 @@ function ConviteIPhone({ aoDispensar }: { aoDispensar: () => void }) {
 
   return (
     <div role="dialog" aria-label="Como instalar o aplicativo" className={`${CARTAO} p-4`} style={POSICAO}>
+      <FioDaMarca />
       <div className="flex items-start gap-3">
         <IconeDoApp />
         <div className="min-w-0 flex-1">
-          <p className="font-display text-[14.5px] leading-tight font-semibold text-ink">
-            {cenario === 'embutido' ? 'Abra no Safari para instalar' : 'Instale o app no seu iPhone'}
+          <p className="font-display text-[15px] leading-tight font-bold text-ink">
+            {cenario === 'embutido' ? 'Abra no Safari para instalar' : `Instale o ${marca.nome} no iPhone`}
           </p>
           <p className="mt-0.5 text-[12px] leading-snug text-ink-3">
             {cenario === 'embutido'
