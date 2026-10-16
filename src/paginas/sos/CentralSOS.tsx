@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   BarChart3,
+  Building2,
   CalendarClock,
   Handshake,
   HardHat,
@@ -32,16 +33,28 @@ import { FILTRO_VAZIO, ListaChamados, type FiltroChamadosTela } from './ListaCha
 import { MecanicosSOS } from './MecanicosSOS'
 import { NovoChamadoCentral } from './NovoChamadoCentral'
 import { PainelOperacao } from './PainelOperacao'
+import { PrestadoresSOS } from './PrestadoresSOS'
 import { RelatoriosSOS } from './RelatoriosSOS'
 import { EstadoSOSInativo, SeloVigia, TEMPO_ACEITE_PADRAO_SEG, ehErroNaoAtivado, useConfigSOS, useIndicadoresSOS, useSomLiberado } from './comum'
 
-type AbaSOS = 'operacao' | 'chamados' | 'mecanicos' | 'contas' | 'contratos' | 'agendamentos' | 'catalogo' | 'relatorios' | 'configuracoes'
+type AbaSOS =
+  | 'operacao'
+  | 'chamados'
+  | 'mecanicos'
+  | 'prestadores'
+  | 'contas'
+  | 'contratos'
+  | 'agendamentos'
+  | 'catalogo'
+  | 'relatorios'
+  | 'configuracoes'
 
 /** Cada área do módulo tem o próprio endereço — é o que o menu lateral abre. */
 const ROTA_DA_ABA: Record<AbaSOS, string> = {
   operacao: '/sos',
   chamados: '/sos/chamados',
   mecanicos: '/sos/mecanicos',
+  prestadores: '/sos/prestadores',
   contas: '/sos/clientes',
   contratos: '/sos/contratos',
   agendamentos: '/sos/agendamentos',
@@ -55,6 +68,7 @@ const TITULOS: Record<AbaSOS, string> = {
   operacao: 'Central ao vivo',
   chamados: 'Chamados',
   mecanicos: 'Mecânicos em campo',
+  prestadores: 'Prestadores do socorro',
   contas: 'Clientes do app',
   contratos: 'Contratos e SLA',
   agendamentos: 'Agendamentos',
@@ -90,7 +104,9 @@ export function CentralSOS() {
 
   const rotaLimpa = pathname.replace(/\/+$/, '') || '/sos'
   const abaRota: AbaSOS = ABA_DA_ROTA[rotaLimpa] ?? 'operacao'
-  const aba: AbaSOS = abaRota === 'configuracoes' && !podeConfigurar ? 'operacao' : abaRota
+  // Prestadores e Configurações mexem na regra do despacho: sem a permissão
+  // `sos:configurar` a pessoa cai na central ao vivo.
+  const aba: AbaSOS = (abaRota === 'configuracoes' || abaRota === 'prestadores') && !podeConfigurar ? 'operacao' : abaRota
   const chamadoId = params.get('chamado')
   const abaLegada = params.get('aba') as AbaSOS | null
 
@@ -169,6 +185,7 @@ export function CentralSOS() {
     { valor: 'operacao', rotulo: 'Ao vivo', icone: <Radar />, contador: aguardando || undefined },
     { valor: 'chamados', rotulo: 'Chamados', icone: <LayoutList /> },
     { valor: 'mecanicos', rotulo: 'Mecânicos', icone: <HardHat />, contador: ind ? ind.mecanicos_disponiveis : undefined },
+    ...(podeConfigurar ? [{ valor: 'prestadores' as const, rotulo: 'Prestadores', icone: <Building2 /> }] : []),
     { valor: 'contas', rotulo: 'Clientes do app', icone: <Smartphone /> },
     { valor: 'contratos', rotulo: 'Contratos e SLA', icone: <Handshake /> },
     { valor: 'agendamentos', rotulo: 'Agendamentos', icone: <CalendarClock />, contador: ind?.agendamentos_pendentes || undefined },
@@ -256,6 +273,7 @@ export function CentralSOS() {
           )}
           {aba === 'agendamentos' && <Agendamentos podeEditar={podeEditar} />}
           {aba === 'mecanicos' && <MecanicosSOS aoAbrirChamado={abrirChamado} />}
+          {aba === 'prestadores' && <PrestadoresSOS podeConfigurar={podeConfigurar} />}
           {aba === 'contas' && <ContasApp podeEditar={podeEditar} />}
           {aba === 'contratos' && <ContratosSOS podeConfigurar={podeConfigurar} />}
           {aba === 'catalogo' && <CatalogoSOS />}

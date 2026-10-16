@@ -165,6 +165,30 @@ function papel(persona) {
   }
 }
 
+/** A Tecnoar: o prestador de todo mecânico da casa (`sos_prestadores`). */
+const prestadorProprio = {
+  id: 'ppppppp1-pppp-4ppp-8ppp-pppppppppppp',
+  nome: 'Tecnoar Sistemas',
+  tipo: 'proprio',
+  nivel: 'ouro',
+  situacao: 'ativo',
+  documento: null,
+  documento_digitos: '',
+  telefone: '19993896000',
+  email: null,
+  responsavel: null,
+  base_latitude: -22.7,
+  base_longitude: -47.33,
+  base_municipio: 'Santa Bárbara d’Oeste',
+  base_uf: 'SP',
+  raio_atuacao_km: 60,
+  comissao_pct: 0,
+  atende_tipos: [],
+  observacoes: null,
+  created_at: iso(-60 * 24 * 30),
+  updated_at: iso(-60 * 24),
+}
+
 function fichaMecanico(overrides = {}) {
   return {
     usuario_id: IDS.mecanico,
@@ -376,10 +400,15 @@ export function rpcResposta(nome, persona) {
         ok: true,
         nome: 'Rafael Almeida',
         ficha: fichaMecanico(),
+        // O prestador de quem atende. Aqui é a própria Tecnoar; mecânico de
+        // oficina parceira vê o nome dela no cabeçalho do app.
+        prestador: prestadorProprio,
         chamado_atual: null,
+        // Cada item traz a oferta que o trouxe até aqui: onda, distância do
+        // momento da oferta e o prazo para responder (`sos_ofertas`).
         aguardando: [
-          { ...chamadoAtivo, status: 'procurando_mecanico', mecanico_id: null, ocorrencia_rotulo: 'Freios', cliente_nome: 'Lucca Santana', placa: veiculo.placa, veiculo: `${veiculo.marca} ${veiculo.modelo}`, distancia_km: 8.4, para_mim: true, recusei: false },
-          { ...chamado({ id: '88888888-8888-4888-8888-888888888888', protocolo: 'SOS-2026-1285', tipo_ocorrencia: 'eletrica', prioridade: 'alta', endereco: 'Rodovia Anhanguera, km 98' }), status: 'recebido', mecanico_id: null, ocorrencia_rotulo: 'Elétrica', cliente_nome: 'Transportes Nova Rota', placa: 'EIX4A10', veiculo: 'Scania R450', distancia_km: 14.2, para_mim: false, recusei: false },
+          { ...chamadoAtivo, status: 'procurando_mecanico', mecanico_id: null, ocorrencia_rotulo: 'Freios', cliente_nome: 'Lucca Santana', placa: veiculo.placa, veiculo: `${veiculo.marca} ${veiculo.modelo}`, distancia_km: 8.4, para_mim: true, recusei: false, onda: 1, eta_min_oferta: 13, oferta_expira_em: iso(1.2) },
+          { ...chamado({ id: '88888888-8888-4888-8888-888888888888', protocolo: 'SOS-2026-1285', tipo_ocorrencia: 'eletrica', prioridade: 'alta', endereco: 'Rodovia Anhanguera, km 98' }), status: 'recebido', mecanico_id: null, ocorrencia_rotulo: 'Elétrica', cliente_nome: 'Transportes Nova Rota', placa: 'EIX4A10', veiculo: 'Scania R450', distancia_km: 14.2, para_mim: false, recusei: false, onda: 2, eta_min_oferta: 22, oferta_expira_em: iso(0.6) },
         ],
         hoje: { atendimentos: 4, concluidos: 3, nota_media: 4.9 },
         historico: [

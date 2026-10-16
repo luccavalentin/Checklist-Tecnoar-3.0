@@ -13,6 +13,7 @@ import { PRIORIDADES, SITUACOES_MECANICO, formatarDistancia, haQuanto, linkTelef
 import type { ChamadoListado, MecanicoMapa } from '@/sos/tipos'
 import { AvisosVigia, RelogioChamado } from './CartaoChamado'
 import { Despacho } from './Despacho'
+import { SeloOnda } from './OndasDespacho'
 import { IconeOcorrencia, Placa, aguardando, posicaoRecente, useConfigSOS } from './comum'
 
 /**
@@ -229,6 +230,9 @@ export function CartaoFocoChamado({
         <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1.5">
           <SeloStatus status={c.status} />
           <RelogioChamado chamado={c} tempoAceiteSeg={tempoAceiteSeg} />
+          {/* A onda do despacho: quem olha o mapa vê a quem o chamado está
+              oferecido agora, sem abrir o painel. */}
+          <SeloOnda chamado={c} />
         </div>
 
         <AvisosVigia chamado={c} />

@@ -13,7 +13,16 @@ import {
   Zap,
   type LucideIcon,
 } from 'lucide-react'
-import type { OcorrenciaSOS, PrioridadeSOS, SituacaoMecanico, StatusSOS } from './tipos'
+import type {
+  NivelPrestador,
+  OcorrenciaSOS,
+  OndaDespacho,
+  PrioridadeSOS,
+  SituacaoMecanico,
+  SituacaoPrestador,
+  StatusSOS,
+  TipoPrestador,
+} from './tipos'
 
 /**
  * Vocabulário do SOS, o mesmo no app do cliente, no do mecânico e na central.
@@ -208,6 +217,70 @@ export const SITUACOES_MECANICO: Record<
   pausa: { rotulo: 'Pausa', descricao: 'Volta em instantes', tom: 'atencao', ponto: 'bg-warn' },
   indisponivel: { rotulo: 'Indisponível', descricao: 'Não recebe chamados', tom: 'neutro', ponto: 'bg-ink-3' },
   offline: { rotulo: 'Offline', descricao: 'Fora do app', tom: 'neutro', ponto: 'bg-line-strong' },
+}
+
+/* ── prestadores e ondas de despacho ────────────────────────────────────── */
+
+export const TIPOS_PRESTADOR: Record<TipoPrestador, { rotulo: string; curto: string; descricao: string }> = {
+  proprio: {
+    rotulo: 'Prestador próprio',
+    curto: 'Tecnoar',
+    descricao: 'A própria Tecnoar. Existe uma só, e ela tem a primeira janela de todo chamado.',
+  },
+  parceiro: {
+    rotulo: 'Oficina parceira',
+    curto: 'Parceiro',
+    descricao: 'Acionada quando a Tecnoar não alcança o veículo parado.',
+  },
+}
+
+/** Nível do parceiro: é por ele que as ondas escolhem quem chamar primeiro. */
+export const NIVEIS_PRESTADOR: Record<NivelPrestador, { rotulo: string; descricao: string; tom: TomSOS }> = {
+  ouro: { rotulo: 'Ouro', descricao: 'Primeira escolha entre as parceiras', tom: 'destaque' },
+  prata: { rotulo: 'Prata', descricao: 'Chamada junto com as ouro nas ondas de parceiro', tom: 'info' },
+  bronze: { rotulo: 'Bronze', descricao: 'Só nas ondas que aceitam qualquer nível', tom: 'neutro' },
+}
+
+export const SITUACOES_PRESTADOR: Record<SituacaoPrestador, { rotulo: string; descricao: string; tom: TomSOS }> = {
+  ativo: { rotulo: 'Ativo', descricao: 'Entra no despacho', tom: 'ok' },
+  suspenso: { rotulo: 'Suspenso', descricao: 'Fora do despacho, sem perder o histórico', tom: 'atencao' },
+  inativo: { rotulo: 'Inativo', descricao: 'Encerrado: nunca recebe oferta', tom: 'neutro' },
+}
+
+/** "0 a 60 km" — a faixa de distância em que a onda procura mecânico. */
+export function faixaDaOnda(o: Pick<OndaDespacho, 'raio_min_km' | 'raio_max_km'>): string {
+  const n = (v: number) => Number(v).toLocaleString('pt-BR', { maximumFractionDigits: 1 })
+  return Number(o.raio_min_km) > 0 ? `${n(o.raio_min_km)} a ${n(o.raio_max_km)} km` : `até ${n(o.raio_max_km)} km`
+}
+
+/** "espera 90 s" — e, na última onda, o que o prazo 0 significa de verdade. */
+export function esperaDaOnda(seg: number): string {
+  if (!seg) return 'fica aberta até alguém aceitar'
+  // Até dois minutos a central pensa em segundos ("90 s", não "1 min 30 s").
+  if (seg < 120) return `espera ${seg} s`
+  const m = Math.floor(seg / 60)
+  const s = seg % 60
+  return s ? `espera ${m} min ${s} s` : `espera ${m} min`
+}
+
+/**
+ * A onda em uma frase: "Tecnoar, até 60 km, só disponível, espera 90 s". É
+ * assim que a central lê a política — a tabela do banco em português.
+ */
+export function descreverOnda(o: OndaDespacho): string {
+  const quem = o.tipo_prestador ? TIPOS_PRESTADOR[o.tipo_prestador].curto : 'Qualquer prestador'
+  const niveis = o.niveis.length ? `${o.niveis.map((n) => NIVEIS_PRESTADOR[n].rotulo.toLowerCase()).join(' e ')}` : null
+  // Só "disponível" é o caso comum; alargar para pausa/atendimento é o que
+  // distingue a onda de reforço da onda exclusiva.
+  const situacoes =
+    o.situacoes.length === 1 && o.situacoes[0] === 'disponivel'
+      ? 'só disponível'
+      : `${o.situacoes.map((s) => SITUACOES_MECANICO[s].rotulo.toLowerCase()).join(', ')}`
+  const partes = [niveis ? `${quem} ${niveis}` : quem, faixaDaOnda(o), situacoes, esperaDaOnda(o.espera_seg)]
+  if (o.aceita_sem_posicao) partes.push('aceita quem está com o app fechado')
+  if (o.max_ofertas > 0) partes.push(`no máximo ${o.max_ofertas} por vez`)
+  if (o.prioridades.length) partes.push(`só ${o.prioridades.map((p) => PRIORIDADES[p].rotulo.toLowerCase()).join(' e ')}`)
+  return partes.join(', ')
 }
 
 export const ICONE_VEICULO: LucideIcon = CarFront

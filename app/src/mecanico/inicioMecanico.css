@@ -189,6 +189,33 @@
   color: var(--mi-texto-2);
 }
 
+/* Mecânico de oficina parceira: ele precisa saber por qual prestador está
+   atendendo — é o nome que aparece para o cliente e que recebe o repasse.
+   Quem é da Tecnoar não vê nada aqui: é o caso normal. */
+.mi-prestador {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  max-width: 100%;
+  padding: 0.2rem 0.6rem 0.2rem 0.45rem;
+  border: 1px solid var(--mi-borda);
+  border-radius: 999px;
+  background: var(--mi-icone-fundo);
+  font-size: 11.5px;
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--mi-texto-2);
+}
+
+.mi-prestador-nome {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--mi-texto);
+}
+
 /* ── conteúdo ───────────────────────────────────────────────────────────── */
 
 .mi-conteudo {

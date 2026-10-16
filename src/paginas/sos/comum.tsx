@@ -5,7 +5,16 @@ import { cn, iniciais, mensagemErro } from '@/lib/utils'
 import { Botao } from '@/componentes/ui/Botao'
 import { Alternador } from '@/componentes/ui/Campo'
 import { EstadoErro } from '@/componentes/ui/Estados'
-import { sosConfigAtual, sosIaPublico, sosIndicadores, sosListarChamados, sosMecanicosMapa, sosVigiaStatus } from '@/sos/api'
+import {
+  sosConfigAtual,
+  sosIaPublico,
+  sosIndicadores,
+  sosListarChamados,
+  sosListarPolitica,
+  sosListarPrestadores,
+  sosMecanicosMapa,
+  sosVigiaStatus,
+} from '@/sos/api'
 import { CHAVES_SOS } from '@/sos/tempoReal'
 import { linkAppSOS } from '@/sos/endereco'
 import { audioLiberado, destravarAudio } from '@/sos/alerta'
@@ -145,6 +154,34 @@ export function useConfigSOS(ativo = true) {
 export const CHAVE_VIGIA = ['sos', 'vigia'] as const
 export const CHAVE_IA_PUBLICO = ['sos', 'ia-publico'] as const
 export const CHAVE_CONTRATOS = ['sos', 'contratos'] as const
+export const CHAVE_PRESTADORES = ['sos', 'prestadores'] as const
+export const CHAVE_ONDAS = ['sos', 'politica-despacho'] as const
+
+/**
+ * Quem atende: a Tecnoar e as oficinas parceiras, com o desempenho do mês.
+ * A tela de prestadores e as ondas leem a mesma chave — a onda precisa dizer
+ * quantas parceiras ela alcança.
+ */
+export function usePrestadoresSOS(ativo = true) {
+  return useQuery({
+    queryKey: CHAVE_PRESTADORES,
+    enabled: ativo,
+    staleTime: 60_000,
+    retry: semRepetirSeInativo,
+    queryFn: sosListarPrestadores,
+  })
+}
+
+/** As ondas do despacho, em ordem. É aqui que moram os 60 km da Tecnoar. */
+export function useOndasSOS(ativo = true) {
+  return useQuery({
+    queryKey: CHAVE_ONDAS,
+    enabled: ativo,
+    staleTime: 60_000,
+    retry: semRepetirSeInativo,
+    queryFn: sosListarPolitica,
+  })
+}
 
 /**
  * Saúde do vigia (pg_cron). O cabeçalho e a tela de configurações leem a

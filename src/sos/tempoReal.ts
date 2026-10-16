@@ -173,6 +173,18 @@ export function useTempoRealMecanico(
         void qc.invalidateQueries({ queryKey: CHAVES_SOS.homeMecanico })
         void qc.invalidateQueries({ queryKey: CHAVES_SOS.papel })
       })
+      /*
+       * A oferta é o que põe e o que tira o chamado da fila dele: nasce no
+       * despacho da onda e é fechada (`expirada`, `cancelada`) quando o prazo
+       * vence ou outro mecânico aceita. O chamado em si pode não mudar nessa
+       * hora — se o despacho seguiu para a onda seguinte, só a oferta mudou —
+       * então sem este canal o cartão ficaria na tela até a próxima recarga.
+       */
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sos_ofertas', filter: `mecanico_id=eq.${usuarioId}` }, (e) => {
+        void qc.invalidateQueries({ queryKey: CHAVES_SOS.homeMecanico })
+        const chamado = (e.new as { chamado_id?: string })?.chamado_id ?? (e.old as { chamado_id?: string })?.chamado_id
+        if (chamado) void qc.invalidateQueries({ queryKey: CHAVES_SOS.detalhe(chamado) })
+      })
       .subscribe()
     return () => {
       void supabase.removeChannel(canal)

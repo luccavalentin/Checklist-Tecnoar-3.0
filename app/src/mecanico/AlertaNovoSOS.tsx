@@ -40,6 +40,10 @@ export type InicialAlerta = Partial<ChamadoSOS> & {
   ocorrencia_rotulo?: string
   para_mim?: boolean
   recusei?: boolean
+  /* Da oferta que trouxe o chamado até aqui (`sos_home_mecanico`). */
+  onda?: number | null
+  eta_min_oferta?: number | null
+  oferta_expira_em?: string | null
 }
 
 const MOTIVOS = ['Longe demais', 'Sem ferramenta/peça', 'Em outro atendimento', 'Outro'] as const
@@ -197,11 +201,22 @@ export function AlertaNovoSOS({
   const chegada = eta != null ? horaCurta(new Date(agora + eta * 60_000).toISOString()) : null
 
 
-  /* ── contagem regressiva (visual) ── */
+  /*
+   * ── contagem regressiva ──
+   * Com despacho em ondas o prazo é real: vencida a oferta, o banco recusa o
+   * aceite e o chamado segue para a onda seguinte. É esse prazo que manda
+   * quando ele vem da fila (`oferta_expira_em`). Sem oferta — chamado
+   * atribuído pela central, última onda sem prazo, ondas desligadas — vale a
+   * contagem visual de antes, pelo tempo de aceite configurado.
+   */
   const limite = config.data?.tempo_aceite_seg ?? 120
+  const expiraOferta = inicial?.oferta_expira_em ?? null
   const base = Date.parse((paraMim && c.atribuido_em) || c.recebido_em || '') || abertoEm
   const decorrido = Math.max(0, (agora - base) / 1000)
-  const restante = Math.max(0, limite - decorrido)
+  const restante = expiraOferta
+    ? Math.max(0, (Date.parse(expiraOferta) - agora) / 1000)
+    : Math.max(0, limite - decorrido)
+  const ofertaVencida = !!expiraOferta && restante === 0
 
   /* ── ações ── */
   async function aceitar() {
@@ -252,7 +267,8 @@ export function AlertaNovoSOS({
   }
 
   const cabecalho = escalado ? 'A central escalou você' : paraMim ? 'SOS para você' : 'Novo SOS Tecnoar'
-  const fracao = escalado || perdido ? 0 : restante > 0 ? restante / limite : 0
+  // Prazo de onda maior que o tempo de aceite não estoura a barra.
+  const fracao = escalado || perdido ? 0 : restante > 0 ? Math.min(1, restante / limite) : 0
 
   return createPortal(
     <div
@@ -302,8 +318,15 @@ export function AlertaNovoSOS({
                 {haQuanto(c.recebido_em, agora) === 'agora' ? 'Chegou agora' : `Aguardando ${haQuanto(c.recebido_em, agora)}`}
               </span>
             )}
+            {!!inicial?.onda && !paraMim && <SeloM tom="ciano">{inicial.onda}ª onda</SeloM>}
             {c.protocolo && <span className="num ml-auto text-[12.5px] text-ink-3">{c.protocolo}</span>}
           </div>
+
+          {ofertaVencida && !perdido && (
+            <p className="rounded-2xl bg-warn-soft px-3.5 py-2.5 text-[13.5px] leading-snug font-semibold text-warn-ink">
+              O prazo desta oferta venceu — o chamado pode já ter passado para a próxima onda. Você ainda pode tentar aceitar.
+            </p>
+          )}
 
           <div>
             <RotuloM>Cliente</RotuloM>

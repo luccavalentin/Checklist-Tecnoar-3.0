@@ -583,9 +583,9 @@ paralelo. Os produtos e serviços lançados no atendimento vêm do catálogo
    isso, mas o tipo gerado passa a conhecer as tabelas `sos_*`).
 3. Na Central → **Configurações**: modo de distribuição, velocidade média,
    telefone da central e, se quiser, WhatsApp (Evolution API). O despacho em
-   ondas já vem ligado, com as seis ondas padrão; a base da Tecnoar
-   (`sos_prestadores.base_latitude/base_longitude`) vale a pena preencher, é
-   ela que dá distância ao mecânico que está com o app fechado.
+   ondas já vem ligado, com as seis ondas padrão (Configurações › Ondas de
+   despacho); em **SOS › Prestadores**, marque a base de operação da Tecnoar no
+   mapa — é ela que dá distância ao mecânico que está com o app fechado.
 4. Mecânicos: todo usuário ativo do Checklist entra no app. Cada um toca
    **Ficar disponível** — só aí passa a aparecer no despacho da central (quem
    tem função "atua como mecânico" aparece desde o início).
@@ -685,6 +685,57 @@ e permissão continuam sendo do Checklist, já testadas. O que o separa da casa 
 `sos_eh_equipe()`, que passou a recusar quem pertence a prestador parceiro
 (`sos_eh_parceiro()`), mesmo que um perfil mal configurado lhe dê a permissão
 `sos`: a barreira fica no banco, não na tela.
+
+**Falta uma tela** para ligar mecânico a prestador: a coluna
+`sos_mecanicos.prestador_id` ainda é escrita no banco (todo mecânico existente
+nasceu na Tecnoar, pela migração). A tela de prestadores diz isso ao cadastrar
+a primeira parceira — sem mecânico ligado a ela, ela nunca recebe oferta.
+
+### As telas (`src/paginas/sos/PrestadoresSOS.tsx`, `OndasDespacho.tsx`)
+
+Até aqui prestadores e ondas só se mexiam por SQL. Agora:
+
+- **SOS › Prestadores** (`/sos/prestadores`, exige `sos:configurar`): a Tecnoar
+  sempre no topo, em destaque — ela não se duplica nem vira parceira, e o
+  formulário dela não mostra nível, raio nem repasse (a casa vai onde a central
+  mandar). Abaixo, as parceiras em cartões com nível, situação, mecânicos,
+  disponíveis, atendimentos do mês, nota média, raio, repasse e ocorrências
+  atendidas. O formulário marca a **base de operação** no mapa (`src/sos/Mapa.tsx`,
+  com busca por endereço e coordenadas coladas do WhatsApp) e diz na tela por que
+  ela importa: é a base que dá distância ao mecânico com o app fechado.
+- **SOS › Configurações › Ondas de despacho**: a chave `despacho_em_ondas` (com
+  o aviso de que desligar devolve o push para todo mecânico disponível, sem
+  raio), `onda_emergencia_pct` e `posicao_valida_min`, e a política em escada —
+  cada onda escrita em uma frase ("Tecnoar, até 60 km, só disponível, espera
+  90 s"), com a **janela exclusiva da Tecnoar** (ordem 1) e a **rede de
+  segurança** (a última, espera 0) marcadas. Editar abre o formulário da onda,
+  que mostra a frase resultante antes de salvar. Sem parceira cadastrada, a tela
+  avisa que as ondas de parceiro são puladas na hora.
+- **Central**: o cartão do chamado traz a onda atual com o tempo que falta
+  (`SeloOnda`) e, quando `sem_prestador_em` está preenchido, o aviso forte
+  "Sem prestador: assuma na mão". No painel do chamado, o bloco de Despacho abre
+  com a onda corrente, a próxima da fila e o botão **Empurrar próxima onda**
+  (`sosDespachar`), para a central não esperar o cronômetro.
+- **App do mecânico**: cada cartão da fila mostra a distância da oferta, a
+  previsão, a onda e o contador até `oferta_expira_em` — prazo real, porque
+  vencida a oferta o banco recusa o aceite. A baixa chega pelo Realtime de
+  `sos_ofertas` (o chamado pode nem mudar quando a onda vira), sem recarregar a
+  tela. Quem é de oficina parceira vê o nome dela no cabeçalho do início.
+
+Duas migrações nasceram dessas telas, porque o que elas precisavam gravar não
+existia no banco (nunca reaplicar uma migração antiga — migração nova):
+
+- `20261002_sos_config_das_ondas.sql`: `sos_salvar_config` é de 20260927 e não
+  conhecia `despacho_em_ondas`, `onda_emergencia_pct` nem `posicao_valida_min`,
+  colunas criadas depois, em 20260930. Sem isso a tela de Configurações não
+  tinha como gravar a chave de desligar.
+- `20261003_sos_listas_que_esvaziam.sql`: em `sos_salvar_prestador` e
+  `sos_salvar_politica`, lista vazia era descartada em silêncio
+  (`array_agg` sobre zero linhas devolve null, e o `coalesce` caía no valor
+  antigo). Mas vazio ali é regra — "atende qualquer ocorrência", "qualquer
+  nível", "qualquer prioridade" — e desmarcar a última caixinha tinha de valer.
+  Agora a lista é trocada quando vem no payload (ainda que vazia) e preservada
+  quando não vem.
 
 ### Contas
 
@@ -902,8 +953,9 @@ empresa (chamados e OS) fica, sem vínculo com a conta.
 ### Testes
 
 `npm run test:sos` — todas as migrações do SOS num PostgreSQL local (PGlite)
-com o ciclo completo (135 etapas) + impressão digital das funções para
-comparar com o banco real (ver `scripts/testes-sos/LEIA-ME.md`).
+com o ciclo completo (182 etapas, 11 delas só do motor de ondas) + impressão
+digital das funções para comparar com o banco real (ver
+`scripts/testes-sos/LEIA-ME.md`).
 
 ### Mapas
 
@@ -917,7 +969,7 @@ Waze ou Apple Maps.
 | Caminho | Conteúdo |
 | --- | --- |
 | `src/sos/` | Camada compartilhada: tipos, API (uma função por RPC), rótulos, GPS/rota, mapa, tempo real, alerta sonoro, componentes (chat, galeria, itens do catálogo, linha do tempo) |
-| `src/paginas/sos/` | Central SOS no Checklist |
+| `src/paginas/sos/` | Central SOS no Checklist (inclui `PrestadoresSOS.tsx` e `OndasDespacho.tsx`, as telas do despacho em ondas) |
 | `src/layout/AlertaSOS.tsx` | Alerta global de novo SOS (sirene + banner) em qualquer tela do Checklist |
 | `app/` | App SOS (cliente e mecânico): build próprio (`vite.app.config.ts`), manifesto "SOS Tecnoar", service worker próprio, servido na raiz de `sos.tecnoarsistemas.com.br` |
 

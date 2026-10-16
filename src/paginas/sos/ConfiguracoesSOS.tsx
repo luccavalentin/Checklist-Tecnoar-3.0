@@ -28,6 +28,7 @@ import {
   Settings2,
   Siren,
   Trash2,
+  Waves,
   Wrench,
   XCircle,
 } from 'lucide-react'
@@ -46,6 +47,7 @@ import { ErroIa, sosCatalogo, sosGerarLembretes, sosIaTestar, sosSalvarConfig } 
 import { CHAVES_SOS } from '@/sos/tempoReal'
 import { STATUS_SOS, WHATSAPP_SOS_PADRAO, linkTelefone, linkWhatsApp } from '@/sos/rotulos'
 import type { ConfigSOS, ProvedorIa, StatusSOS } from '@/sos/tipos'
+import { ListaOndas } from './OndasDespacho'
 import { ALVO_ALTERNADOR, CHAVE_IA_PUBLICO, ErroSOS, LinhaAlternador, haQuantoSegundos, lerNumero, saudeVigia, useAgora, useConfigSOS, useVigiaSOS } from './comum'
 
 /**
@@ -102,6 +104,10 @@ const ORDEM_PROVEDORES: ProvedorIa[] = ['anthropic', 'openai', 'gemini']
 
 interface Formulario {
   modo_distribuicao: 'manual' | 'inteligente'
+  /* Despacho em ondas: a chave de desligar e os dois números que a governam. */
+  despacho_em_ondas: boolean
+  onda_emergencia_pct: string
+  posicao_valida_min: string
   raio_busca_km: string
   velocidade_media_kmh: string
   tempo_aceite_min: string
@@ -148,6 +154,9 @@ function reais(n: number | null | undefined): string {
 function doConfig(c: ConfigSOS): Formulario {
   return {
     modo_distribuicao: c.modo_distribuicao,
+    despacho_em_ondas: c.despacho_em_ondas ?? true,
+    onda_emergencia_pct: String(c.onda_emergencia_pct ?? 50),
+    posicao_valida_min: String(c.posicao_valida_min ?? 120),
     raio_busca_km: String(c.raio_busca_km ?? ''),
     velocidade_media_kmh: String(c.velocidade_media_kmh ?? ''),
     // A central pensa em minutos; o banco guarda segundos.
@@ -211,6 +220,7 @@ function milhares(n: number): string {
 /** Painéis da tela — o atalho do topo leva direto a cada um. */
 const SECOES = [
   ['cfg-distribuicao', 'Distribuição'],
+  ['cfg-ondas', 'Ondas de despacho'],
   ['cfg-vigia', 'Vigia'],
   ['cfg-contatos', 'Contatos no app'],
   ['cfg-atendimento', 'Atendimento'],
@@ -255,6 +265,10 @@ export function ConfiguracoesSOS({ podeConfigurar }: { podeConfigurar: boolean }
     if (vel == null || vel < 5 || vel > 150) e.velocidade_media_kmh = 'Entre 5 e 150 km/h.'
     const aceite = numero(form.tempo_aceite_min)
     if (aceite == null || aceite < 0.5 || aceite > 60) e.tempo_aceite_min = 'Entre 0,5 e 60 minutos.'
+    const pct = numero(form.onda_emergencia_pct)
+    if (pct == null || pct <= 0 || pct > 100) e.onda_emergencia_pct = 'De 1 a 100%.'
+    const posicao = numero(form.posicao_valida_min)
+    if (posicao == null || posicao < 5 || posicao > 1440 || !Number.isInteger(posicao)) e.posicao_valida_min = 'Minutos inteiros, de 5 a 1440.'
     const meses = numero(form.lembrete_meses)
     if (meses == null || meses < 1 || meses > 36 || !Number.isInteger(meses)) e.lembrete_meses = 'Meses inteiros, de 1 a 36.'
     const km = numero(form.lembrete_km)
@@ -303,6 +317,9 @@ export function ConfiguracoesSOS({ podeConfigurar }: { podeConfigurar: boolean }
     mutationFn: (f: Formulario) =>
       sosSalvarConfig({
         modo_distribuicao: f.modo_distribuicao,
+        despacho_em_ondas: f.despacho_em_ondas,
+        onda_emergencia_pct: numero(f.onda_emergencia_pct)!,
+        posicao_valida_min: Math.round(numero(f.posicao_valida_min)!),
         raio_busca_km: numero(f.raio_busca_km)!,
         velocidade_media_kmh: numero(f.velocidade_media_kmh)!,
         tempo_aceite_seg: Math.round(numero(f.tempo_aceite_min)! * 60),
@@ -647,6 +664,10 @@ export function ConfiguracoesSOS({ podeConfigurar }: { podeConfigurar: boolean }
         </div>
       </div>
 
+      <Secao id="cfg-ondas">
+        <PainelOndas form={form} erros={erros} mudar={mudar} />
+      </Secao>
+
       <Secao id="cfg-ia">
         <PainelIA
           form={form}
@@ -806,6 +827,92 @@ function StatusVigia() {
         </p>
       )}
     </div>
+  )
+}
+
+/* ── ondas de despacho ──────────────────────────────────────────────────── */
+
+/**
+ * O chamado não é gritado para todo mundo: é oferecido em ondas, que se abrem
+ * no tempo e no espaço. Aqui ficam a chave de desligar e os dois números que
+ * valem para todas as ondas; a política onda por onda vem logo abaixo, em
+ * `ListaOndas` — ela salva sozinha, onda por onda, e não depende do Salvar
+ * desta tela.
+ */
+function PainelOndas({ form, erros, mudar }: PropsPainel) {
+  return (
+    <Painel semPadding>
+      <CabecalhoPainel
+        titulo="Despacho em ondas"
+        descricao="A quem o chamado é oferecido primeiro, e quanto tempo cada um tem para responder."
+      />
+      <div className="flex flex-col gap-4 p-5">
+        <LinhaAlternador
+          rotulo="Oferecer em ondas"
+          texto={
+            <>
+              Ligado, o chamado é oferecido por etapas — a Tecnoar tem os primeiros 60 km, e só depois entram as parceiras.{' '}
+              <strong className="font-semibold text-ink-2">
+                Desligando, o push volta a ir de uma vez para todo mecânico disponível, sem raio nenhum
+              </strong>{' '}
+              (o comportamento antigo do SOS): pane em Rondonópolis acorda o mecânico de Cuiabá e o de São Paulo com o mesmo alarme. A política
+              abaixo fica guardada.
+            </>
+          }
+          ativo={form.despacho_em_ondas}
+          icone={<Waves />}
+          onChange={(v) => mudar('despacho_em_ondas', v)}
+        />
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Campo
+            rotulo="Emergência espera (% do prazo)"
+            obrigatorio
+            erro={erros.onda_emergencia_pct}
+            dica="Chamado de emergência não cumpre o mesmo cronômetro: 50% encurta pela metade a espera de cada onda (nunca menos de 20 s)."
+          >
+            {(p) => (
+              <Entrada
+                {...p}
+                inputMode="numeric"
+                value={form.onda_emergencia_pct}
+                onChange={(e) => mudar('onda_emergencia_pct', e.target.value.replace(/\D/g, '').slice(0, 3))}
+                iconeInicio={<Siren />}
+                mono
+              />
+            )}
+          </Campo>
+          <Campo
+            rotulo="Posição vale por (min)"
+            obrigatorio
+            erro={erros.posicao_valida_min}
+            dica="Passado disso, a leitura do GPS não conta para distância (o mecânico pode ter andado 200 km) e vale a base do prestador."
+          >
+            {(p) => (
+              <Entrada
+                {...p}
+                inputMode="numeric"
+                value={form.posicao_valida_min}
+                onChange={(e) => mudar('posicao_valida_min', e.target.value.replace(/\D/g, '').slice(0, 4))}
+                iconeInicio={<Route />}
+                mono
+              />
+            )}
+          </Campo>
+        </div>
+
+        {form.modo_distribuicao === 'manual' && (
+          <p className="rounded-lg bg-warn-soft px-3 py-2 text-[12.5px] leading-relaxed text-warn-ink">
+            No modo de distribuição <strong className="font-semibold">manual</strong> o chamado não passa pelo despacho automático: ele para na
+            central, que escolhe o mecânico, e as ondas abaixo não abrem sozinhas.
+          </p>
+        )}
+
+        <div className="border-t border-line pt-4">
+          <ListaOndas ondasLigadas={form.despacho_em_ondas} />
+        </div>
+      </div>
+    </Painel>
   )
 }
 

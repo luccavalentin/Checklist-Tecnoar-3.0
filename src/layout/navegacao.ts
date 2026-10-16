@@ -85,6 +85,7 @@ export const NAVEGACAO: GrupoMenu[] = [
       { rotulo: 'Central ao vivo', rota: '/sos', icone: Siren, etapa: 15, recurso: 'sos' },
       { rotulo: 'Chamados', rota: '/sos/chamados', icone: LayoutList, etapa: 15, recurso: 'sos' },
       { rotulo: 'Mecânicos em campo', rota: '/sos/mecanicos', icone: HardHat, etapa: 15, recurso: 'sos' },
+      { rotulo: 'Prestadores', rota: '/sos/prestadores', icone: Building2, etapa: 15, recurso: 'sos' },
       { rotulo: 'Clientes do app', rota: '/sos/clientes', icone: Smartphone, etapa: 15, recurso: 'sos' },
       { rotulo: 'Contratos e SLA', rota: '/sos/contratos', icone: Handshake, etapa: 15, recurso: 'sos' },
       { rotulo: 'Agendamentos', rota: '/sos/agendamentos', icone: CalendarClock, etapa: 15, recurso: 'sos' },

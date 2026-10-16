@@ -5,6 +5,7 @@ import { SeloStatus } from '@/sos/componentes'
 import { PRIORIDADES, dataHoraCurta, formatarDuracao, formatarEta, horaCurta } from '@/sos/rotulos'
 import type { ChamadoListado, ChamadoSOS } from '@/sos/tipos'
 import { IconeOcorrencia, Placa, aguardando, cronometro, segundosDesde, useAgora } from './comum'
+import { SeloOnda } from './OndasDespacho'
 
 /**
  * Relógio do chamado conforme a etapa: quem espera vê a espera correndo; quem
@@ -65,6 +66,11 @@ export function RelogioChamado({ chamado: c, tempoAceiteSeg, className }: { cham
  */
 export function AvisosVigia({ chamado: c, className }: { chamado: ChamadoSOS; className?: string }) {
   const avisos: Array<{ chave: string; texto: string; icone: typeof Siren; forte?: boolean }> = []
+  // As ondas terminaram e ninguém aceitou: não há mais despacho automático
+  // nenhum para esperar. É o aviso mais forte da fila.
+  if (aguardando(c.status) && c.sem_prestador_em) {
+    avisos.push({ chave: 'sem-prestador', texto: 'Sem prestador: assuma na mão', icone: UserRoundX, forte: true })
+  }
   if (aguardando(c.status) && (c.alerta_nivel ?? 0) >= 1) {
     avisos.push({
       chave: 'escalado',
@@ -185,6 +191,9 @@ export function CartaoChamado({
       </div>
 
       <AvisosVigia chamado={c} className="pointer-events-none" />
+
+      {/* Em que onda o chamado está e quanto falta para a seguinte abrir. */}
+      <SeloOnda chamado={c} className="pointer-events-none self-start" />
 
       {!compacto && (c.endereco || c.latitude == null) && (
         <span className="pointer-events-none flex min-w-0 items-center gap-1.5 text-[12px] text-ink-3">

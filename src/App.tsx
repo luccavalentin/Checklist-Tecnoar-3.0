@@ -78,6 +78,7 @@ const TELAS: Record<string, ComponentType> = {
   '/sos': CentralSOS,
   '/sos/chamados': CentralSOS,
   '/sos/mecanicos': CentralSOS,
+  '/sos/prestadores': CentralSOS,
   '/sos/clientes': CentralSOS,
   '/sos/contratos': CentralSOS,
   '/sos/agendamentos': CentralSOS,

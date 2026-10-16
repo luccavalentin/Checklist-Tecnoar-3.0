@@ -10,6 +10,8 @@ import {
   ClipboardList,
   Clock,
   FileText,
+  Handshake,
+  Hourglass,
   Loader2,
   MapPin,
   Moon,
@@ -28,7 +30,7 @@ import { useToast } from '@/componentes/ui/Toast'
 import { ativarNotificacoes, permissaoAtual } from '@/notificacoes/sistema'
 import { destravarAudio } from '@/sos/alerta'
 import { enderecoDoPonto } from '@/sos/geo'
-import { STATUS_SOS, formatarDistancia, haQuanto } from '@/sos/rotulos'
+import { STATUS_SOS, formatarDistancia, formatarEta, haQuanto } from '@/sos/rotulos'
 import type { HomeMecanico, SituacaoMecanico } from '@/sos/tipos'
 import { useMecanico } from '../sessao'
 import { Avatar, LogoSOS } from '../comum/ui'
@@ -126,6 +128,13 @@ export function PainelMecanico() {
             Olá, <span className="text-[#FF6A00]">{nome || 'mecânico'}!</span>
           </h1>
           <p className="mi-sub">Pronto para o próximo atendimento?</p>
+          {/* Parceira: o chamado que ele aceitar é atendido no nome dela. */}
+          {h?.prestador?.tipo === 'parceiro' && (
+            <p className="mi-prestador" title={`Você atende pelo prestador ${h.prestador.nome}`}>
+              <Handshake className="size-3.5 shrink-0" strokeWidth={2.1} />
+              <span className="mi-prestador-nome">{h.prestador.nome}</span>
+            </p>
+          )}
         </div>
       </header>
 
@@ -410,7 +419,24 @@ function AbrirChamado({ atual }: { atual: { id: string; protocolo: string; clien
 
 /* ── fila ───────────────────────────────────────────────────────────────── */
 
+/**
+ * Cartão da fila: o que o mecânico precisa para decidir num relance — o
+ * problema, o cliente, a que distância está e **quanto tempo a oferta ainda
+ * é dele**.
+ *
+ * O prazo não é enfeite: vencida a oferta, o banco recusa o aceite ("este
+ * chamado não está oferecido a você") e o despacho leva o chamado para a onda
+ * seguinte. Por isso o contador tem relógio próprio, de segundo em segundo —
+ * o resto do painel anda de 30 em 30 s e não precisa redesenhar por isto.
+ */
 function CartaoFila({ chamado: c, agora, aoAbrir }: { chamado: HomeMecanico['aguardando'][number]; agora: number; aoAbrir: () => void }) {
+  const tique = useAgora(1000)
+  const resta = c.oferta_expira_em ? Math.max(0, Math.round((Date.parse(c.oferta_expira_em) - tique) / 1000)) : null
+  // Zerou aqui e o chamado ainda está na lista: o vigia do servidor (a cada
+  // 15 s) ainda não fechou a oferta. Dizer "vencido" é mais honesto do que
+  // deixar o cartão com cara de disponível.
+  const vencida = resta === 0
+  const apertado = resta != null && resta > 0 && resta <= 20
   return (
     <button
       type="button"
@@ -418,7 +444,7 @@ function CartaoFila({ chamado: c, agora, aoAbrir }: { chamado: HomeMecanico['agu
       className={cn(
         'sos-choice-card flex w-full items-center gap-3 rounded-[1.25rem] p-3.5 text-left transition-transform active:scale-[0.99]',
         c.para_mim ? 'border-2 border-accent' : c.prioridade === 'emergencia' ? 'border-2 border-crit/60' : 'border-line',
-        c.recusei && 'opacity-70',
+        (c.recusei || vencida) && 'opacity-70',
       )}
     >
       <IconeOcorrencia tipo={c.tipo_ocorrencia} prioridade={c.prioridade} />
@@ -428,6 +454,9 @@ function CartaoFila({ chamado: c, agora, aoAbrir }: { chamado: HomeMecanico['agu
           {c.para_mim && <SeloM tom="laranja">Para você</SeloM>}
           {c.prioridade === 'emergencia' && !c.para_mim && <SeloM tom="vermelho">Emergência</SeloM>}
           {c.recusei && <SeloM>Você recusou</SeloM>}
+          {/* A onda que trouxe o chamado até aqui: na 1ª, só a Tecnoar de
+              perto foi chamada; nas seguintes, o cerco foi aberto. */}
+          {!!c.onda && !c.para_mim && <SeloM tom="ciano">{c.onda}ª onda</SeloM>}
         </div>
         <p className="truncate text-[14px] text-ink-2">{c.cliente_nome}</p>
         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] font-semibold text-ink-3">
@@ -436,15 +465,32 @@ function CartaoFila({ chamado: c, agora, aoAbrir }: { chamado: HomeMecanico['agu
             <MapPin className="size-3.5" />
             {c.distancia_km != null ? formatarDistancia(c.distancia_km) : '—'}
           </span>
+          {c.eta_min_oferta != null && <span className="num">~{formatarEta(c.eta_min_oferta)}</span>}
           <span className="flex items-center gap-1">
             <Clock className="size-3.5" />
             {haQuanto(c.recebido_em, agora)}
           </span>
         </div>
+        {resta != null && (
+          <p
+            className={cn(
+              'num mt-1.5 flex items-center gap-1.5 text-[13px] font-bold',
+              vencida ? 'text-ink-3' : apertado ? 'text-crit-ink' : 'text-accent-ink',
+            )}
+          >
+            <Hourglass className={cn('size-3.5', apertado && 'sos-piscar')} />
+            {vencida ? 'Prazo vencido — passou para a próxima onda' : `${formatarRelogioFila(resta)} para responder`}
+          </p>
+        )}
       </div>
       <ChevronRight className="size-5 shrink-0 text-ink-3" />
     </button>
   )
+}
+
+/** 0:42 — o prazo da oferta, lido de relance com o celular na mão. */
+function formatarRelogioFila(seg: number): string {
+  return `${Math.floor(seg / 60)}:${String(seg % 60).padStart(2, '0')}`
 }
 
 /* ── acessos rápidos ────────────────────────────────────────────────────── */

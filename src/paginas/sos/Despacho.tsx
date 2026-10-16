@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { BadgeCheck, ChevronDown, Hourglass, PhoneForwarded, Sparkles, Star, UserCheck } from 'lucide-react'
 import { cn, mensagemErro } from '@/lib/utils'
 import { Botao } from '@/componentes/ui/Botao'
+import { usePermissoes } from '@/permissoes/PermissoesProvider'
 import { Esqueleto, EstadoVazio } from '@/componentes/ui/Estados'
 import { Confirmacao } from '@/componentes/ui/Sobreposicoes'
 import { Selo } from '@/componentes/ui/Selo'
@@ -12,6 +13,7 @@ import { CHAVES_SOS } from '@/sos/tempoReal'
 import { SITUACOES_MECANICO, formatarDistancia, formatarEta, haQuanto } from '@/sos/rotulos'
 import type { ChamadoSOS, SugestaoMecanico } from '@/sos/tipos'
 import { Avatar, ErroSOS, aguardando, invalidarSOS } from './comum'
+import { PainelOndaDoChamado } from './OndasDespacho'
 
 /**
  * Despacho do chamado: a sugestão ranqueada pelo banco (disponibilidade,
@@ -36,6 +38,7 @@ export function Despacho({
 }) {
   const qc = useQueryClient()
   const toast = useToast()
+  const podeEditar = usePermissoes().pode('sos', 'editar')
   const [verTodos, setVerTodos] = useState(false)
   const [escalando, setEscalando] = useState<SugestaoMecanico | null>(null)
 
@@ -66,6 +69,9 @@ export function Despacho({
 
   return (
     <div className="flex flex-col gap-3">
+      {/* Antes da escolha na mão: onde o despacho automático está agora. */}
+      <PainelOndaDoChamado chamado={chamado} podeDespachar={podeEditar} />
+
       {esperandoAceite && (
         <div className="flex items-start gap-3 rounded-lg border border-warn/35 bg-warn-soft px-3.5 py-3">
           <Hourglass aria-hidden className="mt-0.5 size-4 shrink-0 text-warn" />
