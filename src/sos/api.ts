@@ -49,6 +49,11 @@ import type {
   TipoAnexo,
   NovaOSApp,
   OSAbertaApp,
+  CandidatoOnda,
+  OndaDespacho,
+  PrestadorListado,
+  PrestadorSOS,
+  ResultadoDespacho,
 } from './tipos'
 
 /**
@@ -556,6 +561,36 @@ export const sosResponderOrcamento = (
 export const sosListarContratos = () => rpc<ContratoListado[]>('sos_listar_contratos')
 
 export const sosSalvarContrato = (p: Partial<ContratoSOS>) => rpc<ContratoSOS>('sos_salvar_contrato', { p })
+
+/* ── prestadores e despacho em ondas ────────────────────────────────────── */
+
+/** Prestadores com o desempenho do mês. A Tecnoar é a linha `tipo: 'proprio'`. */
+export const sosListarPrestadores = () => rpc<PrestadorListado[]>('sos_listar_prestadores')
+
+/**
+ * Cria ou altera um prestador. O próprio (a Tecnoar) existe desde a migração
+ * e não pode ser duplicado nem convertido em parceiro pela tela.
+ */
+export const sosSalvarPrestador = (p: Partial<PrestadorSOS>) =>
+  rpc<PrestadorSOS>('sos_salvar_prestador', { p })
+
+/** As ondas do despacho, em ordem. É aqui que moram os 60 km da Tecnoar. */
+export const sosListarPolitica = () => rpc<OndaDespacho[]>('sos_listar_politica')
+
+export const sosSalvarOnda = (p: Partial<OndaDespacho>) => rpc<OndaDespacho>('sos_salvar_politica', { p })
+
+/**
+ * Quem seria chamado nesta onda, do melhor para o pior. Só consulta — a
+ * central usa para conferir uma regra antes de salvar.
+ */
+export const sosCandidatos = (chamadoId: string, ondaId: string) =>
+  rpc<CandidatoOnda[]>('sos_candidatos', { p_chamado: chamadoId, p_politica: ondaId })
+
+/**
+ * Abre a próxima onda do chamado na mão (a central empurrando o despacho sem
+ * esperar o prazo). Onda sem ninguém elegível é pulada na hora.
+ */
+export const sosDespachar = (chamadoId: string) => rpc<ResultadoDespacho>('sos_despachar', { p_chamado: chamadoId })
 
 /** Saúde do vigia (última execução no pg_cron). */
 export const sosVigiaStatus = () => rpc<VigiaStatus>('sos_vigia_status')

@@ -582,7 +582,10 @@ paralelo. Os produtos e serviços lançados no atendimento vêm do catálogo
 2. Regerar `src/tipos/supabase.ts` (a camada `src/sos/api.ts` funciona sem
    isso, mas o tipo gerado passa a conhecer as tabelas `sos_*`).
 3. Na Central → **Configurações**: modo de distribuição, velocidade média,
-   telefone da central e, se quiser, WhatsApp (Evolution API).
+   telefone da central e, se quiser, WhatsApp (Evolution API). O despacho em
+   ondas já vem ligado, com as seis ondas padrão; a base da Tecnoar
+   (`sos_prestadores.base_latitude/base_longitude`) vale a pena preencher, é
+   ela que dá distância ao mecânico que está com o app fechado.
 4. Mecânicos: todo usuário ativo do Checklist entra no app. Cada um toca
    **Ficar disponível** — só aí passa a aparecer no despacho da central (quem
    tem função "atua como mecânico" aparece desde o início).
@@ -595,7 +598,7 @@ no banco de dados" — nada quebra no restante do sistema.
 ```
 cliente toca SOS ──► sos_abrir_chamado ──► status recebido/procurando_mecanico
                                               │  notifica central (sino + push + sirene)
-                                              │  notifica mecânicos DISPONÍVEIS
+                                              │  sos_despachar: onda 1 (Tecnoar, até 60 km)
                                               │  WhatsApp (se configurado)
 mecânico aceita ──► sos_aceitar ─────────► a_caminho  (posição ao vivo nos 2 lados)
 "Cheguei"       ──► sos_avancar ─────────► no_local
@@ -609,13 +612,98 @@ até a etapa configurada; mecânico nunca cancela; a central cancela com
 permissão `sos:cancelar` e motivo obrigatório. Toda mudança fica em
 `sos_eventos` (linha do tempo) e as ações da central em `auditoria`.
 
+### Despacho em ondas (`20260930` + `20261001`)
+
+O chamado não é oferecido a todo mundo: é oferecido em **ondas**, que se abrem
+no tempo e no espaço. A Tecnoar tem a primeira janela.
+
+```
+caminhoneiro aperta SOS
+  └─ onda 1  Tecnoar · 0–60 km · só disponível com posição ....  90 s
+  └─ onda 2  Tecnoar · 0–60 km · todos, até com o app fechado .  90 s
+  └─ onda 3  Tecnoar · 60–120 km .............................. 120 s
+  └─ onda 4  Parceiro ouro/prata · 0–60 km .................... 120 s
+  └─ onda 5  Parceiro · qualquer nível · 0–250 km ............. 120 s
+  └─ onda 6  Tecnoar · qualquer distância ..... fica aberta (rede de segurança)
+```
+
+As faixas são **dados, não código**: `sos_politica_despacho`, uma linha por
+onda (`tipo_prestador`, `niveis`, `raio_min_km`, `raio_max_km`, `situacoes`,
+`espera_seg`, `prioridades`, `max_ofertas`, `aceita_sem_posicao`). Mudar os 60
+km para 80 é editar um campo na Gestão SOS; não tem deploy. A onda 6 repete o
+comportamento antigo (qualquer mecânico da casa vê o chamado) de propósito:
+melhor um mecânico longe do que caminhoneiro sozinho na pista.
+
+Note a ordem: **Tecnoar a 90 km vem antes de parceiro a 60 km**. É a decisão de
+priorizar a própria operação; a central reordena as ondas se quiser o
+contrário.
+
+- **`sos_ofertas`** é o registro de a quem o chamado foi oferecido, quando, até
+  quando e o que a pessoa respondeu (`aceita`/`recusada`/`expirada`/`cancelada`).
+  É dela que saem o funil, o tempo de resposta por prestador e a fila do
+  mecânico — e é ela que fecha a RLS: o mecânico vê o chamado porque **tem
+  oferta**, não porque o chamado existe.
+- **Onda vazia não faz ninguém esperar**: se nenhum candidato é elegível,
+  `sos_despachar` segue para a onda seguinte na mesma transação.
+- **Recusa de todos encurta a espera**: respondida a última oferta aberta da
+  onda, `sos_recusar` abre a próxima na hora, sem esperar o cronômetro.
+- **Emergência espera menos**: `sos_config.onda_emergencia_pct` (50% por
+  padrão) encurta o prazo de cada onda quando a prioridade é `emergencia`.
+- **`sos_girar_ondas`** roda no pg_cron a cada 15 s: marca oferta vencida como
+  `expirada` e abre a onda seguinte de quem ficou sem resposta.
+- **Chave de desligar**: `sos_config.despacho_em_ondas = false` devolve o
+  comportamento antigo (push para todo disponível, fila global) sem migração.
+  No **modo manual** de distribuição o chamado nasce `recebido` e nunca passa
+  pelo despacho (`onda_atual = 0`): a fila continua sendo da central.
+
+Distância: **sem PostGIS**. O Supabase tem a extensão, mas `npm run test:sos`
+roda em PGlite, que não — e perder a suíte custa mais do que o índice ganha. O
+raio é cortado por **pré-filtro de retângulo** (`latitude between … and
+longitude between …`, sobre o índice `sos_mecanicos_posicao_ix`) e só os
+sobreviventes passam pelo haversine de `sos_distancia_km`. Trocar por
+`ST_DWithin` depois é mexer só em `sos_candidatos`. A distância é **em linha
+reta** — a previsão de chegada continua vindo da rota (OSRM) depois do aceite.
+
+Posição mais velha que `sos_config.posicao_valida_min` (120 min) não vale
+distância: usa-se a **base do prestador** (`base_latitude`/`base_longitude`).
+Sem posição nem base, o mecânico só entra nas ondas `aceita_sem_posicao`.
+
+### Prestadores (`20260928`)
+
+Todo mecânico pertence a um **prestador** (`sos_mecanicos.prestador_id`). A
+Tecnoar é o prestador nº 1, `tipo = 'proprio'`, único por índice parcial; as
+oficinas parceiras são `tipo = 'parceiro'`, com nível (ouro/prata/bronze),
+base de operação, `raio_atuacao_km`, `comissao_pct` e `atende_tipos`. O chamado
+guarda quem atendeu em `sos_chamados.prestador_id`, para repasse e relatório
+não dependerem da ficha do mecânico (que muda se ele trocar de oficina).
+
+`raio_atuacao_km` é o compromisso **do parceiro**: não limita a Tecnoar, que
+vai onde a central mandar.
+
+O mecânico parceiro é uma linha em `usuarios` com perfil restrito — identidade
+e permissão continuam sendo do Checklist, já testadas. O que o separa da casa é
+`sos_eh_equipe()`, que passou a recusar quem pertence a prestador parceiro
+(`sos_eh_parceiro()`), mesmo que um perfil mal configurado lhe dê a permissão
+`sos`: a barreira fica no banco, não na tela.
+
 ### Contas
 
 - **Cliente**: entra pelo mesmo Supabase Auth, com `tipo_conta = 'sos_cliente'`
-  nos metadados. Vira `sos_contas_cliente` ligado a um `clientes` existente
-  (por CPF/CNPJ ou celular) ou criado na hora. **Nunca** vira linha em
-  `usuarios`: o gatilho `sos_ignorar_conta_cliente` descarta o "pedido de
-  acesso" automático e o Checklist redireciona essa conta para o app do SOS.
+  nos metadados. Vira `sos_contas_cliente`, ligado a um `clientes` existente
+  quando o **e-mail confirmado** da conta é o mesmo do cadastro. **Nunca** vira
+  linha em `usuarios`: o gatilho `sos_ignorar_conta_cliente` descarta o "pedido
+  de acesso" automático e o Checklist redireciona essa conta para o app do SOS.
+- **Cliente avulso** (`20260929`): qualquer caminhoneiro baixa o app e pede
+  socorro. Cadastrar-se **não** cria linha em `clientes` — o cadastro fiscal,
+  que vai para a Omie, não recebe quem só abriu a tela. A conta fica avulsa
+  (`cliente_id` nulo) e o cadastro nasce no **primeiro pedido**, dentro da
+  transação dele (`sos_garantir_cliente_da_conta`). Por isso
+  `sos_chamados.cliente_id` continua `not null`: chamado sempre tem cadastro,
+  porque o cadastro nasce junto. Documento ou celular de um cadastro que já
+  existe não é herdado — nasce cadastro próprio e a central é avisada para
+  vincular (SOS → Clientes do app). O veículo da conta avulsa fica em
+  `veiculos` sem dono (essa tabela não vai para a Omie), amarrado por
+  `veiculo_principal_id`, e é adotado quando o cadastro nasce.
 - **Mecânico**: qualquer `usuarios` ativo usa o app de atendimento
   (`sos_eh_mecanico`, `20260917_sos_toda_equipe_no_app.sql`). Mapa e
   sugestão de despacho da central listam quem tem função de mecânico ou ficha
@@ -643,7 +731,9 @@ bucket privado `sos`, pasta = id do chamado), `sos_mecanicos` (situação e
 posição), `sos_recusas`, `sos_compartilhamentos` (link público temporário),
 `sos_agendamentos`, `sos_lembretes` (revisão por tempo/km, gerados todo dia
 pelo `pg_cron`), `sos_contatos_emergencia`, `sos_contas_cliente`,
-`sos_config` (linha única).
+`sos_config` (linha única), `sos_prestadores` (a Tecnoar e as parceiras),
+`sos_politica_despacho` (as ondas) e `sos_ofertas` (a quem o chamado foi
+oferecido e o que respondeu).
 
 Leitura por RLS (cada lado só vê o que é seu); escrita quase sempre por RPC
 `security definer`. O cliente final ganha políticas **adicionais** de leitura
@@ -653,8 +743,9 @@ só dos próprios registros em `clientes`, `veiculos`, `ordens_servico`,
 ### Tempo real
 
 Supabase Realtime sobre `sos_chamados`, `sos_posicoes`, `sos_mensagens`,
-`sos_eventos`, `sos_itens`, `sos_anexos`, `sos_mecanicos` e
-`sos_agendamentos`. O Realtime respeita a RLS. O mecânico manda posição a
+`sos_eventos`, `sos_itens`, `sos_anexos`, `sos_mecanicos`, `sos_agendamentos` e
+`sos_ofertas` (a oferta tem de chegar na tela do mecânico sem recarregar, e
+sair dela quando outro aceita). O Realtime respeita a RLS. O mecânico manda posição a
 cada ~25 m / 15 s durante o chamado; disponível sem chamado, a cada ~150 m /
 2 min. A previsão de chegada é recalculada no servidor a cada posição.
 
@@ -668,7 +759,7 @@ O que garante que nenhum SOS fica esquecido, com todas as telas fechadas:
 
 | Situação | O que acontece |
 | --- | --- |
-| Ninguém aceitou no prazo (`tempo_aceite_seg`) | Nível 1: mecânicos disponíveis (menos quem recusou) e central avisados de novo. 3× o prazo: central acionada, WhatsApp, cliente tranquilizado. 6×: alerta máximo. |
+| Ninguém aceitou no prazo (`tempo_aceite_seg`) | Nível 1: central e mecânicos avisados de novo. 3× o prazo: central acionada, WhatsApp, cliente tranquilizado. 6×: alerta máximo. Com o despacho em ondas, `sos_avisar_mecanicos` insiste só com quem está **com a oferta na mão** — era por aqui que o vigia furava o raio a cada 30 s. |
 | Mecânico escolhido pela central não respondeu | Modo inteligente: o SOS volta para todos. Modo manual: central e mecânico avisados. |
 | Deslocamento além de 1,5× a previsão inicial + 10 min | Central avisada ("atrasado"). |
 | 8 min sem posição do mecânico em deslocamento | Central avisada e o mecânico recebe push para reabrir o app. |

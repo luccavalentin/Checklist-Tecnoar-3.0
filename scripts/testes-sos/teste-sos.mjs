@@ -125,24 +125,43 @@ await etapa('conta com celular e e-mail de um cliente, sem confirmar pelo link, 
   await db.exec(`insert into auth.users (id, email, raw_user_meta_data, email_confirmed_at) values
     ('00000000-0000-0000-0000-0000000000e1', 'joao@cliente.com', '{"tipo_conta":"sos_cliente"}', now())`)
   const p = await um('00000000-0000-0000-0000-0000000000e1', `select public.sos_registrar_conta('Falso João', '11 99999-1234', null, null, true)`)
-  if (p.papel !== 'cliente' || !p.cliente_id || p.cliente_id === '40000000-0000-0000-0000-000000000001') throw new Error(JSON.stringify(p))
+  // Cadastrar-se não cria mais linha em `clientes`: a conta fica avulsa até
+  // o primeiro pedido (20260929_sos_solicitante_avulso.sql).
+  if (p.papel !== 'cliente' || p.cliente_id !== null) throw new Error(JSON.stringify(p))
+  // O cadastro nasce no primeiro pedido — próprio, nunca o do João.
+  const cli = await um('00000000-0000-0000-0000-0000000000e1', `select public.sos_garantir_cliente_da_conta()`)
+  if (!cli || cli === '40000000-0000-0000-0000-000000000001') throw new Error(`herdou o cadastro: ${cli}`)
   const aviso = await um(null, `select count(*)::int from public.notificacoes where usuario_id = '${ids.admin}' and titulo = 'Conta do app para conferir'`)
   if (aviso < 1) throw new Error('central não foi avisada')
   // Some do resto do teste (não conta como cliente nos números seguintes).
   await db.exec(`delete from public.sos_contas_cliente where usuario_id = '00000000-0000-0000-0000-0000000000e1';
-    delete from public.clientes where id = '${p.cliente_id}'; delete from public.notificacoes where titulo = 'Conta do app para conferir';
+    delete from public.clientes where id = '${cli}'; delete from public.notificacoes where titulo = 'Conta do app para conferir';
     delete from auth.users where id = '00000000-0000-0000-0000-0000000000e1'`)
-  return 'cadastro novo + aviso à central'
+  return 'conta avulsa, cadastro próprio no pedido + aviso à central'
+})
+await etapa('cadastrar-se não cria cliente: a Omie não recebe quem só baixou o app', async () => {
+  await db.exec(`insert into auth.users (id, email, raw_user_meta_data, email_confirmed_at) values
+    ('00000000-0000-0000-0000-0000000000e2', 'curioso@gmail.com', '{"tipo_conta":"sos_cliente"}', now())`)
+  const antes = await um(null, `select count(*)::int from public.clientes`)
+  const p = await um('00000000-0000-0000-0000-0000000000e2', `select public.sos_registrar_conta('Curioso', '11 98888-7777', null, null, true)`)
+  const depois = await um(null, `select count(*)::int from public.clientes`)
+  if (p.cliente_id !== null || depois !== antes) throw new Error(`${antes} → ${depois} / ${JSON.stringify(p)}`)
+  // A home abre normalmente, com o nome da conta e sem veículo.
+  const h = await um('00000000-0000-0000-0000-0000000000e2', `select public.sos_home_cliente()`)
+  if (!h.ok || h.nome !== 'Curioso' || h.veiculo !== null) throw new Error(JSON.stringify(h))
+  await db.exec(`delete from public.sos_contas_cliente where usuario_id = '00000000-0000-0000-0000-0000000000e2';
+    delete from auth.users where id = '00000000-0000-0000-0000-0000000000e2'`)
+  return `clientes: ${antes} → ${depois}`
 })
 await etapa('registrar conta acha o cliente existente pelo e-mail confirmado', async () => {
   const p = await um(ids.cliente, `select public.sos_registrar_conta('João da Silva', '11 99999-1234', null, null, true)`)
   if (p.papel !== 'cliente' || p.cliente_id !== '40000000-0000-0000-0000-000000000001') throw new Error(JSON.stringify(p))
   return p
 })
-await etapa('segundo cliente, sem cadastro, é criado', async () => {
+await etapa('segundo cliente, sem cadastro, fica avulso até pedir socorro', async () => {
   const p = await um(ids.cliente2, `select public.sos_registrar_conta('Maria Souza', '21988880000', '529.982.247-25', null, true)`)
-  if (p.papel !== 'cliente' || !p.cliente_id) throw new Error(JSON.stringify(p))
-  return p.cliente_id
+  if (p.papel !== 'cliente' || p.cliente_id !== null) throw new Error(JSON.stringify(p))
+  return 'conta avulsa'
 })
 await etapa('cadastrar veículo pela placa existente não duplica', async () => {
   const v = await um(ids.cliente, `select public.sos_cadastrar_veiculo('ABC-1D23', null, 'cavalo')`)
@@ -798,12 +817,17 @@ await etapa('cliente 2 encerra o SOS e exclui a conta', async () => {
 // ── Conta da equipe também como cliente (modo cliente do app)
 await etapa('funcionário ativo cria o perfil de cliente e continua mecânico', async () => {
   const r = await um(ids.admin, `select public.sos_registrar_conta('Admin Teste', '(11) 97777-0001')`)
-  if (r.papel !== 'mecanico' || !r.central || !r.cliente?.cliente_id) throw new Error(JSON.stringify(r))
+  if (r.papel !== 'mecanico' || !r.central || !r.cliente) throw new Error(JSON.stringify(r))
+  // O perfil de cliente nasce avulso, como o de qualquer um.
+  if (r.cliente.cliente_id !== null) throw new Error(JSON.stringify(r.cliente))
   return { papel: r.papel, cliente: Boolean(r.cliente) }
 })
 const chEquipe = await etapa('no modo cliente, a equipe pede SOS para si (sem informar cliente)', async () => {
   const c = await um(ids.admin, `select public.sos_abrir_chamado('{"tipo_ocorrencia":"roda_pneu","descricao":"Teste do modo cliente","latitude":-23.5,"longitude":-46.6}'::jsonb)`)
   if (c.conta_usuario_id !== ids.admin || c.origem !== 'app' || c.aberto_por_equipe) throw new Error(JSON.stringify(c))
+  // Conta avulsa da equipe: o cadastro nasceu com o pedido, e o pedido não
+  // caiu no fluxo da central (que pediria `cliente_id`).
+  if (!c.cliente_id) throw new Error('cadastro não nasceu com o pedido')
   const ev = await um(null, `select autor_papel from public.sos_eventos where chamado_id = '${c.id}' order by ocorrido_em limit 1`)
   if (ev !== 'cliente') throw new Error('evento como ' + ev)
   return c
@@ -1063,6 +1087,142 @@ await etapa('OS no app: sem veículo, sem nome ou com documento inválido é rec
     cliente_nome: 'Documento Errado', telefone: '(11) 93333-4444', documento: '123.456', placa: 'DOC1E23', problema: 'Teste',
   })], 'CPF com 11')
   return [semPlaca, semNome, doc].length + ' recusas'
+})
+
+// ── despacho em ondas: a Tecnoar tem os primeiros 60 km
+// Cenário limpo: nada de chamado em aberto, mec1 perto do veículo parado
+// (Marginal, ~6 km), mec2 longe (Campinas, ~90 km), um parceiro em Santos
+// (~60 km). Pane em São Paulo, -23.5 / -46.6.
+const IDS_ONDAS = {
+  parceiroMec: '00000000-0000-0000-0000-0000000000f1',
+  cliente3: '00000000-0000-0000-0000-0000000000f2',
+}
+const prestParceiro = await etapa('ondas: cenário limpo com um parceiro cadastrado', async () => {
+  await db.exec(`
+    update public.sos_chamados set status = 'cancelado', cancelado_em = now(),
+      motivo_cancelamento = 'limpeza do cenário de ondas'
+      where status not in ('servico_finalizado', 'concluido', 'cancelado');
+    update public.sos_mecanicos set chamado_atual_id = null;
+    insert into auth.users (id, email, raw_user_meta_data, email_confirmed_at, confirmation_sent_at) values
+      ('${IDS_ONDAS.parceiroMec}', 'zedaoficina@parceiro.com', '{}', now(), now() - interval '1 minute'),
+      ('${IDS_ONDAS.cliente3}', 'rodoviario@gmail.com', '{"tipo_conta":"sos_cliente"}', now(), now() - interval '1 minute');
+    insert into public.usuarios (id, nome_completo, email, situacao, is_admin, perfil_id, funcao_id) values
+      ('${IDS_ONDAS.parceiroMec}', 'Zé da Oficina', 'zedaoficina@parceiro.com', 'ativo', false,
+       '10000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000001');
+  `)
+  await um(ids.admin, `select public.sos_salvar_config('{"modo_distribuicao":"inteligente"}'::jsonb)`)
+  const p = await um(ids.admin, `select public.sos_salvar_prestador($1::jsonb)`, [JSON.stringify({
+    nome: 'Oficina do Zé — Santos', tipo: 'parceiro', nivel: 'ouro',
+    base_latitude: -23.96, base_longitude: -46.33, raio_atuacao_km: 120, comissao_pct: 70,
+  })])
+  // Mecânico do parceiro, disponível e com posição na base.
+  await db.exec(`
+    insert into public.sos_mecanicos (usuario_id, prestador_id, situacao, aceita_sos, latitude, longitude, posicao_em)
+    values ('${IDS_ONDAS.parceiroMec}', '${p.id}', 'disponivel', true, -23.96, -46.33, now());
+    update public.sos_mecanicos set situacao = 'disponivel', latitude = -23.55, longitude = -46.63, posicao_em = now()
+      where usuario_id = '${ids.mec1}';
+    update public.sos_mecanicos set situacao = 'disponivel', latitude = -22.90, longitude = -47.06, posicao_em = now()
+      where usuario_id = '${ids.mec2}';
+  `)
+  const proprio = await um(null, `select nome from public.sos_prestadores where tipo = 'proprio'`)
+  console.log('   próprio:', proprio, '· parceiro:', p.nome, `(${p.nivel}, ${p.comissao_pct}% de repasse)`)
+  return p
+})
+
+const chOnda = await etapa('ondas: onda 1 oferece só à Tecnoar de até 60 km', async () => {
+  await um(IDS_ONDAS.cliente3, `select public.sos_registrar_conta('Rodoviário Avulso', '11 96666-5555')`)
+  await um(IDS_ONDAS.cliente3, `select public.sos_cadastrar_veiculo('RDV7A11', 'Scania R450', 'cavalo')`)
+  const c = await um(IDS_ONDAS.cliente3, `select public.sos_abrir_chamado('{"tipo_ocorrencia":"freios","latitude":-23.5,"longitude":-46.6}'::jsonb)`)
+  const of = await como(null, `select mecanico_id, onda, round(distancia_km) as km from public.sos_ofertas where chamado_id = '${c.id}' order by onda`)
+  if (c.onda_atual !== 1) throw new Error(`onda ${c.onda_atual}`)
+  if (of.length !== 1 || of[0].mecanico_id !== ids.mec1) throw new Error(JSON.stringify(of))
+  console.log('   onda 1:', of.length, 'oferta(s), a', of[0].km, 'km — só mecânico próprio')
+  return c
+})
+
+await etapa('ondas: mecânico de 90 km não recebe oferta nem vê o chamado', async () => {
+  const of = await um(null, `select count(*)::int from public.sos_ofertas where chamado_id = '${chOnda.id}' and mecanico_id = '${ids.mec2}'`)
+  const ve = await comoPapel(ids.mec2, `select count(*)::int as n from public.sos_chamados where id = '${chOnda.id}'`)
+  const fila = await um(ids.mec2, `select jsonb_array_length((public.sos_home_mecanico())->'aguardando')`)
+  if (of !== 0 || ve[0].n !== 0 || fila !== 0) throw new Error(JSON.stringify({ of, ve: ve[0].n, fila }))
+  return 'fora do raio: sem oferta, sem RLS, fila vazia'
+})
+
+await etapa('ondas: parceiro não é chamado enquanto a Tecnoar tem a vez', async () => {
+  const of = await um(null, `select count(*)::int from public.sos_ofertas where chamado_id = '${chOnda.id}' and mecanico_id = '${IDS_ONDAS.parceiroMec}'`)
+  if (of !== 0) throw new Error('parceiro furou a fila da Tecnoar')
+  return 'parceiro em espera'
+})
+
+await etapa('ondas: recusado perto, a vez é da Tecnoar longe — não do parceiro perto', async () => {
+  await um(ids.mec1, `select public.sos_recusar('${chOnda.id}', 'Estou em outra ponta da cidade')`)
+  const c = await um(null, `select to_jsonb(c) from public.sos_chamados c where c.id = '${chOnda.id}'`)
+  const of = await como(null, `select mecanico_id, onda, round(distancia_km) as km from public.sos_ofertas where chamado_id = '${chOnda.id}' and resposta is null`)
+  // A onda 2 ("Tecnoar — todos", 0–60 km) fica vazia: mec1 recusou e mec2
+  // está a 90 km. O despacho não espera o cronômetro de uma onda vazia e
+  // chega à onda 3 (Tecnoar, 60–120 km), onde mec2 entra. O parceiro de
+  // Santos, mesmo mais perto, continua esperando: é a prioridade da Tecnoar.
+  if (c.onda_atual !== 3) throw new Error(`onda ${c.onda_atual}`)
+  if (of.length !== 1 || of[0].mecanico_id !== ids.mec2) throw new Error(JSON.stringify(of))
+  return { onda: c.onda_atual, para: 'Tecnoar a ' + of[0].km + ' km', parceiro: 'ainda esperando' }
+})
+
+await etapa('ondas: só com a Tecnoar toda recusada o parceiro é acionado', async () => {
+  await um(ids.mec2, `select public.sos_recusar('${chOnda.id}', 'Carro de apoio na manutenção')`)
+  const c = await um(null, `select to_jsonb(c) from public.sos_chamados c where c.id = '${chOnda.id}'`)
+  const of = await como(null, `select mecanico_id, onda from public.sos_ofertas where chamado_id = '${chOnda.id}' and resposta is null`)
+  if (of.length !== 1 || of[0].mecanico_id !== IDS_ONDAS.parceiroMec) throw new Error(JSON.stringify({ onda: c.onda_atual, of }))
+  return { onda: c.onda_atual, para: 'parceiro ouro de Santos' }
+})
+
+await etapa('ondas: parceiro aceita, vira prestador do chamado e as outras ofertas fecham', async () => {
+  const c = await um(IDS_ONDAS.parceiroMec, `select public.sos_aceitar('${chOnda.id}', -23.96, -46.33)`)
+  if (c.status !== 'a_caminho' || c.prestador_id !== prestParceiro.id) throw new Error(JSON.stringify({ s: c.status, p: c.prestador_id }))
+  const abertas = await um(null, `select count(*)::int from public.sos_ofertas where chamado_id = '${chOnda.id}' and resposta is null`)
+  const aceita = await um(null, `select count(*)::int from public.sos_ofertas where chamado_id = '${chOnda.id}' and resposta = 'aceita'`)
+  if (abertas !== 0 || aceita !== 1) throw new Error(JSON.stringify({ abertas, aceita }))
+  return { status: c.status, prestador: prestParceiro.nome, aceita, abertas }
+})
+
+await etapa('ondas: parceiro NÃO é equipe (não vê a central nem o despacho)', async () => {
+  const equipe = await um(IDS_ONDAS.parceiroMec, `select public.sos_eh_equipe()`)
+  const parceiro = await um(IDS_ONDAS.parceiroMec, `select public.sos_eh_parceiro()`)
+  const politica = await um(IDS_ONDAS.parceiroMec, `select jsonb_array_length(public.sos_listar_politica())`)
+  const prestadores = await um(IDS_ONDAS.parceiroMec, `select jsonb_array_length(public.sos_listar_prestadores())`)
+  if (equipe || !parceiro || politica !== 0 || prestadores !== 0) {
+    throw new Error(JSON.stringify({ equipe, parceiro, politica, prestadores }))
+  }
+  return 'fechado para o parceiro'
+})
+
+await etapa('ondas: emergência espera menos que chamado normal', async () => {
+  const esperas = await como(null, `
+    select c.prioridade, extract(epoch from (c.onda_expira_em - c.onda_em))::int as espera
+    from public.sos_chamados c where c.id = '${chOnda.id}'`)
+  const pol = await um(null, `select espera_seg from public.sos_politica_despacho where ordem = 1`)
+  // O chamado do teste é 'emergencia' (tipo freios): metade dos 90 s.
+  if (esperas[0].prioridade !== 'emergencia') throw new Error(esperas[0].prioridade)
+  if (Number(pol) !== 90) throw new Error(`política mudou: ${pol}`)
+  return { politica_seg: Number(pol), aplicado_a: esperas[0].prioridade }
+})
+
+await etapa('ondas: a chave de desligar devolve a fila aberta a todo mecânico', async () => {
+  // Um SOS ativo por conta: encerra o anterior para o novo pedido nascer.
+  await um(ids.admin, `select public.sos_cancelar('${chOnda.id}', 'Fim do cenário de ondas')`)
+  await db.exec(`update public.sos_config set despacho_em_ondas = false where singleton`)
+  const c = await um(IDS_ONDAS.cliente3, `select public.sos_abrir_chamado('{"tipo_ocorrencia":"roda_pneu","latitude":-23.5,"longitude":-46.6}'::jsonb)`)
+  const of = await um(null, `select count(*)::int from public.sos_ofertas where chamado_id = '${c.id}'`)
+  const ve = await comoPapel(ids.mec2, `select count(*)::int as n from public.sos_chamados where id = '${c.id}'`)
+  await db.exec(`update public.sos_config set despacho_em_ondas = true where singleton`)
+  if (of !== 0 || ve[0].n !== 1) throw new Error(JSON.stringify({ of, ve: ve[0].n }))
+  return 'sem ofertas, fila global — comportamento antigo'
+})
+
+await etapa('ondas: política é só de quem configura o SOS', async () => {
+  const leu = await um(ids.atendente, `select jsonb_array_length(public.sos_listar_politica())`)
+  const negado = await falhaCom(ids.atendente, `select public.sos_salvar_politica('{"nome":"Minha onda"}'::jsonb)`, [], 'Sem permissão')
+  if (!leu) throw new Error('central não leu a política')
+  return { central_le: leu, sem_configurar: negado }
 })
 
 console.log(`\nTUDO CERTO — ${passos} etapas.`)

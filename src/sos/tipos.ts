@@ -89,6 +89,16 @@ export interface ChamadoSOS {
   avaliacao_comentario: string | null
   avaliado_em: string | null
   contexto_ia: Record<string, unknown> | null
+  /* Despacho em ondas (`sos_despachar`). */
+  /** Quem atendeu: a Tecnoar ou a oficina parceira. */
+  prestador_id?: string | null
+  /** Onda em que o chamado está. 0 = nunca passou pelo despacho (modo manual). */
+  onda_atual?: number
+  onda_em?: string | null
+  /** Quando esta onda vence e o despacho abre a seguinte. */
+  onda_expira_em?: string | null
+  /** As ondas terminaram sem ninguém: a central precisa assumir na mão. */
+  sem_prestador_em?: string | null
   /* Vigia do SOS (`sos_vigiar`, a cada 30 s no servidor). */
   /** Início da espera atual por um mecânico (zera ao atribuir ou voltar para a fila). */
   espera_desde?: string | null
@@ -757,6 +767,8 @@ export interface HomeMecanico {
   nome: string
   ficha: FichaMecanico | null
   chamado_atual: (ChamadoSOS & { status_rotulo: string; ocorrencia_rotulo: string; cliente_nome: string; placa: string | null }) | null
+  /** O prestador a que este mecânico pertence (a Tecnoar ou uma parceira). */
+  prestador?: PrestadorSOS | null
   aguardando: Array<
     ChamadoSOS & {
       ocorrencia_rotulo: string
@@ -766,9 +778,21 @@ export interface HomeMecanico {
       distancia_km: number | null
       para_mim: boolean
       recusei: boolean
+      /** Onda do despacho que trouxe este chamado até aqui. */
+      onda?: number | null
+      /** Distância e previsão do momento da oferta. */
+      eta_min_oferta?: number | null
+      /** Quando a oferta vence e o chamado passa para a onda seguinte. */
+      oferta_expira_em?: string | null
     }
   >
-  hoje: { atendimentos: number; concluidos: number; nota_media: number | null }
+  hoje: {
+    atendimentos: number
+    concluidos: number
+    nota_media: number | null
+    ofertas_recebidas?: number
+    ofertas_aceitas?: number
+  }
   historico: Array<{
     id: string
     protocolo: string
@@ -853,7 +877,139 @@ export interface ConfigSOS {
   /** Chaves da Tecnoar IA (colaboradores) que o SOS pode reaproveitar. */
   tecnoar_ia_provedores?: Array<{ provedor: ProvedorIa; modelo: string | null; conectada: boolean }>
   ia_uso_30d?: { respostas: number; erros: number; tokens_entrada: number; tokens_saida: number }
+  /* Despacho em ondas (20260930/20261001). */
+  /** Desligado, o chamado volta a ser oferecido a todo mecânico disponível. */
+  despacho_em_ondas?: boolean
+  /** Emergência espera esta porcentagem do prazo da onda. */
+  onda_emergencia_pct?: number
+  /** Posição de mecânico mais velha que isto não vale distância. */
+  posicao_valida_min?: number
   updated_at: string
+}
+
+/* ── prestadores e despacho em ondas ────────────────────────────────────── */
+
+export type TipoPrestador = 'proprio' | 'parceiro'
+export type NivelPrestador = 'ouro' | 'prata' | 'bronze'
+export type SituacaoPrestador = 'ativo' | 'suspenso' | 'inativo'
+export type RespostaOferta = 'aceita' | 'recusada' | 'expirada' | 'cancelada'
+
+/**
+ * Quem atende. A Tecnoar é a linha `tipo: 'proprio'` — única, criada pela
+ * migração. As demais são oficinas parceiras acionadas quando a Tecnoar não
+ * alcança o veículo parado.
+ */
+export interface PrestadorSOS {
+  id: string
+  nome: string
+  tipo: TipoPrestador
+  nivel: NivelPrestador
+  situacao: SituacaoPrestador
+  documento: string | null
+  documento_digitos: string | null
+  telefone: string | null
+  email: string | null
+  responsavel: string | null
+  /** Base de operação: vale como posição quando o app está fechado. */
+  base_latitude: number | null
+  base_longitude: number | null
+  base_municipio: string | null
+  base_uf: string | null
+  /** Até onde o parceiro se compromete a ir. Não limita a Tecnoar. */
+  raio_atuacao_km: number
+  comissao_pct: number
+  /** Vazio = atende qualquer ocorrência. */
+  atende_tipos: OcorrenciaSOS[]
+  observacoes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface PrestadorListado extends PrestadorSOS {
+  mecanicos: number
+  disponiveis: number
+  atendimentos_mes: number
+  nota_media: number | null
+}
+
+/**
+ * Uma onda do despacho. A regra "até 60 km é sempre Tecnoar" é a onda de
+ * `ordem: 1` com `tipo_prestador: 'proprio'` e `raio_max_km: 60`.
+ */
+export interface OndaDespacho {
+  id: string
+  ordem: number
+  nome: string
+  /** null = qualquer prestador. */
+  tipo_prestador: TipoPrestador | null
+  /** Vazio = qualquer nível. */
+  niveis: NivelPrestador[]
+  raio_min_km: number
+  raio_max_km: number
+  situacoes: SituacaoMecanico[]
+  /** 0 = onda final: fica aberta até alguém aceitar. */
+  espera_seg: number
+  /** Vazio = vale para qualquer prioridade. */
+  prioridades: PrioridadeSOS[]
+  /** 0 = oferece a todos os elegíveis. */
+  max_ofertas: number
+  /** Aceita mecânico sem posição recente nem base (ondas de reforço). */
+  aceita_sem_posicao: boolean
+  ativo: boolean
+  observacoes: string | null
+  created_at: string
+  updated_at: string
+}
+
+/** A quem o chamado foi oferecido, quando, até quando, e o que respondeu. */
+export interface OfertaSOS {
+  id: string
+  chamado_id: string
+  mecanico_id: string
+  prestador_id: string
+  onda: number
+  politica_id: string | null
+  distancia_km: number | null
+  eta_min: number | null
+  /** A distância saiu da base do prestador, não da posição ao vivo. */
+  por_base: boolean
+  enviada_em: string
+  expira_em: string | null
+  respondida_em: string | null
+  /** null = aberta, esperando resposta. */
+  resposta: RespostaOferta | null
+  motivo: string | null
+}
+
+/** Candidato elegível a uma onda, do melhor para o pior. */
+export interface CandidatoOnda {
+  mecanico_id: string
+  prestador_id: string
+  nome: string
+  prestador: string
+  tipo: TipoPrestador
+  nivel: NivelPrestador
+  situacao: SituacaoMecanico
+  distancia_km: number | null
+  eta_min: number | null
+  por_base: boolean
+  afinidade: boolean
+  atendimentos_hoje: number
+  nota_media: number | null
+  pontuacao: number
+}
+
+/** Retorno de `sos_despachar`. */
+export interface ResultadoDespacho {
+  ok: boolean
+  motivo?: 'despacho_em_ondas_desligado' | 'fora_da_fila' | 'sem_ondas' | 'voltas_demais'
+  status?: StatusSOS
+  onda?: number
+  nome?: string
+  ofertas?: number
+  espera_seg?: number
+  /** Ondas puladas por não ter ninguém elegível. */
+  ondas_vazias?: number
 }
 
 export interface AgendamentoSOS {
