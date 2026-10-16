@@ -195,7 +195,7 @@ export function CartaoFocoChamado({
       ref={refRaiz}
       role="region"
       aria-label={`Chamado ${c.protocolo} em foco no mapa`}
-      className={cn('entrada-suave relative overflow-hidden rounded-xl border border-line bg-surface shadow-e3', className)}
+      className={cn('entrada-dialogo relative overflow-hidden rounded-xl border border-line bg-surface shadow-e3', className)}
     >
       <span aria-hidden className={cn('absolute inset-x-0 top-0 h-[3px]', faixa(c))} />
       <div className="flex flex-col gap-2 p-3 pt-3.5 sm:gap-2.5 sm:p-3.5 sm:pt-4">

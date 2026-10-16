@@ -108,7 +108,7 @@ export function Modal({
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6">
-      <div className="absolute inset-0 bg-overlay backdrop-blur-[2px]" onClick={aoFechar} aria-hidden />
+      <div className="entrada-veu absolute inset-0 bg-overlay backdrop-blur-[2px]" onClick={aoFechar} aria-hidden />
       <div
         ref={ref}
         role="dialog"
@@ -116,7 +116,7 @@ export function Modal({
         aria-label={titulo}
         tabIndex={-1}
         className={cn(
-          'entrada-suave relative flex max-h-[92dvh] w-full flex-col overflow-hidden bg-surface shadow-e3',
+          'entrada-dialogo relative flex max-h-[92dvh] w-full flex-col overflow-hidden bg-surface shadow-e3',
           /* Celular: folha encostada embaixo, sem borda lateral raspando a tela. */
           'rounded-t-2xl border-x-0 border-b-0 border-t border-line-strong',
           'sm:rounded-xl sm:border',
@@ -183,7 +183,7 @@ export function PainelLateral({
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-stretch justify-center p-0 sm:items-center sm:p-6">
-      <div className="absolute inset-0 bg-overlay backdrop-blur-[2px]" onClick={aoFechar} aria-hidden />
+      <div className="entrada-veu absolute inset-0 bg-overlay backdrop-blur-[2px]" onClick={aoFechar} aria-hidden />
       <div
         ref={ref}
         role="dialog"
@@ -247,7 +247,7 @@ export function Confirmacao({
 
   return createPortal(
     <div className="fixed inset-0 z-60 flex items-end justify-center p-0 sm:items-center sm:p-6">
-      <div className="absolute inset-0 bg-overlay backdrop-blur-[2px]" onClick={aoFechar} aria-hidden />
+      <div className="entrada-veu absolute inset-0 bg-overlay backdrop-blur-[2px]" onClick={aoFechar} aria-hidden />
       <div
         ref={ref}
         role="alertdialog"
@@ -257,7 +257,7 @@ export function Confirmacao({
         className={cn(
           /* `overflow-hidden` é o que impede a faixa do topo de passar por cima
              do canto arredondado e da borda. Sem ele, a borda some ali. */
-          'entrada-suave relative w-full max-w-md overflow-hidden bg-surface shadow-e3',
+          'entrada-dialogo relative w-full max-w-md overflow-hidden bg-surface shadow-e3',
           'rounded-t-2xl border-x-0 border-b-0 border-t border-line-strong',
           'px-5 pb-5 pt-6 sm:rounded-xl sm:border sm:px-6 sm:pb-6',
         )}

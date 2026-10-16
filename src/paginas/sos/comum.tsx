@@ -434,10 +434,12 @@ export function Avatar({ nome, url, tamanho = 'md', className }: { nome: string;
   )
 }
 
+/* Mesmo material do `Botao`: link com cara de botão tem de ter o mesmo corpo,
+   senão "Ligar" parece desligado ao lado de "Gerenciar". */
 const CLASSE_BOTAO_LINK = {
-  neutro: 'border border-line-strong bg-transparent text-ink-2 hover:bg-surface-2 hover:text-ink',
-  ok: 'border border-ok/40 bg-ok-soft text-ok-ink hover:border-ok',
-  primario: 'border border-transparent bg-accent text-on-accent shadow-accent hover:bg-accent-hover',
+  neutro: 'tatil border border-line-strong bg-surface text-ink-2 hover:bg-surface-2 hover:text-ink',
+  ok: 'tatil border border-ok/40 bg-ok-soft text-ok-ink hover:border-ok',
+  primario: 'tatil tatil-solido border border-transparent bg-accent text-on-accent hover:bg-accent-hover',
 } as const
 
 /** Link com cara de botão (tel:, wa.me, abrir OS): o gesto nativo do aparelho continua funcionando. */
@@ -452,7 +454,7 @@ export function BotaoLink({
     <a
       {...props}
       className={cn(
-        'inline-flex h-10 items-center justify-center gap-2 rounded-md px-3.5 font-display text-[11px] font-bold tracking-[0.06em] whitespace-nowrap uppercase transition-colors',
+        'inline-flex h-10 items-center justify-center gap-2 rounded-md px-3.5 font-display text-[11px] font-bold tracking-[0.06em] whitespace-nowrap uppercase',
         CLASSE_BOTAO_LINK[variante],
         className,
       )}

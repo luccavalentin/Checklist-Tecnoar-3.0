@@ -82,7 +82,8 @@ export function Campo({ rotulo, obrigatorio, erro, dica, children, className }: 
  * claro que o campo não aceita edição.
  */
 const BASE_CONTROLE =
-  'w-full min-w-0 rounded-md border bg-inset text-[13.5px] text-ink transition-colors duration-150 ' +
+  'w-full min-w-0 rounded-md border bg-inset text-[13.5px] text-ink shadow-[inset_0_1px_2px_var(--pressao)] ' +
+  'transition-colors duration-150 ' +
   'placeholder:text-ink-3 disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-ink-2 ' +
   'focus:outline-none focus-visible:outline-none'
 
@@ -189,7 +190,7 @@ export function Segmentado<T extends string>({
     <div
       role="radiogroup"
       aria-label={rotuloGrupo}
-      className={cn('flex min-w-0 flex-wrap gap-0.5 rounded-md border border-line-strong bg-inset p-[3px]', className)}
+      className={cn('leito flex min-w-0 flex-wrap gap-0.5 rounded-md border border-line-strong bg-inset p-[3px]', className)}
     >
       {opcoes.map((o) => {
         const ativo = o.valor === valor
@@ -204,7 +205,7 @@ export function Segmentado<T extends string>({
               'flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-[5px] px-3 py-1.5',
               'font-display text-[11.5px] font-semibold transition-colors duration-150 whitespace-nowrap',
               '[&_svg]:size-3.5',
-              ativo ? 'bg-surface-2 text-ink shadow-e1' : 'text-ink-3 hover:text-ink-2',
+              ativo ? 'tatil bg-surface text-ink' : 'text-ink-3 hover:text-ink-2',
             )}
           >
             {o.icone}
@@ -238,14 +239,17 @@ export function Alternador({
       disabled={disabled}
       onClick={() => onChange(!ativo)}
       className={cn(
-        'relative inline-flex h-[22px] w-[38px] shrink-0 items-center rounded-full border p-[2px] transition-colors duration-150',
-        'disabled:cursor-not-allowed disabled:opacity-50',
+        'leito relative inline-flex h-[22px] w-[38px] shrink-0 items-center rounded-full border p-[2px]',
+        'transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50',
         ativo ? 'border-transparent bg-accent' : 'border-line-strong bg-surface-2',
       )}
     >
+      {/* A bolinha tem corpo: luz em cima, contato embaixo, e corre no trilho
+          com a mesma saída exponencial do resto do sistema. */}
       <span
         className={cn(
-          'size-4 rounded-full transition-transform duration-150',
+          'size-4 rounded-full shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_1px_2px_rgb(11_28_51/0.35)]',
+          'transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]',
           ativo ? 'translate-x-4 bg-on-accent' : 'translate-x-0 bg-ink-3',
         )}
       />

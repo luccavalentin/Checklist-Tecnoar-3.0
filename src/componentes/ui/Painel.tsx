@@ -13,7 +13,7 @@ export function Painel({
   return (
     <section
       className={cn(
-        'aresta rounded-lg border border-line bg-surface shadow-e1',
+        'relevo rounded-lg border border-line bg-surface',
         !semPadding && 'p-5',
         className,
       )}

@@ -185,7 +185,7 @@ function temBase(p: PrestadorSOS): boolean {
 /** A Tecnoar: sempre no topo, sem nível nem repasse — a casa não é parceira. */
 function CartaoProprio({ p, aoEditar }: { p: PrestadorListado; aoEditar: () => void }) {
   return (
-    <article className="aresta relative overflow-hidden rounded-lg border border-accent/45 bg-gradient-to-br from-accent-soft via-surface to-surface p-4 shadow-e1 sm:p-5">
+    <article className="relevo overflow-hidden rounded-lg border border-accent/45 bg-gradient-to-br from-accent-soft via-surface to-surface p-4 sm:p-5">
       <span aria-hidden className="absolute inset-y-0 left-0 w-[3px] bg-accent" />
       <div className="flex min-w-0 flex-wrap items-start gap-3">
         <span aria-hidden className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-accent text-on-accent">
@@ -238,7 +238,12 @@ function CartaoParceiro({ p, aoEditar }: { p: PrestadorListado; aoEditar: () => 
   const situacao = SITUACOES_PRESTADOR[p.situacao]
   const inativo = p.situacao !== 'ativo'
   return (
-    <article className={cn('aresta flex h-full flex-col gap-3 rounded-lg border border-line bg-surface p-4 shadow-e1', inativo && 'opacity-80')}>
+    <article
+      className={cn(
+        'relevo relevo-interativo flex h-full flex-col gap-3 rounded-lg border border-line bg-surface p-4 hover:border-line-strong',
+        inativo && 'opacity-80',
+      )}
+    >
       <header className="flex min-w-0 items-start gap-3">
         <span aria-hidden className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-surface-2 font-display text-[12.5px] font-bold text-ink-2 ring-1 ring-line">
           {iniciais(p.nome)}
@@ -592,8 +597,8 @@ function ModalPrestador({
                         mudar('atende_tipos', marcado ? f.atende_tipos.filter((x) => x !== t) : [...f.atende_tipos, t])
                       }
                       className={cn(
-                        'flex min-h-11 items-center rounded-full border px-3.5 text-[12.5px] font-medium transition-colors lg:min-h-9',
-                        marcado ? 'border-accent bg-accent-soft text-accent-ink' : 'border-line-strong bg-surface text-ink-2 hover:text-ink',
+                        'flex min-h-11 items-center rounded-full border px-3.5 text-[12.5px] font-medium lg:min-h-9',
+                        marcado ? 'afundado border-accent bg-accent-soft text-accent-ink' : 'tatil border-line-strong bg-surface text-ink-2 hover:text-ink',
                       )}
                     >
                       {OCORRENCIAS[t].rotulo}

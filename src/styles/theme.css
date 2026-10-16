@@ -53,6 +53,28 @@
   /* Elevação da ação primária: apoio no plano + um resíduo quente curto.
      O halo largo anterior lia como néon, não como botão de ferramenta. */
   --sh-accent: 0 1px 2px rgb(11 28 51 / 0.10), 0 4px 12px -7px rgb(252 100 0 / 0.40);
+
+  /* ---- MATERIAL ----------------------------------------------------------
+     A peça tem espessura: luz vinda de cima na quina superior, sombra de
+     contato logo abaixo e sombra ambiente mais larga e mais macia. É a mesma
+     física em toda a interface — muda só a intensidade. Nenhuma cor nova:
+     branco para a luz, a tinta do sistema para a sombra. */
+  --luz-topo: rgb(255 255 255 / 0.85);
+  --luz-topo-forte: rgb(255 255 255 / 1);
+  --pressao: rgb(11 28 51 / 0.13);
+
+  /* Controles: a elevação que o dedo espera encontrar. */
+  --sh-controle: 0 1px 1.5px rgb(11 28 51 / 0.10), 0 2px 5px -3px rgb(11 28 51 / 0.14);
+  --sh-controle-alto: 0 1px 2px rgb(11 28 51 / 0.12), 0 6px 14px -8px rgb(11 28 51 / 0.26);
+
+  /* Superfícies: contato curto + ambiente longo, para o cartão descolar do fundo. */
+  --sh-relevo: 0 1px 1px rgb(11 28 51 / 0.05), 0 2px 4px -2px rgb(11 28 51 / 0.07), 0 16px 32px -24px rgb(11 28 51 / 0.22);
+  --sh-relevo-alto: 0 1px 2px rgb(11 28 51 / 0.07), 0 6px 14px -6px rgb(11 28 51 / 0.14), 0 26px 50px -28px rgb(11 28 51 / 0.32);
+  --brilho-superficie: rgb(255 255 255 / 0.55);
+
+  /* Saída exponencial: começa rápido e assenta devagar — é o que faz o
+     movimento parecer peso, não cronômetro. */
+  --ease-saida: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dark {
@@ -98,6 +120,20 @@
   --sh-2: 0 6px 18px -6px rgb(0 0 0 / 0.55);
   --sh-3: 0 24px 60px -22px rgb(0 0 0 / 0.85);
   --sh-accent: 0 1px 2px rgb(0 0 0 / 0.5), 0 4px 14px -8px rgb(252 100 0 / 0.45);
+
+  /* No escuro a luz não vem de uma lâmpada: vem da própria quina da peça.
+     O realce cai para alguns por cento e a sombra ganha alcance — é o que
+     impede o cartão de virar um recorte chapado no fundo. */
+  --luz-topo: rgb(255 255 255 / 0.07);
+  --luz-topo-forte: rgb(255 255 255 / 0.12);
+  --pressao: rgb(0 0 0 / 0.5);
+
+  --sh-controle: 0 1px 2px rgb(0 0 0 / 0.45), 0 2px 6px -3px rgb(0 0 0 / 0.55);
+  --sh-controle-alto: 0 2px 4px rgb(0 0 0 / 0.5), 0 8px 18px -8px rgb(0 0 0 / 0.7);
+
+  --sh-relevo: 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 34px -26px rgb(0 0 0 / 0.9);
+  --sh-relevo-alto: 0 2px 6px rgb(0 0 0 / 0.5), 0 28px 54px -28px rgb(0 0 0 / 0.95);
+  --brilho-superficie: rgb(255 255 255 / 0.045);
 }
 
 @theme inline {
@@ -274,6 +310,117 @@
   pointer-events: none;
 }
 
+/* ============================================================
+   MATERIAL — a espessura das peças
+   ------------------------------------------------------------
+   Duas classes, uma física. `tatil` é o que se aperta (botão,
+   pastilha de ação); `relevo` é o que se olha (cartão, painel,
+   métrica). As duas desenham a mesma história: luz na quina de
+   cima, contato curto embaixo, ambiente longo e macio por fora.
+
+   Apertar não é só escurecer: a peça AFUNDA — a elevação vira
+   sombra interna e o conteúdo desce 1px. É o detalhe que faz o
+   clique ter resposta física mesmo sem som nem vibração.
+
+   Quem usa `relevo` não leva `shadow-e1` junto: a sombra é desta
+   classe, senão o utilitário do Tailwind ganha e a peça volta a
+   ser chapada.
+   ============================================================ */
+@layer components {
+  .tatil {
+    box-shadow:
+      inset 0 1px 0 var(--luz-topo),
+      var(--sh-controle);
+    transition:
+      box-shadow 0.18s var(--ease-saida),
+      transform 0.18s var(--ease-saida),
+      background-color 0.15s linear,
+      border-color 0.15s linear,
+      color 0.15s linear;
+  }
+
+  .tatil:hover:not(:disabled) {
+    box-shadow:
+      inset 0 1px 0 var(--luz-topo-forte),
+      var(--sh-controle-alto);
+  }
+
+  /* Afunda: a luz de cima vira sombra de dentro. */
+  .tatil:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px var(--pressao);
+  }
+
+  .tatil:disabled {
+    box-shadow: none;
+  }
+
+  /* Preenchido (a ação primária): o realce é branco sobre a própria cor,
+     e a sombra quente da marca continua sendo a de `--sh-accent`. */
+  .tatil-solido {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.3),
+      var(--sh-accent);
+  }
+
+  .tatil-solido:hover:not(:disabled) {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.38),
+      0 1px 2px rgb(11 28 51 / 0.14),
+      0 8px 18px -8px rgb(252 100 0 / 0.5);
+  }
+
+  .tatil-solido:active:not(:disabled) {
+    box-shadow: inset 0 2px 5px rgb(11 28 51 / 0.3);
+  }
+
+  /*
+   * A luz entra pelo `background-image` e pelo `inset` da sombra, não por um
+   * pseudo-elemento: elemento posicionado pinta DEPOIS do conteúdo de fluxo,
+   * e um véu `inset: 0` passaria por cima do próprio texto do cartão. Como
+   * os utilitários do Tailwind mexem em `background-color`, o degradê e a
+   * cor convivem sem brigar.
+   */
+  /* Marcado/ligado não é só outra cor: a peça fica AFUNDADA. É o par do
+     `tatil` — um sobe, o outro desce, e o olho lê o estado sem ler a cor. */
+  .afundado {
+    box-shadow: inset 0 2px 4px var(--pressao);
+  }
+
+  /* Trilho: o leito onde a peça corre (segmentado, interruptor, campo). */
+  .leito {
+    box-shadow: inset 0 1px 2px var(--pressao);
+  }
+
+  .relevo {
+    position: relative;
+    background-image: linear-gradient(180deg, var(--brilho-superficie), transparent 42%);
+    box-shadow:
+      inset 0 1px 0 var(--luz-topo),
+      var(--sh-relevo);
+    transition:
+      box-shadow 0.22s var(--ease-saida),
+      transform 0.22s var(--ease-saida),
+      border-color 0.18s linear;
+  }
+
+  /* Cartão que responde ao cursor: sobe um fio e a sombra acompanha.
+     No toque não existe hover, e o `:active` devolve a peça ao plano. */
+  .relevo-interativo:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 var(--luz-topo-forte),
+      var(--sh-relevo-alto);
+  }
+
+  .relevo-interativo:active {
+    transform: translateY(0);
+    box-shadow:
+      inset 0 1px 0 var(--luz-topo),
+      var(--sh-relevo);
+  }
+}
+
 /*
  * Cartão dos componentes compartilhados do SOS (src/sos). No Checklist é o
  * painel sóbrio do sistema; o app SOS redefine com vidro em
@@ -398,6 +545,61 @@
   animation: tec-entrada 0.18s ease-out both;
 }
 
+/*
+ * A escada de ondas do despacho entrando na ordem em que abre — a cascata é
+ * a própria regra do SOS contada em movimento: a Tecnoar perto primeiro, as
+ * parceiras depois. Começa a 40% de opacidade, nunca invisível: se o
+ * navegador pausar a animação, a política continua legível.
+ */
+@keyframes tec-onda {
+  from {
+    opacity: 0.4;
+    transform: translateY(7px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.onda-entrando {
+  animation: tec-onda 0.32s var(--ease-saida) both;
+}
+
+/*
+ * Diálogo: a peça vem PARA A FRENTE, não desliza. Escala quase imperceptível
+ * (1,5%) somada à subida — é o que dá a sensação de profundidade sem o
+ * exagero de um zoom. O véu escurece junto, senão o fundo "pisca" preto antes
+ * de a caixa chegar.
+ */
+@keyframes tec-dialogo {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tec-veu {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.entrada-dialogo {
+  animation: tec-dialogo 0.24s var(--ease-saida) both;
+}
+
+.entrada-veu {
+  animation: tec-veu 0.2s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -460,6 +662,13 @@ select option:disabled {
     --sh-2: none;
     --sh-3: none;
     --sh-accent: none;
+    --sh-controle: none;
+    --sh-controle-alto: none;
+    --sh-relevo: none;
+    --sh-relevo-alto: none;
+    --luz-topo: transparent;
+    --luz-topo-forte: transparent;
+    --brilho-superficie: transparent;
   }
 
   body {

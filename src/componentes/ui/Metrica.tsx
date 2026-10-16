@@ -108,21 +108,19 @@ export function Metrica({
       {...(onClick ? { type: 'button' as const, onClick } : {})}
       aria-pressed={onClick ? ativo : undefined}
       className={cn(
-        'aresta group relative overflow-hidden rounded-lg border bg-surface p-3.5 text-left shadow-e1',
+        'relevo group overflow-hidden rounded-lg border bg-surface p-3.5 text-left',
         /* No celular o cartão deita: rótulo à esquerda, número à direita. Cinco
            indicadores empilhados na vertical custariam cinco telas de rolagem
            antes do conteúdo. */
         'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1',
         longo && 'lg:grid-cols-1',
         grande ? 'min-h-[92px]' : 'min-h-[84px]',
-        'transition-[border-color,box-shadow,transform] duration-150',
         ativo
           ? 'border-cyan ring-1 ring-cyan/25'
           : alerta
             ? 'border-crit/35'
             : 'border-line',
-        onClick &&
-          'cursor-pointer hover:-translate-y-0.5 hover:border-line-strong hover:shadow-e2 active:translate-y-px',
+        onClick && 'relevo-interativo cursor-pointer hover:border-line-strong',
         className,
       )}
     >

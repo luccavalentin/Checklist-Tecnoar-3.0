@@ -5,16 +5,20 @@ import { cn } from '@/lib/utils'
 export type VarianteBotao = 'primario' | 'secundario' | 'neutro' | 'destrutivo' | 'fantasma'
 export type TamanhoBotao = 'sm' | 'md' | 'lg'
 
+/*
+ * O material de cada variante. A peça tem espessura: `tatil` põe a luz na
+ * quina de cima e a sombra de contato embaixo, e no clique a elevação vira
+ * sombra interna — o botão afunda sob o dedo em vez de só mudar de cor.
+ *
+ * `fantasma` é a exceção de propósito: botão de texto não tem corpo, e dar
+ * relevo a ele apagaria a diferença entre ação e link.
+ */
 const VARIANTES: Record<VarianteBotao, string> = {
-  primario:
-    'bg-accent text-on-accent border border-transparent shadow-accent hover:bg-accent-hover active:translate-y-px',
-  secundario:
-    'bg-cyan-soft text-cyan-ink border border-cyan/45 hover:border-cyan hover:bg-cyan-soft active:translate-y-px',
-  neutro:
-    'bg-transparent text-ink-2 border border-line-strong hover:text-ink hover:bg-surface-2 active:translate-y-px',
-  destrutivo:
-    'bg-transparent text-crit-ink border border-crit/45 hover:bg-crit-soft hover:border-crit active:translate-y-px',
-  fantasma: 'bg-transparent text-ink-2 border border-transparent hover:bg-surface-2 hover:text-ink',
+  primario: 'tatil tatil-solido bg-accent text-on-accent border border-transparent hover:bg-accent-hover',
+  secundario: 'tatil bg-cyan-soft text-cyan-ink border border-cyan/45 hover:border-cyan hover:bg-cyan-soft',
+  neutro: 'tatil bg-surface text-ink-2 border border-line-strong hover:text-ink hover:bg-surface-2',
+  destrutivo: 'tatil bg-surface text-crit-ink border border-crit/45 hover:bg-crit-soft hover:border-crit',
+  fantasma: 'bg-transparent text-ink-2 border border-transparent transition-colors duration-150 hover:bg-surface-2 hover:text-ink',
 }
 
 const TAMANHOS: Record<TamanhoBotao, string> = {
@@ -56,7 +60,7 @@ export const Botao = forwardRef<HTMLButtonElement, BotaoProps>(function Botao(
       aria-busy={carregando || undefined}
       className={cn(
         'inline-flex items-center justify-center rounded-md font-display font-bold uppercase tracking-[0.06em]',
-        'transition-colors duration-150 select-none whitespace-nowrap',
+        'select-none whitespace-nowrap',
         'disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none disabled:active:translate-y-0',
         VARIANTES[variante],
         TAMANHOS[tamanho],
@@ -95,10 +99,10 @@ export const BotaoIcone = forwardRef<HTMLButtonElement, BotaoIconeProps>(functio
       title={rotulo}
       aria-label={rotulo}
       className={cn(
-        'inline-flex items-center justify-center rounded-md transition-colors duration-150',
+        'inline-flex items-center justify-center rounded-md',
         'disabled:cursor-not-allowed disabled:opacity-45',
         variante === 'fantasma'
-          ? 'text-ink-2 hover:bg-surface-2 hover:text-ink border border-transparent'
+          ? 'border border-transparent text-ink-2 transition-colors duration-150 hover:bg-surface-2 hover:text-ink'
           : VARIANTES[variante],
         dim,
         '[&_svg]:size-[1.05rem]',

@@ -142,8 +142,8 @@ export function CartaoChamado({
       onMouseEnter={aoPassar ? () => aoPassar(c.id) : undefined}
       onMouseLeave={aoPassar ? () => aoPassar(null) : undefined}
       className={cn(
-        '@container group relative flex w-full min-w-0 flex-col gap-2 overflow-hidden rounded-lg border bg-surface text-left shadow-e1',
-        'transition-[border-color,box-shadow,transform] duration-150 hover:-translate-y-px hover:border-line-strong hover:shadow-e2 has-[>button:active]:translate-y-0',
+        'relevo relevo-interativo @container group flex w-full min-w-0 flex-col gap-2 overflow-hidden rounded-lg border bg-surface text-left',
+        'hover:border-line-strong has-[>button:active]:translate-y-0',
         compacto ? 'p-3 pl-3.5' : 'p-3.5 pl-4',
         espera && emergencia ? 'border-crit/55 ring-1 ring-crit/25' : espera ? 'border-accent/45' : 'border-line',
         selecionado && 'border-cyan bg-cyan-soft/25 ring-2 ring-cyan/35 hover:border-cyan',

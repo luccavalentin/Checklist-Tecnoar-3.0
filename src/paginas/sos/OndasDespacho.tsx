@@ -84,6 +84,7 @@ export function ListaOndas({ ondasLigadas }: { ondasLigadas: boolean }) {
           <li key={o.id} className="flex min-w-0 flex-col">
             <CartaoOnda
               o={o}
+              atraso={i}
               exclusivaTecnoar={o.ordem === 1 && o.tipo_prestador === 'proprio'}
               redeDeSeguranca={o.id === redeDeSeguranca}
               semCandidato={o.tipo_prestador === 'parceiro' && !temParceira}
@@ -122,12 +123,15 @@ function IconeDaOnda({ tipo }: { tipo: TipoPrestador | null }) {
 
 function CartaoOnda({
   o,
+  atraso,
   exclusivaTecnoar,
   redeDeSeguranca,
   semCandidato,
   aoEditar,
 }: {
   o: OndaDespacho
+  /** Posição na escada: as ondas entram na tela na ordem em que abrem. */
+  atraso: number
   exclusivaTecnoar: boolean
   redeDeSeguranca: boolean
   semCandidato: boolean
@@ -135,8 +139,9 @@ function CartaoOnda({
 }) {
   return (
     <article
+      style={{ animationDelay: `${Math.min(atraso, 5) * 45}ms` }}
       className={cn(
-        'aresta relative flex min-w-0 flex-col gap-2 overflow-hidden rounded-lg border bg-surface p-3.5 shadow-e1',
+        'relevo onda-entrando flex min-w-0 flex-col gap-2 overflow-hidden rounded-lg border bg-surface p-3.5',
         !o.ativo && 'border-dashed border-line opacity-70',
         o.ativo && exclusivaTecnoar && 'border-accent/45',
         o.ativo && redeDeSeguranca && 'border-ok/40',
@@ -524,8 +529,8 @@ function Chips<T extends string>({
               aria-pressed={marcado}
               onClick={() => aoMudar(marcado ? valor.filter((x) => x !== o.valor) : [...valor, o.valor])}
               className={cn(
-                'flex min-h-11 items-center rounded-full border px-3.5 text-[12.5px] font-medium transition-colors lg:min-h-9',
-                marcado ? 'border-accent bg-accent-soft text-accent-ink' : 'border-line-strong bg-surface text-ink-2 hover:text-ink',
+                'flex min-h-11 items-center rounded-full border px-3.5 text-[12.5px] font-medium lg:min-h-9',
+                marcado ? 'afundado border-accent bg-accent-soft text-accent-ink' : 'tatil border-line-strong bg-surface text-ink-2 hover:text-ink',
               )}
             >
               {o.rotulo}
