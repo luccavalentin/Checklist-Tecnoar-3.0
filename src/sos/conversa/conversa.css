@@ -1,0 +1,555 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   A CONVERSA
+   ───────────────────────────────────────────────────────────────────────────
+   Tela cheia, três faixas fixas: topo, lista que rola, compositor colado
+   embaixo. O compositor NUNCA sai do alcance do polegar — numa conversa, o
+   campo de escrever que rola junto com o conteúdo é o defeito que mais
+   irrita, porque obriga a caçar o campo a cada mensagem.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cv-tela {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background: var(--c-surface-2, #0a1422);
+}
+
+/* ── topo ─────────────────────────────────────────────────────────────── */
+
+.cv-topo {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.9rem 0.5rem 0.25rem;
+  padding-top: calc(0.5rem + env(safe-area-inset-top));
+  border-bottom: 1px solid var(--c-line, rgb(148 178 214 / 0.16));
+  background: var(--c-surface, #0d1c33);
+}
+
+.cv-voltar {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--c-ink, #fff);
+}
+
+.cv-voltar:active {
+  opacity: 0.6;
+}
+
+.cv-topo-nome {
+  font-family: var(--font-display, inherit);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--c-ink, #fff);
+}
+
+.cv-topo-estado {
+  font-size: 12.5px;
+  line-height: 1.2;
+  color: var(--c-ink-3, rgb(214 228 245 / 0.6));
+}
+
+/* Digitando é o único estado que muda de cor: é o que prova que tem gente
+   do outro lado AGORA, e essa é a informação mais valiosa da tela. */
+.cv-topo-estado-vivo {
+  font-weight: 600;
+  color: #00a8e8;
+}
+
+/* ── lista ────────────────────────────────────────────────────────────── */
+
+.cv-lista {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-height: 0;
+  padding: 0.85rem 0.9rem 0.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.cv-vazio {
+  margin: auto;
+  max-width: 26ch;
+  font-size: 13.5px;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--c-ink-3, rgb(214 228 245 / 0.55));
+}
+
+.cv-dia,
+.cv-divisor {
+  align-self: center;
+  margin: 0.7rem 0 0.4rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  background: rgb(148 178 214 / 0.12);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--c-ink-3, rgb(214 228 245 / 0.65));
+}
+
+.cv-divisor {
+  display: block;
+  width: fit-content;
+  margin-inline: auto;
+  color: #fc6400;
+  background: rgb(252 100 0 / 0.14);
+}
+
+.cv-linha {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-block: 0.1rem;
+}
+
+.cv-linha-minha {
+  align-items: flex-end;
+}
+
+.cv-linha-dele {
+  align-items: flex-start;
+}
+
+.cv-destacada .cv-bolha {
+  animation: cv-piscar 1.4s ease-out;
+}
+
+@keyframes cv-piscar {
+  0%,
+  40% {
+    box-shadow: 0 0 0 2px rgb(0 168 232 / 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 2px rgb(0 168 232 / 0);
+  }
+}
+
+/* ── bolha ────────────────────────────────────────────────────────────── */
+
+.cv-bolha {
+  position: relative;
+  display: flex;
+  max-width: 82%;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.45rem 0.6rem 0.3rem;
+  border-radius: 1.05rem;
+  font-size: 14.5px;
+  line-height: 1.35;
+  box-shadow: 0 1px 2px rgb(3 8 16 / 0.35);
+}
+
+.cv-bolha-minha {
+  border-bottom-right-radius: 0.3rem;
+  color: #fff;
+  background: linear-gradient(165deg, #fc6400, #e05400);
+}
+
+.cv-bolha-dele {
+  border-bottom-left-radius: 0.3rem;
+  color: var(--c-ink, #fff);
+  background: var(--c-surface, rgb(255 255 255 / 0.07));
+}
+
+.cv-bolha-apagada {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--c-ink-3, rgb(214 228 245 / 0.55));
+  background: rgb(148 178 214 / 0.08);
+  box-shadow: none;
+}
+
+.cv-autor {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #00a8e8;
+}
+
+.cv-texto {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.cv-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  margin-top: -0.1rem;
+}
+
+.cv-hora {
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
+/* ── citação ──────────────────────────────────────────────────────────── */
+
+.cv-citacao {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  padding: 0.3rem 0.5rem;
+  border-left: 3px solid currentColor;
+  border-radius: 0.45rem;
+  background: rgb(0 0 0 / 0.18);
+  text-align: left;
+}
+
+.cv-citacao-autor {
+  font-size: 11.5px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.cv-citacao-texto {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 12.5px;
+  opacity: 0.8;
+}
+
+/* ── mídia ────────────────────────────────────────────────────────────── */
+
+.cv-foto {
+  width: 100%;
+  max-width: 15rem;
+  border-radius: 0.7rem;
+  object-fit: cover;
+}
+
+.cv-local {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.5rem;
+  border-radius: 0.6rem;
+  background: rgb(0 0 0 / 0.18);
+  font-size: 13px;
+}
+
+.cv-audio {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 11rem;
+  padding: 0.15rem 0;
+}
+
+.cv-audio-botao {
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 999px;
+  color: #fff;
+  background: rgb(0 0 0 / 0.28);
+}
+
+.cv-audio-minha .cv-audio-botao {
+  background: rgb(255 255 255 / 0.25);
+}
+
+.cv-audio-trilho {
+  position: relative;
+  flex: 1;
+  height: 3px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 0.25);
+}
+
+.cv-audio-cheio {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 3px;
+  background: currentColor;
+}
+
+.cv-audio-tempo {
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+/* ── menu de segurar ──────────────────────────────────────────────────── */
+
+.cv-veu {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  cursor: default;
+}
+
+.cv-menu {
+  position: absolute;
+  bottom: 100%;
+  z-index: 2;
+  display: flex;
+  min-width: 11rem;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--c-line, rgb(148 178 214 / 0.2));
+  border-radius: 0.9rem;
+  background: var(--c-surface, #13233c);
+  box-shadow: 0 16px 36px -14px rgb(0 0 0 / 0.8);
+}
+
+.cv-menu-minha {
+  right: 0;
+}
+
+.cv-menu-dele {
+  left: 0;
+}
+
+.cv-menu button {
+  display: flex;
+  min-height: 2.9rem;
+  align-items: center;
+  gap: 0.55rem;
+  padding-inline: 0.85rem;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--c-ink, #fff);
+}
+
+.cv-menu button:active {
+  background: rgb(148 178 214 / 0.12);
+}
+
+.cv-menu-perigo {
+  color: #e5484d !important;
+}
+
+/* ── descer ───────────────────────────────────────────────────────────── */
+
+.cv-descer {
+  position: absolute;
+  right: 1rem;
+  bottom: 6.5rem;
+  z-index: 3;
+  display: grid;
+  width: 2.9rem;
+  height: 2.9rem;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--c-ink, #fff);
+  background: var(--c-surface, #13233c);
+  box-shadow: 0 8px 20px -6px rgb(0 0 0 / 0.7);
+}
+
+.cv-descer-contador {
+  position: absolute;
+  top: -0.3rem;
+  right: -0.3rem;
+  display: grid;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  place-items: center;
+  padding-inline: 0.25rem;
+  border-radius: 999px;
+  background: #fc6400;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ── compositor ───────────────────────────────────────────────────────── */
+
+.cv-compositor {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--c-line, rgb(148 178 214 / 0.16));
+  background: var(--c-surface, #0d1c33);
+}
+
+.cv-erro {
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: #e5484d;
+}
+
+.cv-respondendo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-left: 3px solid #fc6400;
+  border-radius: 0.5rem;
+  background: rgb(148 178 214 / 0.1);
+  color: var(--c-ink-2, rgb(214 228 245 / 0.8));
+}
+
+.cv-respondendo-autor {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fc6400;
+}
+
+.cv-respondendo-texto {
+  display: block;
+  overflow: hidden;
+  font-size: 12.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cv-rapidas {
+  display: flex;
+  gap: 0.4rem;
+  margin-inline: -0.25rem;
+  padding-inline: 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cv-rapidas button {
+  flex-shrink: 0;
+  min-height: 2.3rem;
+  padding-inline: 0.75rem;
+  border: 1px solid var(--c-line, rgb(148 178 214 / 0.22));
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--c-ink-2, rgb(214 228 245 / 0.8));
+}
+
+.cv-barra {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.3rem;
+}
+
+.cv-acessorio {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--c-ink-3, rgb(214 228 245 / 0.65));
+}
+
+.cv-acessorio:active {
+  opacity: 0.6;
+}
+
+.cv-campo {
+  flex: 1;
+  min-height: 2.75rem;
+  max-height: 7rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--c-line, rgb(148 178 214 / 0.2));
+  border-radius: 1.4rem;
+  background: var(--c-surface-2, rgb(255 255 255 / 0.05));
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--c-ink, #fff);
+  resize: none;
+}
+
+.cv-campo:focus-visible {
+  outline: 2px solid #fc6400;
+  outline-offset: 1px;
+}
+
+/* Um alvo só, na posição que o polegar já conhece: microfone quando não há
+   texto, avião quando há. Dois botões disputando o canto fariam a pessoa
+   mirar — e mirar é o que ninguém consegue fazer com a mão tremendo. */
+.cv-enviar {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 999px;
+  color: #fff;
+  background: radial-gradient(circle at 34% 26%, #ffb047 0%, #fc6400 52%, #b84100 100%);
+  box-shadow: inset 0 1px 0 rgb(255 226 190 / 0.6), 0 3px 9px -3px rgb(252 100 0 / 0.6);
+  transition: transform 140ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.cv-enviar:active {
+  transform: scale(0.94);
+}
+
+.cv-enviar:disabled {
+  filter: grayscale(0.7);
+  opacity: 0.5;
+}
+
+/* ── gravando ─────────────────────────────────────────────────────────── */
+
+.cv-gravando {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.3rem 0.3rem 0.3rem 0.75rem;
+  border: 1px solid rgb(229 72 77 / 0.4);
+  border-radius: 1.6rem;
+  background: rgb(229 72 77 / 0.12);
+  font-size: 13.5px;
+  color: var(--c-ink-2, rgb(214 228 245 / 0.85));
+}
+
+.cv-gravando-ponto {
+  width: 0.65rem;
+  height: 0.65rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: #e5484d;
+  animation: cv-pulsando 1.1s ease-in-out infinite;
+}
+
+@keyframes cv-pulsando {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.cv-fechada {
+  flex-shrink: 0;
+  padding: 0.9rem;
+  padding-bottom: calc(0.9rem + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--c-line, rgb(148 178 214 / 0.16));
+  font-size: 13px;
+  text-align: center;
+  color: var(--c-ink-3, rgb(214 228 245 / 0.6));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cv-gravando-ponto,
+  .cv-destacada .cv-bolha {
+    animation: none;
+  }
+}

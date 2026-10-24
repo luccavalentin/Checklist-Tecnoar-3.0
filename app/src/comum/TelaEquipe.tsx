@@ -68,7 +68,7 @@ export function TelaEquipe() {
             <button
               type="button"
               onClick={() => (window.location.href = `${URL_CHECKLIST}/sos`)}
-              className="sos-premium-action flex min-h-16 items-center justify-center gap-3 rounded-[1.25rem] px-5 font-display text-[17px] font-extrabold text-white uppercase active:scale-[0.98]"
+              className="sos-button-3d sos-button-3d-primario sos-premium-action flex min-h-16 items-center justify-center gap-3 rounded-[1.25rem] px-5 font-display text-[17px] font-extrabold text-white uppercase active:scale-[0.98]"
             >
               <Command className="size-5" />
               Abrir Central SOS

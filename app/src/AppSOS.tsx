@@ -11,6 +11,7 @@ import { TelaCarregandoApp } from './comum/Carregando'
  * `/chamado/:id` existe nas duas — é para onde apontam as notificações.
  */
 
+const ConversaCliente = lazy(() => import('./cliente/ConversaCliente').then((m) => ({ default: m.ConversaCliente })))
 const Entrar = lazy(() => import('./auth/Entrar').then((m) => ({ default: m.Entrar })))
 const Cadastro = lazy(() => import('./auth/Cadastro').then((m) => ({ default: m.Cadastro })))
 const EsqueciSenha = lazy(() => import('./auth/EsqueciSenha').then((m) => ({ default: m.EsqueciSenha })))
@@ -136,6 +137,7 @@ function PorPapel() {
               conversa da TECNO IA (o campo de mensagem ocupa o rodapé; o SOS fica no topo). */}
           <Route path="sos" element={<FluxoSOS />} />
           <Route path="chamado/:id" element={<ChamadoCliente />} />
+          <Route path="chamado/:id/conversa" element={<ConversaCliente />} />
           <Route path="tecno-ia" element={<TecnoIA />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

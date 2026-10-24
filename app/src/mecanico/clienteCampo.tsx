@@ -27,7 +27,7 @@ import { BotaoM, CampoM, CartaoM, EsqueletoM, RodapeAcao, RotuloM, SecaoM, SeloM
 /**
  * CLIENTE EM CAMPO — quem é o cliente, e com qual veículo.
  *
- * Um só componente para o chamado aberto pelo mecânico e para a OS aberta no
+ * Um só componente para o chamado aberto pelo especialista e para a OS aberta no
  * app: o mesmo campo busca por placa, nome, celular ou CPF/CNPJ no cadastro
  * de clientes do sistema Tecnoar (a tabela `clientes` do Checklist), e o
  * cliente novo, quando não existe, é cadastrado nessa mesma tabela pelo banco

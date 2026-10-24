@@ -50,7 +50,7 @@ function Atendimento({ id }: { id: string }) {
     // O tempo real traz tudo na hora; o intervalo cobre o canal caído.
     refetchInterval: 20_000,
   })
-  // Etapa guardada no aparelho (sem sinal) já vale na tela: o mecânico segue
+  // Etapa guardada no aparelho (sem sinal) já vale na tela: o especialista segue
   // o atendimento e a fila manda quando a internet voltar.
   const d = useMemo(() => (detalhe.data ? aplicarFila(detalhe.data, fila.acoes) : undefined), [detalhe.data, fila.acoes])
   const status = d?.chamado.status
@@ -60,7 +60,7 @@ function Atendimento({ id }: { id: string }) {
 
   useTempoRealChamado(id, {
     aoChamado: (c, anterior) => {
-      // Central ou cliente cancelou com o mecânico a caminho: bipe e vibração.
+      // Central ou cliente cancelou com o especialista a caminho: bipe e vibração.
       if (c.status === 'cancelado' && anterior?.status !== 'cancelado') {
         tocarAlerta({ tipo: 'aviso' })
         vibrarAlerta('sos')
@@ -83,7 +83,7 @@ function Atendimento({ id }: { id: string }) {
       <TelaAvisoChamado
         icone={semAcesso ? Ban : undefined}
         titulo={semAcesso ? 'Chamado indisponível' : 'Não foi possível abrir'}
-        texto={semAcesso ? 'Outro mecânico já assumiu este chamado, ou ele foi encerrado.' : msg}
+        texto={semAcesso ? 'Outro especialista já assumiu este chamado, ou ele foi encerrado.' : msg}
         aoTentar={semAcesso ? undefined : () => void detalhe.refetch()}
         tentando={detalhe.isFetching}
       />
@@ -110,10 +110,10 @@ function Atendimento({ id }: { id: string }) {
     return (
       <TelaAvisoChamado
         icone={UserRoundX}
-        titulo="Chamado de outro mecânico"
+        titulo="Chamado de outro especialista"
         texto={
           <>
-            Este atendimento está com {d.mecanico?.nome ?? 'outro mecânico'}.
+            Este atendimento está com {d.mecanico?.nome ?? 'outro especialista'}.
             {d.papel === 'central' && (
               <>
                 {' '}

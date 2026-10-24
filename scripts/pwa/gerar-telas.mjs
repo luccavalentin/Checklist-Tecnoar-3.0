@@ -152,8 +152,7 @@ function htmlAbertura() {
     body{background:radial-gradient(120% 70% at 50% 42%,#0f2c55 0%,#081830 58%,#050f20 100%);
       display:flex;flex-direction:column;align-items:center;justify-content:center;
       font-family:"Segoe UI",system-ui,-apple-system,sans-serif;color:#fff}
-    .marca{width:min(62vw,52vh);aspect-ratio:1;background:url(data:image/png;base64,${icone}) center/contain no-repeat;
-      -webkit-mask:radial-gradient(closest-side,#000 78%,transparent 100%);mask:radial-gradient(closest-side,#000 78%,transparent 100%)}
+    .marca{width:min(62vw,52vh);aspect-ratio:1;background:url(data:image/png;base64,${icone}) center/contain no-repeat}
     h1{margin:min(2vh,18px) 0 0;font-size:min(7.2vw,4.4vh);font-weight:800;letter-spacing:-.02em}
     p{margin:.5em 0 0;font-size:min(3.8vw,2.3vh);color:rgba(255,255,255,.62);font-weight:500}
     .rodape{position:fixed;bottom:max(5vh,34px);left:0;right:0;text-align:center;font-size:min(3.2vw,1.9vh);

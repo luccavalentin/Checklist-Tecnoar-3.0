@@ -29,18 +29,21 @@ import { aplicarTema, lerTema, useCliente } from '../sessao'
 import { Avatar, BotaoApp, CabecalhoTela, CampoApp, Faixa, Folha, Tela } from '../comum/ui'
 import { useOnline } from '../comum/Pwa'
 import { CartaoAparelho } from '../comum/Aparelho'
+import { Arte } from '../comum/Arte'
+import { ARTE3D, ARTE_MOBILE, VEICULO_MOBILE, sumirSeFalhar } from '../comum/kit3d'
 import { useAlturaTeclado, useCasca, useHomeCliente, useInfoPublica } from './dados'
 import { Escolha, GrupoLista, LinhaLista } from './pecas'
 
 type Tema = 'claro' | 'escuro' | 'sistema'
 
 /**
- * Perfil do cliente: dados de contato (é por eles que o mecânico liga),
+ * Perfil do cliente: dados de contato (é por eles que o especialista liga),
  * aparência do app e a saída. Nada de configuração escondida em submenu.
  */
 export function PerfilCliente() {
   const { conta, email, sair } = useCliente()
   const { naoLidas } = useCasca()
+  const homePerfil = useHomeCliente()
   const qc = useQueryClient()
   const toast = useToast()
   const info = useInfoPublica()
@@ -59,7 +62,7 @@ export function PerfilCliente() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: CHAVES_SOS.papel })
       void qc.invalidateQueries({ queryKey: CHAVES_SOS.homeCliente })
-      toast.ok('Dados atualizados', 'O mecânico vai ligar para este número.')
+      toast.ok('Dados atualizados', 'O especialista vai ligar para este número.')
       setEditando(false)
     },
     onError: (e) => setErro((e as Error).message),
@@ -80,22 +83,26 @@ export function PerfilCliente() {
 
   return (
     <>
-      <CabecalhoTela titulo="Conta" />
-      <Tela className="entrada-suave">
-        <section className="flex items-center gap-4 rounded-[1.25rem] border border-line bg-surface p-4">
-          <Avatar nome={conta.nome} tamanho="lg" />
+      <div className="conta-cabecalho">
+        <CabecalhoTela titulo="Conta" />
+        <div className="conta-abertura"><h1>Conta</h1><p>Seus dados e preferências<br />em um só lugar.</p></div>
+      </div>
+      <Tela className="entrada-suave conta-mobile">
+        <section className="conta-identidade flex items-center gap-4 rounded-[1.25rem] border border-line bg-surface p-4">
+          <span className="conta-avatar-aro"><Avatar nome={conta.nome} tamanho="lg" /></span>
           <div className="min-w-0 flex-1">
             <p className="line-clamp-2 font-display text-[20px] leading-tight font-bold break-words text-ink">{conta.nome}</p>
             <p className="truncate text-[13.5px] text-ink-3">{email ?? conta.email ?? 'Sem e-mail'}</p>
             <p className="num truncate text-[13px] text-ink-3">{conta.telefone ? mascaraTelefone(conta.telefone) : 'Sem telefone'}</p>
           </div>
+          {homePerfil.data?.veiculo && <img src={VEICULO_MOBILE[homePerfil.data.veiculo.tipo ?? 'cavalo'] ?? ARTE_MOBILE.caminhao} alt="" aria-hidden="true" className="conta-veiculo-canto" onError={sumirSeFalhar} />}
         </section>
 
         {!conta.cliente_id && (
           <Faixa tom="info">Seu pedido de socorro já funciona. O histórico da Tecnoar aparece assim que a conta for ligada ao seu cadastro.</Faixa>
         )}
 
-        <section className="flex flex-col gap-3 rounded-[1.25rem] border border-line bg-surface p-4">
+        <section className="conta-dados flex flex-col gap-3 rounded-[1.25rem] border border-line bg-surface p-4">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-display text-[16px] font-bold text-ink">Seus dados</h2>
             {!editando && (
@@ -115,7 +122,7 @@ export function PerfilCliente() {
                 icone={Phone}
                 value={telefone}
                 onChange={(e) => setTelefone(mascaraTelefone(e.target.value))}
-                dica="É o número que vai para o mecânico no pedido de socorro."
+                dica="É o número que vai para o especialista no pedido de socorro."
               />
               {erro && <Faixa tom="critico">{erro}</Faixa>}
               <div className="grid grid-cols-2 gap-2">
@@ -137,25 +144,25 @@ export function PerfilCliente() {
             </form>
           ) : (
             <div className="flex flex-col divide-y divide-line dark:divide-white/10">
-              <Dado icone={User} rotulo="Nome" valor={conta.nome} />
-              <Dado icone={Phone} rotulo="Celular" valor={conta.telefone ? mascaraTelefone(conta.telefone) : 'Não informado'} />
-              <Dado icone={Mail} rotulo="E-mail" valor={email ?? conta.email ?? 'Não informado'} />
+              <Dado icone={User} peca={ARTE_MOBILE.conta} rotulo="Nome" valor={conta.nome} />
+              <Dado icone={Phone} peca={ARTE_MOBILE.telefone} rotulo="Celular" valor={conta.telefone ? mascaraTelefone(conta.telefone) : 'Não informado'} />
+              <Dado icone={Mail} peca={ARTE_MOBILE.email} rotulo="E-mail" valor={email ?? conta.email ?? 'Não informado'} />
             </div>
           )}
         </section>
 
         <GrupoLista rotulo="Mais opções">
-          <LinhaLista para="/notificacoes" icone={Bell} titulo="Notificações" direita={naoLidas ? <Contador n={naoLidas} /> : undefined} />
-          <LinhaLista para="/veiculos" icone={Truck} titulo="Meus veículos" />
-          <LinhaLista para="/revisoes" icone={CalendarCheck} titulo="Revisões e agendamentos" />
-          <LinhaLista para="/contato" icone={Headset} titulo="Falar com a Tecnoar" />
+          <LinhaLista para="/notificacoes" icone={Bell} peca={ARTE_MOBILE.notificacoes} titulo="Notificações" detalhe="Receba atualizações dos atendimentos" direita={naoLidas ? <Contador n={naoLidas} /> : undefined} />
+          <LinhaLista para="/veiculos" icone={Truck} peca={ARTE_MOBILE.veiculos} titulo="Meus veículos" detalhe="Gerencie seus veículos cadastrados" />
+          <LinhaLista para="/revisoes" icone={CalendarCheck} peca={ARTE_MOBILE.revisoes} titulo="Revisões e agendamentos" detalhe="Acompanhe e agende serviços" />
+          <LinhaLista para="/contato" icone={Headset} peca={ARTE_MOBILE.atendimento} titulo="Falar com a Tecnoar" detalhe="Tire dúvidas com nosso time" />
         </GrupoLista>
 
         <section className="flex flex-col gap-2" aria-labelledby="perfil-aparelho">
           <h2 id="perfil-aparelho" className="px-1 font-display text-[16px] font-bold text-ink">
-            App e notificações
+            Notificações
           </h2>
-          <CartaoAparelho />
+          <CartaoAparelho mostrarInstalacao={false} />
         </section>
 
         <section className="flex flex-col gap-3 rounded-[1.25rem] border border-line bg-surface p-4">
@@ -164,20 +171,21 @@ export function PerfilCliente() {
             valor={tema}
             aoMudar={trocarTema}
             opcoes={[
-              { valor: 'claro', rotulo: 'Claro', icone: Sun },
-              { valor: 'escuro', rotulo: 'Escuro', icone: Moon },
-              { valor: 'sistema', rotulo: 'Auto', icone: Monitor },
+              { valor: 'claro', rotulo: 'Claro', icone: Sun, peca: ARTE_MOBILE.temaClaro },
+              { valor: 'escuro', rotulo: 'Escuro', icone: Moon, peca: ARTE_MOBILE.temaEscuro },
+              { valor: 'sistema', rotulo: 'Auto', icone: Monitor, peca: ARTE_MOBILE.temaAuto },
             ]}
           />
           <p className="text-[12.5px] text-ink-3">O claro lê melhor ao sol; o escuro descansa a vista à noite.</p>
         </section>
 
         <GrupoLista rotulo="Privacidade e termos">
-          <LinhaLista para="/privacidade" icone={ShieldCheck} titulo="Política de privacidade" />
-          <LinhaLista para="/termos" icone={ScrollText} titulo="Termos de uso" />
+          <LinhaLista para="/privacidade" icone={ShieldCheck} peca={ARTE3D.seguranca} titulo="Política de privacidade" />
+          <LinhaLista para="/termos" icone={ScrollText} peca={ARTE_MOBILE.termos} titulo="Termos de uso" />
         </GrupoLista>
 
-        <BotaoApp variante="perigo" tamanho="lg" largo icone={LogOut} onClick={() => setConfirmarSaida(true)}>
+        <BotaoApp variante="perigo" tamanho="lg" largo onClick={() => setConfirmarSaida(true)}>
+          <Arte src={ARTE_MOBILE.sair} alt="" recuo={<LogOut className="size-5" />} classeImagem="size-8 shrink-0 object-contain" />
           Sair da conta
         </BotaoApp>
         <button
@@ -185,7 +193,7 @@ export function PerfilCliente() {
           onClick={() => setExcluindo(true)}
           className="mx-auto flex min-h-11 items-center gap-2 rounded-full px-4 text-[13.5px] font-semibold text-crit-ink/85 transition-colors hover:bg-crit-soft active:bg-crit-soft"
         >
-          <Trash2 className="size-4" /> Excluir minha conta
+          <Arte src={ARTE_MOBILE.excluir} alt="" recuo={<Trash2 className="size-4" />} classeImagem="size-7 shrink-0 object-contain" /> Excluir minha conta
         </button>
       </Tela>
 
@@ -325,10 +333,10 @@ function FolhaExcluirConta({ aberta, aoFechar, empresa }: { aberta: boolean; aoF
   )
 }
 
-function Dado({ icone: Icone, rotulo, valor }: { icone: ComponentType<{ className?: string }>; rotulo: string; valor: string }) {
+function Dado({ icone: Icone, rotulo, valor, peca }: { icone: ComponentType<{ className?: string }>; rotulo: string; valor: string; peca?: string }) {
   return (
     <div className="flex items-center gap-3 py-2.5">
-      <Icone className="size-5 shrink-0 text-ink-3" />
+      {peca ? <Arte src={peca} alt="" recuo={<Icone className="size-5 shrink-0 text-ink-3" />} classeImagem="conta-dado-peca" /> : <Icone className="size-5 shrink-0 text-ink-3" />}
       <div className="min-w-0 flex-1">
         <p className="text-[12px] text-ink-3">{rotulo}</p>
         <p className="truncate text-[15px] font-medium text-ink">{valor}</p>

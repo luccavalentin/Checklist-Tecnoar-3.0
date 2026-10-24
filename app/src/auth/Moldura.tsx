@@ -1,5 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { LogoSOS } from '../comum/ui'
+import { Arte } from '../comum/Arte'
+import { ARTE_MOBILE } from '../comum/kit3d'
 
 const dois = (n: number) => String(n).padStart(2, '0')
 
@@ -65,7 +67,7 @@ export function MolduraAcesso({
         {/* Uma identidade só: o selo do topo ("SOS Tecnoar" / "Equipe Tecnoar"). */}
         <div className="flex items-center justify-between gap-3">
           <Cronometro />
-          <span className="rounded-full border border-white/16 bg-white/10 px-3 py-1 text-[12.5px] font-semibold text-white/85 backdrop-blur-md">{selo}</span>
+          <span className="sos-login-selo flex items-center gap-2 text-[12px] font-semibold text-white"><Arte src={ARTE_MOBILE.seloSOS} alt="" classeImagem="size-11 object-contain" recuo={null} /><span>{selo}</span></span>
         </div>
 
         <div className="sos-login-brand">

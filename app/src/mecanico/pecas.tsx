@@ -4,28 +4,27 @@ import { cn } from '@/lib/utils'
 import { mensagemErroGPS, type ErroGPS } from '@/sos/geo'
 import { OCORRENCIAS, SITUACOES_MECANICO, formatarPlacaExibicao } from '@/sos/rotulos'
 import type { OcorrenciaSOS, PrioridadeSOS, SituacaoMecanico } from '@/sos/tipos'
+import { Arte } from '../comum/Arte'
+import { PECA_OCORRENCIA } from '../comum/kit3d'
 
 /**
- * Peças visuais só do app do mecânico. O que é comum ao cliente fica em
+ * Peças visuais só do app do especialista. O que é comum ao cliente fica em
  * `comum/ui.tsx`; aqui mora o vocabulário de quem está em campo: placa,
  * ícone do problema, situação.
  */
 
 /**
- * Placa no desenho Mercosul (faixa azul em cima, letras escuras). O mecânico
- * procura o caminhão pela placa: ela precisa saltar aos olhos, não se perder
- * no meio do texto.
+ * Identificador em metal estampado, compartilhando o acabamento do cliente.
  */
 export function Placa({ placa, tamanho = 'md', className }: { placa: string | null | undefined; tamanho?: 'sm' | 'md' | 'lg'; className?: string }) {
   if (!placa) return null
   const t = tamanho === 'lg' ? 'text-[17px] px-2.5 py-1' : tamanho === 'sm' ? 'text-[11px] px-1.5 py-[1px]' : 'text-[13px] px-2 py-0.5'
   return (
     <span
-      className={cn('inline-flex shrink-0 flex-col overflow-hidden rounded-[6px] border-[1.5px] border-[#0b1c33] bg-white leading-none shadow-[0_8px_18px_-14px_rgb(8_24_48/0.45)]', className)}
+      className={cn('sos-placa num inline-flex shrink-0 items-center font-bold leading-none', t, className)}
       aria-label={`Placa ${formatarPlacaExibicao(placa)}`}
     >
-      <span aria-hidden className={cn('bg-[#1f4fa8]', tamanho === 'sm' ? 'h-[3px]' : 'h-1')} />
-      <span className={cn('num placa-num font-bold text-[#0b1c33]', t)}>{formatarPlacaExibicao(placa)}</span>
+      <span className="sos-placa-texto">{formatarPlacaExibicao(placa)}</span>
     </span>
   )
 }
@@ -56,7 +55,7 @@ export function IconeOcorrencia({
         className,
       )}
     >
-      <Icone className={icone} strokeWidth={2.2} />
+      {PECA_OCORRENCIA[tipo ?? 'outro'] ? <Arte src={PECA_OCORRENCIA[tipo ?? 'outro']!} alt="" recuo={<Icone className={icone} strokeWidth={2.2} />} classeImagem={cn('object-contain', tamanho === 'lg' ? 'size-14' : tamanho === 'sm' ? 'size-9' : 'size-12')} /> : <Icone className={icone} strokeWidth={2.2} />}
     </span>
   )
 }
@@ -115,7 +114,7 @@ export function Interruptor({
 
 /**
  * Avisos de conexão e GPS no topo das telas em campo. Texto curto e de ação:
- * o mecânico lê de relance, com o caminhão ligado.
+ * o especialista lê de relance, com o caminhão ligado.
  */
 export function FaixasCampo({
   online,

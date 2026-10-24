@@ -13,6 +13,8 @@ import { useOnline } from '../../comum/Pwa'
 import { CHAVE_IA_PUBLICO, chaveConversaIA, primeiroNome, useAlturaTeclado, useHomeCliente, useInfoPublica, type EstadoAgendar, type EstadoFluxoSOS } from '../dados'
 import { IconeOcorrencia } from '../pecas'
 import { BalaoIA, BalaoVoce, Digitando, TextoIA } from './pecasIA'
+import { Arte } from '../../comum/Arte'
+import { ARTE_MOBILE } from '../../comum/kit3d'
 
 /**
  * Conversa com a Tecno IA de verdade (função `sos-ia`, ação `atendimento`).
@@ -323,7 +325,7 @@ export function ChatIA({
     <>
       <main className="entrada-suave mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 pt-4 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]">
         <div role="log" aria-live="polite" aria-label="Conversa com a Tecno IA" className="flex flex-col gap-3">
-          <BalaoIA>
+          <BalaoIA className="tecno-ia-boas-vindas">
             <p>
               Olá{nome ? `, ${nome}` : ''}! Sou a <strong>Tecno IA</strong>, a mecânica virtual da Tecnoar. Conte o que está acontecendo com o veículo — se puder,
               mande uma foto. Eu explico de um jeito simples, digo o que pode ser e se é seguro continuar.
@@ -497,7 +499,7 @@ export function ChatIA({
               onClick={() => arquivo.current?.click()}
               className="sos-soft-action flex size-12 shrink-0 items-center justify-center rounded-full text-accent-ink transition-transform active:scale-95 disabled:opacity-45"
             >
-              <Camera className="size-5" />
+              <Arte src={ARTE_MOBILE.camera} alt="" recuo={<Camera className="size-5" />} classeImagem="tecno-ia-camera" />
             </button>
             <textarea
               ref={campo}
@@ -523,10 +525,10 @@ export function ChatIA({
               disabled={!podeEnviar}
               className="sos-premium-action flex size-12 shrink-0 items-center justify-center rounded-full text-white transition-transform active:scale-95 disabled:opacity-40 disabled:shadow-none"
             >
-              {pensando ? <Loader2 className="size-5 animate-spin" /> : <ArrowUp className="size-5" strokeWidth={2.6} />}
+              {pensando ? <Loader2 className="size-5 animate-spin" /> : <Arte src={ARTE_MOBILE.enviar} alt="" recuo={<ArrowUp className="size-5" strokeWidth={2.6} />} classeImagem="size-12 object-contain" />}
             </button>
           </form>
-          <p className="px-1 text-center text-[11.5px] leading-snug text-ink-3">A Tecno IA orienta, mas não substitui o mecânico. Em perigo, toque em SOS.</p>
+          <p className="px-1 text-center text-[11.5px] leading-snug text-ink-3">A Tecno IA orienta, mas não substitui o especialista. Em perigo, toque em SOS.</p>
           <input
             ref={arquivo}
             type="file"
@@ -571,7 +573,7 @@ function CartaoSugestaoSOS({ sugestao: s, ativo, aoPedir }: { sugestao: Sugestao
         {ativo ? (
           <>
             <p className="text-[13px] leading-snug text-ink-2">
-              Você já tem um socorro em andamento (<span className="whitespace-nowrap">{ativo.protocolo}</span>). Fale com o mecânico por lá.
+              Você já tem um socorro em andamento (<span className="whitespace-nowrap">{ativo.protocolo}</span>). Fale com o especialista por lá.
             </p>
             <BotaoApp variante="sos" tamanho="lg" largo icone={Siren} onClick={() => navegar(`/chamado/${ativo.id}`)}>
               Acompanhar meu socorro

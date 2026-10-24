@@ -19,7 +19,13 @@
 
   --c-ink: #0b1c33;
   --c-ink-2: #4a5d77;
-  --c-ink-3: #71829b;
+  /* Era #71829b: 3,91:1 no branco e 3,55:1 no canvas — abaixo do mínimo de
+     4,5:1 da WCAG 2.2 AA para texto normal, e este token veste justamente a
+     letra pequena (glosa de indicador, legenda de campo, apoio de lista).
+     Este valor escurece mantendo a proporção entre os canais, ou seja o mesmo
+     matiz: 5,04:1 no branco, 4,78:1 na superfície 2 e 4,57:1 no canvas.
+     Conferido por scripts/design/conferir-cores.mjs. */
+  --c-ink-3: #617085;
 
   --c-accent: #fc6400;
   --c-accent-hover: #e35a00;
@@ -45,7 +51,6 @@
 
   --c-skeleton: #e6ebf3;
   --c-overlay: rgb(11 28 51 / 0.42);
-  --c-grid: rgb(11 28 51 / 0.06);
 
   --sh-1: 0 1px 2px rgb(11 28 51 / 0.06), 0 1px 3px rgb(11 28 51 / 0.05);
   --sh-2: 0 4px 14px -4px rgb(11 28 51 / 0.12), 0 2px 6px -2px rgb(11 28 51 / 0.08);
@@ -66,7 +71,13 @@
 
   --c-ink: #eaf1fa;
   --c-ink-2: #9fb4cf;
-  --c-ink-3: #6a809e;
+  /* Era #6a809e: 4,39:1 na superfície e 3,91:1 na superfície 2 — abaixo do
+     mínimo de 4,5:1 da WCAG 2.2 AA, e a superfície 2 é onde a letra pequena
+     mais aparece (linha de lista, cabeçalho de tabela, glosa de cartão).
+     Clareado mantendo o matiz: 5,36:1 na superfície, 4,78:1 na superfície 2 e
+     4,70:1 na superfície 2 do mecânico, que é a mais clara do app.
+     Conferido por scripts/design/conferir-cores.mjs. */
+  --c-ink-3: #778fb1;
 
   --c-accent: #fc6400;
   --c-accent-hover: #ff7a22;
@@ -92,7 +103,6 @@
 
   --c-skeleton: rgb(148 178 214 / 0.11);
   --c-overlay: rgb(2 6 14 / 0.66);
-  --c-grid: rgb(148 178 214 / 0.05);
 
   --sh-1: 0 1px 2px rgb(0 0 0 / 0.4);
   --sh-2: 0 6px 18px -6px rgb(0 0 0 / 0.55);
@@ -296,14 +306,6 @@
   text-transform: uppercase;
   line-height: 1.2;
   color: var(--c-ink-3);
-}
-
-/* Malha técnica de fundo (login, painéis de operação). */
-@utility malha-tecnica {
-  background-image:
-    linear-gradient(var(--c-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--c-grid) 1px, transparent 1px);
-  background-size: 56px 56px;
 }
 
 /*

@@ -454,7 +454,7 @@ function TextoLido({ rotulo, texto }: { rotulo: string; texto: string }) {
 /* ── km, diagnóstico e observações ──────────────────────────────────────── */
 
 /**
- * `null` = o mecânico não mexeu: o campo mostra o que está na OS (e segue o
+ * `null` = o especialista não mexeu: o campo mostra o que está na OS (e segue o
  * banco se outra pessoa mudar). Só vai para o banco o que mudou.
  */
 function DadosOS({ d, socorroAberto }: { d: DetalheOSApp; socorroAberto: boolean }) {

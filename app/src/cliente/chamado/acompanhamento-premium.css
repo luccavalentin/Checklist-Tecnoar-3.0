@@ -1,0 +1,133 @@
+/* Local ao acompanhamento: mapa e estados continuam vindo dos dados reais. */
+.acomp-premium {
+  --acomp-ease: cubic-bezier(.22, 1, .36, 1);
+  --acomp-drawer: cubic-bezier(.32, .72, 0, 1);
+}
+
+.acomp-premium ::selection { background: #00afef; color: #0d1c33; }
+.acomp-protocolo-3d::before, .acomp-protocolo-3d::after { display: none; }
+.acomp-premium :is(button, a, summary):focus-visible {
+  outline: 3px solid #00afef;
+  outline-offset: 4px;
+}
+.acomp-folha {
+  transition-timing-function: var(--acomp-drawer);
+  border-radius: 28px 28px 0 0;
+}
+.acomp-conteudo { scrollbar-width: thin; scrollbar-color: #66839b transparent; }
+.acomp-status {
+  position: relative;
+  isolation: isolate;
+  padding: 16px;
+  min-height: 140px;
+  border-radius: 16px;
+  color: #fff;
+  background: #0d1c33;
+  box-shadow: 0 12px 24px -18px rgb(0 32 97 / 55%);
+  animation: acomp-revelar 240ms var(--acomp-ease) both;
+}
+.acomp-marca { position: absolute; right: 16px; top: 14px; margin: 0; }
+.acomp-status > :is(h1, p) { position: relative; z-index: 1; }
+.acomp-status > h1 {
+  max-width: calc(100% - 58px);
+  color: #fff;
+  font-size: clamp(23px, 5.8vw, 28px);
+  font-weight: 750;
+  letter-spacing: -.025em;
+  text-wrap: balance;
+}
+.acomp-status > p { color: #ceddea; max-width: 37ch; margin-top: 4px; }
+.acomp-status > .flex { position: relative; z-index: 1; padding-right: 64px; }
+.acomp-status > .flex > .inline-flex { background: #203952; color: #e9f5ff; border-color: transparent; }
+.acomp-pino {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  top: 43px;
+  right: 8px;
+  width: 64px;
+  height: 76px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 8px rgb(0 0 0 / 22%));
+}
+.acomp-premium .cli-abrir-conversa {
+  min-height: 72px;
+  border-radius: 16px;
+  transition: transform 160ms var(--acomp-ease), background-color 160ms ease;
+}
+.acomp-premium .cli-abrir-conversa:active { transform: scale(.985); }
+.acomp-premium .cli-abrir-conversa-icone {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+}
+.acomp-status {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 64px;
+  align-items: start;
+  column-gap: 10px;
+  row-gap: 10px;
+  border: 1px solid #3d617d;
+  background: linear-gradient(140deg, #18364d, #081a2f 70%);
+  box-shadow: inset 0 1px 1px #d0edff26, 0 12px 24px -18px #00206188;
+}
+.acomp-status .acomp-marca { position: static; grid-column: 2; grid-row: 1; justify-self: center; }
+.acomp-status .acomp-pino {
+  position: static;
+  grid-column: 2;
+  grid-row: 2;
+  width: 64px;
+  height: 76px;
+  max-width: 100%;
+  object-fit: contain;
+}
+.acomp-status > .flex { grid-column: 1; grid-row: 1; padding-right: 0; gap: 6px; }
+.acomp-status > h1 { grid-column: 1; grid-row: 2; max-width: none; align-self: center; }
+.acomp-status > p { grid-column: 1 / -1; grid-row: 3; max-width: none; }
+.acomp-status > .flex > .acomp-etapa-3d {
+  border: 1px solid #52758e;
+  color: #e9f5ff;
+  background: linear-gradient(150deg, #35556e, #122a43);
+  box-shadow: inset 0 1px 1px #e0f4ff3d;
+}
+.acomp-status > .flex > .acomp-emergencia-3d {
+  border: 1px solid #ba695c;
+  color: #ffe8e3;
+  background: linear-gradient(150deg, #723e39, #3c2025);
+  box-shadow: inset 0 1px 1px #fff3;
+}
+.acomp-previsao {
+  border-radius: 16px;
+  border-color: transparent;
+  background: var(--color-surface, #fff);
+  box-shadow: 0 6px 18px -14px rgb(0 32 97 / 35%);
+  font-variant-numeric: tabular-nums;
+}
+.acomp-previsao > div { padding: 14px 16px; }
+.acomp-previsao > div:first-child > .font-display { color: #006b97; }
+.dark .acomp-previsao > div:first-child > .font-display { color: #55d2ff; }
+.acomp-mecanico { border-radius: 16px; }
+.acomp-mecanico > .grid { border-top: 1px solid var(--color-line, #dbe4ec); padding-top: 12px; }
+
+@keyframes acomp-revelar {
+  from { transform: translateY(7px); }
+  to { transform: translateY(0); }
+}
+@media (min-width: 768px) {
+  .acomp-folha { border-radius: 0; }
+  .acomp-status { padding: 22px; }
+}
+@media (max-width: 360px) {
+  .acomp-status { padding: 16px; }
+  .acomp-pino { width: 68px; height: 84px; right: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .acomp-premium *, .acomp-premium *::before, .acomp-premium *::after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

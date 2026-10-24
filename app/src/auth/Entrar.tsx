@@ -8,6 +8,8 @@ import { WHATSAPP_SOS_PADRAO, linkTelefone, linkWhatsApp } from '@/sos/rotulos'
 import { consumirAvisoContaNaoEquipe, useSessao } from '../sessao'
 import { BotaoApp, CampoApp, Faixa } from '../comum/ui'
 import { MolduraAcesso, traduzirErroAuth } from './Moldura'
+import { Arte } from '../comum/Arte'
+import { ARTE_MOBILE } from '../comum/kit3d'
 
 /** Sirene desenhada para o botão de emergência: cúpula, reflexo e raios finos. */
 function IconeSirene({ className }: { className?: string }) {
@@ -81,11 +83,11 @@ export function Entrar({ perfil = 'cliente' }: { perfil?: 'cliente' | 'mecanico'
       }
       topo={
         !mecanico && (telefone || whatsapp) ? (
-          <div className="flex max-w-full items-center justify-center gap-3">
+          <div className="sos-canais-acesso flex max-w-full items-center justify-center gap-3">
             {telefone && (
               <a href={telefone} aria-label="Emergência 24 horas: ligar para a Tecnoar sem cadastro" className="sos-emergencia min-w-0">
                 <span className="sos-emergencia-orb">
-                  <IconeSirene className="size-9" />
+                  <Arte src={ARTE_MOBILE.sirene} alt="" recuo={<IconeSirene className="size-9" />} classeImagem="sos-acesso-peca" />
                 </span>
                 <span className="flex min-w-0 flex-col text-left leading-tight">
                   <span className="truncate text-[11px] font-semibold tracking-[0.12em] text-white/75 uppercase">Emergência 24h</span>
@@ -102,7 +104,8 @@ export function Entrar({ perfil = 'cliente' }: { perfil?: 'cliente' | 'mecanico'
                 title="WhatsApp"
                 className="flex size-[4.4rem] shrink-0 items-center justify-center rounded-full border border-[#00afef]/36 bg-[#0D1C33]/72 text-[#00afef] shadow-[0_16px_34px_-18px_rgb(0_32_97/0.95)] backdrop-blur-md transition-transform active:scale-95"
               >
-                <IconeWhatsApp className="size-9" />
+                <Arte src={ARTE_MOBILE.whatsapp} alt="" recuo={<IconeWhatsApp className="size-9" />} classeImagem="sos-acesso-peca" />
+                <span className="sos-whatsapp-rotulo"><span>Falar no</span><strong>WhatsApp</strong></span>
               </a>
             )}
           </div>
@@ -128,6 +131,7 @@ export function Entrar({ perfil = 'cliente' }: { perfil?: 'cliente' | 'mecanico'
           inputMode="email"
           autoComplete={mecanico ? 'username' : 'email'}
           icone={Mail}
+          peca={ARTE_MOBILE.email}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -137,6 +141,7 @@ export function Entrar({ perfil = 'cliente' }: { perfil?: 'cliente' | 'mecanico'
           type={ver ? 'text' : 'password'}
           autoComplete="current-password"
           icone={Lock}
+          peca={ARTE_MOBILE.cadeado}
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
           required
@@ -154,7 +159,7 @@ export function Entrar({ perfil = 'cliente' }: { perfil?: 'cliente' | 'mecanico'
           carregando={entrando}
           className={mecanico ? 'bg-[#ff6600] shadow-[0_10px_22px_-12px_rgb(255_102_0/0.7)] hover:bg-[#cc5200]' : undefined}
         >
-          {mecanico ? 'Entrar no app do mecânico' : 'Entrar'}
+          {!entrando && <Arte src={ARTE_MOBILE.cadeado} alt="" classeImagem="size-8 shrink-0 object-contain" recuo={null} />}<span>{mecanico ? 'Entrar no app do mecânico' : 'Entrar'}</span>
         </BotaoApp>
         <div className="flex flex-wrap items-center justify-between gap-x-4 text-[14.5px]">
           <Link to="/esqueci-senha" className="inline-flex min-h-11 shrink-0 items-center font-semibold text-ink-2">

@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Check, PartyPopper } from 'lucide-react'
+import { PartyPopper } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { sosAvaliar } from '@/sos/api'
-import { Estrelas } from '@/sos/componentes'
 import { CHAVES_SOS } from '@/sos/tempoReal'
 import type { DetalheChamado } from '@/sos/tipos'
+import { ARTE3D, sumirSeFalhar } from '../../comum/kit3d'
 import { AreaApp, Avatar, BotaoApp, Faixa } from '../../comum/ui'
+import './avaliacao.css'
 
 const SENTIDO_NOTA = ['', 'Muito ruim', 'Ruim', 'Regular', 'Bom', 'Excelente']
 const ELOGIOS = ['Chegou rápido', 'Resolveu o problema', 'Educado e atencioso', 'Explicou o que fez', 'Preço justo']
@@ -43,9 +44,13 @@ export function TelaAvaliacao({ detalhe, aoFechar }: { detalhe: DetalheChamado; 
     <div className="fixed inset-0 z-[90] flex flex-col overflow-y-auto bg-canvas" role="dialog" aria-modal="true" aria-label="Avaliar atendimento">
       <div className="px-5 pt-[calc(2rem+env(safe-area-inset-top)+var(--faixa-rede,0px))] pb-2 text-center">
         <div className="mx-auto flex max-w-md flex-col items-center gap-3">
-          <span className="flex size-16 items-center justify-center rounded-full bg-ok text-white">
-            {enviado ? <PartyPopper className="size-8" /> : <Check className="size-9" strokeWidth={3} />}
-          </span>
+          {enviado ? (
+            <span className="flex size-16 items-center justify-center rounded-full bg-ok text-white">
+              <PartyPopper className="size-8" />
+            </span>
+          ) : (
+            <img src={ARTE3D.concluido} alt="" aria-hidden="true" width={246} height={320} decoding="async" draggable={false} onError={sumirSeFalhar} className="av-selo" />
+          )}
           <h1 className="font-display text-[26px] leading-tight font-bold text-ink">{enviado ? 'Obrigado!' : 'Serviço finalizado'}</h1>
           <p className="num text-[13px] text-ink-3">{c.protocolo}</p>
         </div>
@@ -68,8 +73,20 @@ export function TelaAvaliacao({ detalhe, aoFechar }: { detalhe: DetalheChamado; 
 
             <div className="flex flex-col items-center gap-2 text-center">
               <h2 className="font-display text-[20px] font-bold text-ink">Como foi o atendimento?</h2>
-              <div className="py-1 [&_button]:p-1.5 [&_svg]:size-11">
-                <Estrelas valor={nota} aoMudar={setNota} tamanho="lg" />
+              <div className="av-estrelas py-1" role="radiogroup" aria-label="Nota">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    role="radio"
+                    aria-checked={nota === n}
+                    aria-label={`${n} estrela${n > 1 ? 's' : ''}`}
+                    onClick={() => setNota(n)}
+                    className={cn('av-estrela', n <= nota ? 'av-estrela-on' : 'av-estrela-off')}
+                  >
+                    <img src={ARTE3D.estrela} alt="" aria-hidden="true" width={264} height={320} decoding="async" draggable={false} onError={sumirSeFalhar} />
+                  </button>
+                ))}
               </div>
               <p className={cn('h-5 text-[14px] font-semibold', nota >= 4 ? 'text-ok-ink' : nota > 0 ? 'text-warn-ink' : 'text-ink-3')}>
                 {nota ? SENTIDO_NOTA[nota] : 'Toque nas estrelas'}

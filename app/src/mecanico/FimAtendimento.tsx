@@ -15,6 +15,9 @@ import { linkOS } from './OrdemServico'
 import { Placa } from './pecas'
 import { modeloVeiculo } from './PecasAtendimento'
 import { BotaoM, RotuloM } from './ui'
+import { Arte } from '../comum/Arte'
+import { ARTE3D, ARTE_MOBILE } from '../comum/kit3d'
+import { IconeM3D } from './ArteMecanico'
 
 /**
  * Telas de fim de linha do chamado: finalizado (com a OS), cancelado e os
@@ -44,9 +47,7 @@ export function TelaConclusao({ d }: { d: DetalheChamado }) {
   return (
     <Moldura>
       <div className="entrada-suave flex flex-col items-center text-center">
-        <span className="flex size-20 items-center justify-center rounded-full bg-[#00afef] text-white mec-sombra-verde">
-          <Check className="size-10" strokeWidth={3} />
-        </span>
+        <Arte src={ARTE3D.concluido} alt="" classeImagem="size-24 object-contain" recuo={<Check className="size-16 text-ok" strokeWidth={3} />} />
         <h1 className="mt-4 font-display text-[28px] leading-tight font-black tracking-tight text-ink">
           {c.status === 'concluido' ? 'Atendimento concluído' : 'Atendimento finalizado'}
         </h1>
@@ -107,7 +108,7 @@ export function TelaConclusao({ d }: { d: DetalheChamado }) {
         </section>
 
         <section className="flex items-center gap-3 rounded-[1.25rem] border border-line bg-surface px-4 py-3.5">
-          <Star className="size-6 shrink-0 fill-[#f5a524] text-[#f5a524]" />
+          <Arte src={ARTE3D.estrela} alt="" classeImagem="size-8 shrink-0 object-contain" recuo={<Star className="size-6 shrink-0 fill-[#f5a524] text-[#f5a524]" />} />
           {c.avaliacao_nota ? (
             <div className="min-w-0">
               <RotuloM>Avaliação recebida</RotuloM>
@@ -145,11 +146,11 @@ function Feito({ children, icone: Icone = Check, tom = 'ok' }: { children: React
     <li className="flex items-center gap-3 px-4 py-3 text-[15px] font-semibold text-ink">
       <span
         className={cn(
-          'flex size-7 shrink-0 items-center justify-center rounded-full',
-          tom === 'ok' ? 'bg-ok-soft text-ok-ink' : tom === 'aviso' ? 'bg-warn-soft text-warn-ink' : 'bg-cyan-soft text-cyan-ink',
+          'flex size-8 shrink-0 items-center justify-center',
+          tom === 'ok' ? 'text-ok-ink' : tom === 'aviso' ? 'text-warn-ink' : 'text-cyan-ink',
         )}
       >
-        <Icone className="size-4" strokeWidth={3} />
+        <IconeM3D icone={Icone} className="size-7" />
       </span>
       <span className="min-w-0">{children}</span>
     </li>
@@ -212,9 +213,7 @@ export function TelaCancelado({ d }: { d: DetalheChamado }) {
   return (
     <Moldura>
       <div className="entrada-suave flex flex-col items-center text-center">
-        <span className="flex size-20 items-center justify-center rounded-full bg-crit-soft text-crit-ink">
-          <Ban className="size-10" />
-        </span>
+        <Arte src={ARTE_MOBILE.cancelarSocorro} alt="" classeImagem="size-24 object-contain" recuo={<Ban className="size-16 text-crit-ink" />} />
         <h1 className="mt-4 font-display text-[28px] leading-tight font-black tracking-tight text-ink">Chamado cancelado</h1>
         <p className="mt-1 text-[15px] text-ink-2">
           Cancelado {quem}
@@ -256,7 +255,7 @@ export function TelaCancelado({ d }: { d: DetalheChamado }) {
   )
 }
 
-/** Chamado que não dá para abrir (de outro mecânico, sumiu, erro de rede). */
+/** Chamado que não dá para abrir (de outro especialista, sumiu, erro de rede). */
 export function TelaAvisoChamado({
   icone: Icone = ClipboardList,
   titulo,

@@ -1,5 +1,20 @@
-/* Meus veículos (vei-*): topo com a foto de campo e o vazio convidando a
-   cadastrar. Mesmo desenho nos dois temas. */
+/* Meus veículos (vei-*).
+
+   O topo tinha uma FOTO de banco de imagem — um mecânico genérico, com véu
+   laranja em diagonal por cima. Três motivos para ela sair:
+
+   1. Não dizia nada. A pessoa está na tela dos veículos DELA; a foto de um
+      desconhecido não acrescenta informação nenhuma, só ruído atrás do
+      texto, e obrigava o título a viver espremido em 70% da largura para
+      não cair em cima de um rosto.
+   2. Brigava com o produto. O Início virou uma peça de metal usinada; uma
+      foto de catálogo ao lado disso denuncia que as duas telas foram feitas
+      por processos diferentes.
+   3. Custava banda. Numa tela que um motorista abre com sinal de estrada,
+      uma imagem de fundo decorativa é a primeira coisa que deveria sair.
+
+   No lugar: tipo, espaço e um fio de aço separando o topo do conteúdo —
+   o mesmo material do disco, em dose de hairline. */
 
 .vei {
   --v-texto: #101f38;
@@ -9,8 +24,6 @@
   --v-borda: rgb(16 31 56 / 0.07);
   --v-sombra: 0 1px 2px rgb(16 31 56 / 0.05), 0 14px 30px -20px rgb(16 31 56 / 0.3);
   --v-chip: #f1f4fa;
-  --v-veu: linear-gradient(95deg, rgb(243 246 251 / 0.96) 0%, rgb(243 246 251 / 0.9) 32%, rgb(243 246 251 / 0.5) 52%, transparent 74%);
-  --v-foto: url('/sos/home/mecanico-claro.webp');
   color: var(--v-texto);
 }
 
@@ -22,8 +35,6 @@
   --v-borda: rgb(148 178 214 / 0.18);
   --v-sombra: 0 16px 34px -26px rgb(0 0 0 / 0.9);
   --v-chip: rgb(255 255 255 / 0.06);
-  --v-veu: linear-gradient(95deg, rgb(7 17 31 / 0.94) 0%, rgb(7 17 31 / 0.86) 34%, rgb(7 17 31 / 0.45) 55%, transparent 76%);
-  --v-foto: url('/sos/home/mecanico-escuro.webp');
 }
 
 .vei-topo {
@@ -31,27 +42,8 @@
   container-type: inline-size;
   max-width: 430px;
   margin-inline: auto;
-  padding-bottom: 0.9rem;
+  padding-bottom: 1.1rem;
   overflow: hidden;
-}
-
-.vei-foto {
-  position: absolute;
-  top: -0.7cqw;
-  left: -1cqw;
-  width: 104cqw;
-  aspect-ratio: 1672 / 941;
-  background: var(--v-foto) center / 100% 100% no-repeat;
-  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 55%, transparent 92%);
-  mask-image: linear-gradient(to bottom, #000 0, #000 55%, transparent 92%);
-  pointer-events: none;
-}
-
-.vei-foto::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--v-veu);
 }
 
 .vei-barra {
@@ -88,9 +80,8 @@
   position: relative;
   margin-top: 1rem;
   padding: 0 1rem;
-  max-width: 70%;
-  font-size: clamp(23px, 6.6cqw, 30px);
-  font-weight: 760;
+  font-size: clamp(26px, 7.4cqw, 33px);
+  font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.025em;
   color: var(--v-texto);
@@ -100,8 +91,8 @@
   position: relative;
   margin-top: 0.35rem;
   padding: 0 1rem;
-  max-width: 62%;
-  font-size: 12.5px;
+  max-width: 34ch;
+  font-size: 13.5px;
   line-height: 1.35;
   color: var(--v-texto-2);
 }
@@ -201,4 +192,204 @@
 
 .vei-botao:active {
   transform: scale(0.985);
+}
+
+/* O fio de aço que fecha o topo. É o mesmo material do disco, reduzido a uma
+   linha: a luz atravessa da esquerda para a direita e apaga nas pontas, como
+   num rebordo torneado. Separa sem desenhar uma caixa. */
+.vei-topo::after {
+  content: '';
+  position: absolute;
+  right: 1rem;
+  bottom: 0;
+  left: 1rem;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgb(148 178 214 / 0.1) 8%,
+    rgb(214 230 250 / 0.42) 42%,
+    rgb(148 178 214 / 0.14) 74%,
+    transparent
+  );
+}
+
+/* ── a ficha do veículo ───────────────────────────────────────────────────
+   Uma superfície, campos estampados, fios de aço. Ver o comentário de
+   CartaoVeiculo para o porquê de ter saído do empilhamento de caixas. */
+
+.vei-ficha {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.05rem 1.1rem 0.9rem;
+  border: 1px solid var(--v-borda);
+  border-radius: 1.3rem;
+  background: var(--v-cartao);
+  box-shadow: var(--v-sombra);
+}
+
+/* O veículo do SOS ganha um fio de luz à esquerda — a borda inteira colorida
+   gritaria num cartão que já carrega a pastilha da placa. */
+.vei-ficha-principal {
+  position: relative;
+  overflow: hidden;
+}
+
+.vei-ficha-principal::before {
+  content: '';
+  position: absolute;
+  top: 1.05rem;
+  bottom: 1.05rem;
+  left: 0;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(to bottom, #ff9a2e, #fc6400 55%, #b84100);
+}
+
+.vei-ficha-urgente {
+  border-color: rgb(229 72 77 / 0.45);
+}
+
+.vei-ficha-nome {
+  font-family: var(--font-display, inherit);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  overflow-wrap: break-word;
+  color: var(--v-texto);
+}
+
+.vei-ficha-detalhe {
+  margin-top: 0.2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 13px;
+  color: var(--v-texto-3);
+}
+
+.vei-ficha-principal-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 700;
+  color: #fc6400;
+}
+
+/* Campos. Dois por linha, separados por fio — como numa plaqueta rebitada. */
+.vei-campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--v-borda);
+}
+
+.vei-campo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  min-height: 3.1rem;
+  text-align: left;
+}
+
+.vei-campo + .vei-campo {
+  padding-left: 1rem;
+  border-left: 1px solid var(--v-borda);
+}
+
+.vei-campo-rotulo {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--v-texto-3);
+}
+
+.vei-campo-valor {
+  font-family: var(--font-display, inherit);
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--v-texto);
+}
+
+.vei-campo-valor-crit {
+  color: #e5484d;
+}
+
+.vei-campo-nota,
+.vei-campo-acao {
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--v-texto-3);
+}
+
+.vei-campo-acao {
+  font-weight: 700;
+  color: #fc6400;
+}
+
+button.vei-campo-toca:active {
+  opacity: 0.6;
+}
+
+.vei-ficha-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1.1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--v-borda);
+}
+
+/* Ação em peso de TEXTO. Botão cheio aqui só quando há revisão vencida — e
+   aí ele é a única coisa cheia na ficha, então não disputa com nada. */
+.vei-ficha-link {
+  display: inline-flex;
+  min-height: 2.6rem;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-display, inherit);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--v-texto-2);
+}
+
+.vei-ficha-link:active {
+  opacity: 0.6;
+}
+
+/* O caminhão na ficha.
+   Encostado na direita e sangrando um pouco para fora: objeto que termina
+   antes da borda vira adesivo colado no cartão; objeto que atravessa a borda
+   dá a impressão de que o cartão é uma JANELA para ele. É a diferença entre
+   ilustrar e mostrar.
+   Fica atrás do texto, com a coluna de texto estreitada para não cruzar. */
+.vei-ficha {
+  position: relative;
+  overflow: hidden;
+}
+
+.vei-ficha-arte {
+  position: absolute;
+  top: -8%;
+  right: -9%;
+  width: 56%;
+  max-width: 15rem;
+  pointer-events: none;
+  /* Apaga ao se aproximar do texto, para nenhuma palavra cair sobre a lataria. */
+  -webkit-mask-image: linear-gradient(to left, #000 52%, transparent 96%);
+  mask-image: linear-gradient(to left, #000 52%, transparent 96%);
+}
+
+/* Com o caminhão atrás, o nome e o detalhe param antes dele. */
+.vei-ficha:has(.vei-ficha-arte[data-pronta]) .vei-ficha-nome,
+.vei-ficha:has(.vei-ficha-arte[data-pronta]) .vei-ficha-detalhe {
+  max-width: 62%;
 }

@@ -1,60 +1,17 @@
-import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
-import { Bus, CalendarCheck, CarFront, ChevronRight, Moon, Siren, Sun, Truck, Wrench } from 'lucide-react'
+import { Bus, CalendarCheck, CarFront, ChevronRight, Moon, Sun, Truck, Wrench } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Arte } from '../../comum/Arte'
+import { ARTE3D, ARTE_MOBILE, VEICULO_MOBILE } from '../../comum/kit3d'
 import type { HomeCliente as DadosHome } from '@/sos/tipos'
 import { aplicarTema } from '../../sessao'
 import { venceu } from '../dados'
 
 /**
- * Peças do Início: o botão de tema, o botão SOS, o ícone do veículo e os
- * avisos do veículo (revisão vencida, veículo na oficina).
+ * Peças do Início: o botão de tema, o ícone do veículo e os avisos do veículo
+ * (revisão vencida, veículo na oficina). O botão de socorro é peça própria,
+ * em BotaoSOS.tsx.
  */
-
-/* ── botão SOS ──────────────────────────────────────────────────────────── */
-
-/**
- * Botão SOS com anéis. Só navega: quem abre o pedido é a tela do SOS — dois
- * toques seguidos não criam dois pedidos.
- */
-export function OrbeSOS({
-  aoTocar,
-  ativo,
-  tema,
-  className,
-  style,
-}: {
-  /** Sem `aoTocar`, é só o desenho (dentro de um cartão que já é o botão). */
-  aoTocar?: () => void
-  ativo: boolean
-  tema: 'claro' | 'escuro'
-  className?: string
-  style?: CSSProperties
-}) {
-  const miolo = (
-    <>
-      <span aria-hidden className="ini-orbe-anel-fora" />
-      <span aria-hidden className="ini-orbe-anel" />
-      <span className="ini-orbe-nucleo">
-        <Siren className="ini-orbe-icone" strokeWidth={1.9} />
-        <span className="ini-orbe-texto">{ativo ? 'AO VIVO' : 'SOS'}</span>
-      </span>
-    </>
-  )
-  const classe = cn('ini-orbe', tema === 'claro' ? 'ini-orbe-claro' : 'ini-orbe-escuro', className)
-  if (!aoTocar) {
-    return (
-      <span aria-hidden className={classe} style={style}>
-        {miolo}
-      </span>
-    )
-  }
-  return (
-    <button type="button" onClick={aoTocar} aria-label={ativo ? 'Acompanhar o socorro em andamento' : 'Pedir socorro (SOS)'} className={classe} style={style}>
-      {miolo}
-    </button>
-  )
-}
 
 /* ── tema ───────────────────────────────────────────────────────────────── */
 
@@ -66,17 +23,28 @@ export function BotaoTema({ para, className }: { para: 'claro' | 'escuro'; class
   const Icone = para === 'escuro' ? Moon : Sun
   return (
     <button type="button" onClick={() => aplicarTema(para)} aria-label={para === 'escuro' ? 'Usar o modo escuro' : 'Usar o modo claro'} title={para === 'escuro' ? 'Modo escuro' : 'Modo claro'} className={className}>
-      <Icone className="size-[20px]" strokeWidth={1.8} />
+      <Arte src={para === 'escuro' ? ARTE_MOBILE.lua : ARTE_MOBILE.sol} alt="" recuo={<Icone className="size-[20px]" strokeWidth={1.8} />} classeImagem="ini-topo-peca" />
     </button>
   )
 }
 
 /* ── veículo ────────────────────────────────────────────────────────────── */
 
-/** Ícone pelo tipo do veículo cadastrado — nunca uma foto de outro veículo. */
+/**
+ * O veículo do cliente — nunca a foto de outro veículo.
+ *
+ * Tenta a arte 3D do tipo cadastrado (`/sos/veiculos/cavalo.png` e irmãos,
+ * gerados pelos prompts em `design/prompts-3d-app.md`) e cai no ícone de
+ * linha enquanto o arquivo não existe. É o que permite as artes chegarem uma
+ * a uma sem nenhuma tela quebrar no meio do caminho.
+ */
 export function IconeVeiculo({ tipo, className }: { tipo?: string | null; className?: string }) {
   const Icone = tipo === 'onibus' ? Bus : tipo === 'van' || tipo === 'utilitario' ? CarFront : Truck
-  return <Icone className={className} strokeWidth={1.6} />
+  const linha = <Icone className={className} strokeWidth={1.6} />
+  /* Sem tipo cadastrado, a peça do kit já é melhor que o traço: o cartão
+     convida a cadastrar, e um caminhão de verdade convida mais. */
+  if (!tipo) return <Arte src={ARTE3D.veiculos} alt="" recuo={linha} classeImagem={className} />
+  return <Arte src={VEICULO_MOBILE[tipo] ?? `/sos/veiculos/${tipo}.png`} alt="" recuo={linha} classeImagem={className} />
 }
 
 /**

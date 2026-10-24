@@ -12,6 +12,8 @@ import { dataLonga, kmTexto, useMeusVeiculos } from './dados'
 import { ErroCarga, PlacaVeiculo, Segmentado } from './pecas'
 import { BotaoLaudo, temLaudo } from './chamado/Laudo'
 import { ListaSocorros, SeloStatusCliente } from './MeusChamados'
+import { ARTE3D, ARTE_MOBILE } from '../comum/kit3d'
+import { Arte } from '../comum/Arte'
 
 type Aba = 'tudo' | 'os' | 'sos'
 
@@ -46,10 +48,11 @@ export function Historico() {
 
   return (
     <>
-      <CabecalhoTela titulo="Histórico" subtitulo="Serviços e socorros do seu veículo" />
+      <CabecalhoTela titulo="Histórico" subtitulo="Seus serviços e socorros" arte={ARTE3D.historico} />
       <Tela className="entrada-suave">
         <Segmentado<Aba>
           rotulo="Mostrar"
+          className="historico-filtros-3d"
           valor={aba}
           aoMudar={(v) => mudar({ tipo: v })}
           opcoes={[
@@ -84,6 +87,7 @@ export function Historico() {
           <ErroCarga erro={historico.error} aoTentar={() => void historico.refetch()} />
         ) : lista.length === 0 ? (
           <VazioApp
+            arte="historico"
             icone={aba === 'os' ? ClipboardList : History}
             titulo={aba === 'os' ? 'Nenhuma ordem de serviço' : 'Nada no histórico ainda'}
             descricao="As ordens de serviço feitas na Tecnoar e os socorros aparecem aqui automaticamente."
@@ -202,9 +206,12 @@ function ItemSOS({ item: i }: { item: HistSOS }) {
   return (
     <article className="overflow-hidden rounded-[1.25rem] border border-line bg-surface">
       <button type="button" onClick={() => navegar(`/chamado/${i.id}`)} className="flex w-full items-start gap-3 p-4 text-left active:bg-surface-2">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-crit-soft text-crit">
-          <Siren className="size-5" />
-        </span>
+        <Arte
+          src={ARTE_MOBILE.sirene}
+          alt=""
+          classeImagem="size-12 shrink-0 rounded-xl object-cover"
+          recuo={<span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-crit-soft text-crit"><Siren className="size-5" /></span>}
+        />
         <div className="min-w-0 flex-1">
           <p className="font-display text-[15.5px] font-bold text-ink">Socorro · {i.ocorrencia_rotulo}</p>
           <p className="mt-0.5 text-[12.5px] text-ink-3">
@@ -220,7 +227,7 @@ function ItemSOS({ item: i }: { item: HistSOS }) {
             )}
           </div>
           {(i.servico || i.diagnostico) && <p className="mt-2 line-clamp-2 text-[13.5px] leading-snug text-ink-2">{i.servico || i.diagnostico}</p>}
-          {i.mecanico && <p className="mt-1 text-[12.5px] text-ink-3">Mecânico: {i.mecanico}</p>}
+          {i.mecanico && <p className="mt-1 text-[12.5px] text-ink-3">Especialista: {i.mecanico}</p>}
         </div>
         <ChevronRight className="mt-1 size-5 shrink-0 text-ink-3" />
       </button>

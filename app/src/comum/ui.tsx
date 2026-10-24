@@ -1,8 +1,12 @@
-import { forwardRef, useEffect, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react'
+import { forwardRef, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react'
 import { createPortal } from 'react-dom'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { ChevronLeft, Loader2, Wrench, X, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useDialogo } from './useDialogo'
+import { Arte } from './Arte'
+import { AcaoAgendar3D } from './AcaoAgendar3D'
+import './experiencia.css'
 
 /**
  * Peças de interface do app SOS (cliente e mecânico).
@@ -67,6 +71,7 @@ export function CabecalhoTela({
   acao,
   transparente,
   className,
+  arte,
 }: {
   titulo?: ReactNode
   subtitulo?: ReactNode
@@ -74,6 +79,7 @@ export function CabecalhoTela({
   acao?: ReactNode
   transparente?: boolean
   className?: string
+  arte?: string
 }) {
   const navegar = useNavigate()
   return (
@@ -82,6 +88,7 @@ export function CabecalhoTela({
         'sticky top-0 z-30 pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))]',
         transparente ? 'bg-transparent' : 'sos-native-header text-ink',
         className,
+        arte && 'mobile-page-header',
       )}
     >
       <div className="mx-auto flex min-h-[3.75rem] w-full max-w-xl items-center gap-2 px-3 pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))]">
@@ -100,6 +107,7 @@ export function CabecalhoTela({
           {subtitulo && <p className="truncate text-[12.5px] text-ink-3">{subtitulo}</p>}
         </div>
         {acao && <div className="flex shrink-0 items-center gap-1">{acao}</div>}
+        {arte && <Arte src={arte} alt="" recuo={null} classeImagem="mobile-header-peca" />}
       </div>
     </header>
   )
@@ -119,7 +127,7 @@ export function Tela({
   return (
     <main
       className={cn(
-        'relative z-[1] mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pt-4 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]',
+          'sos-page-motion relative z-[1] mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pt-4 pr-[max(1rem,env(safe-area-inset-right))] pl-[max(1rem,env(safe-area-inset-left))]',
         comBarra ? 'pb-[calc(9rem+env(safe-area-inset-bottom))]' : 'pb-[calc(1.5rem+env(safe-area-inset-bottom))]',
         className,
       )}
@@ -198,6 +206,7 @@ export const BotaoApp = forwardRef<HTMLButtonElement, BotaoAppProps>(function Bo
   { variante = 'primario', tamanho = 'md', carregando, icone: Icone, largo, className, children, disabled, type = 'button', ...props },
   ref,
 ) {
+  const agendar3d = typeof children === 'string' && children.trim() === 'Agendar revisão'
   return (
     <button
       ref={ref}
@@ -205,16 +214,19 @@ export const BotaoApp = forwardRef<HTMLButtonElement, BotaoAppProps>(function Bo
       disabled={disabled || carregando}
       aria-busy={carregando || undefined}
       className={cn(
-        'inline-flex items-center justify-center font-display font-semibold tracking-tight transition-[transform,background-color,border-color,box-shadow] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:active:scale-100',
+          'sos-motion-button inline-flex items-center justify-center font-display font-semibold tracking-tight transition-[transform,background-color,border-color,box-shadow] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:active:scale-100',
         VARIANTES[variante],
+        'sos-button-3d',
+        `sos-button-3d-${variante}`,
         TAMANHOS[tamanho],
         largo && 'w-full',
         className,
+        agendar3d && 'sos-agendar-render',
       )}
       {...props}
     >
-      {carregando ? <Loader2 className="size-5 animate-spin" /> : Icone && <Icone className="size-5 shrink-0" />}
-      {children}
+      {carregando ? <Loader2 className="size-5 animate-spin" /> : !agendar3d && Icone && <Icone className="size-5 shrink-0" />}
+      {agendar3d ? <AcaoAgendar3D /> : children}
     </button>
   )
 })
@@ -287,26 +299,14 @@ export function Folha({
   rodape?: ReactNode
   fecharFora?: boolean
 }) {
-  useEffect(() => {
-    if (!aberta) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && aoFechar()
-    document.addEventListener('keydown', onKey)
-    const overflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = overflow
-    }
-  }, [aberta, aoFechar])
+  const painel = useDialogo(aberta, aoFechar)
 
   if (!aberta) return null
   return createPortal(
-    <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label={typeof titulo === 'string' ? titulo : undefined}>
-      <div className="absolute inset-0 bg-[#0D1C33]/45" onClick={fecharFora ? aoFechar : undefined} aria-hidden />
-      <div className="sos-sheet sos-sobe relative flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[2rem] text-ink sm:rounded-[2rem]">
-        <div className="flex justify-center pt-2.5 sm:hidden" aria-hidden>
-          <span className="h-1.5 w-10 rounded-full bg-line-strong" />
-        </div>
+    <div className="fixed inset-0 z-[80] sos-dialogo-central flex items-center justify-center p-3 sm:p-6" role="dialog" aria-modal="true" aria-label={typeof titulo === 'string' ? titulo : undefined}>
+      <div className="sos-motion-backdrop absolute inset-0 bg-[#0D1C33]/45" onClick={fecharFora ? aoFechar : undefined} aria-hidden />
+      <div ref={painel} tabIndex={-1} className="sos-sheet sos-dialogo-painel relative flex max-h-[90dvh] w-full max-w-lg flex-col overflow-hidden rounded-[1.5rem] text-ink outline-none">
+        <div className="sos-dialogo-marca flex items-center justify-between border-b border-line px-5 py-3"><img className="sos-dialogo-logo h-7 w-auto" src="/brand/tecnoar-positivo.svg" alt="Tecnoar" /><img className="sos-dialogo-logo-negativo hidden h-7 w-auto" src="/brand/tecnoar-negativo.svg" alt="Tecnoar" /><span className="text-[10px] font-semibold tracking-wide text-ink-3">SOS TECNOAR</span></div>
         {(titulo || descricao) && (
           <div className="flex items-start justify-between gap-3 px-5 pt-3 pb-2 sm:pt-5">
             <div className="min-w-0">
@@ -353,24 +353,57 @@ export function LinhaInfo({ rotulo, valor, icone: Icone }: { rotulo: string; val
   )
 }
 
+/**
+ * Tela sem nada.
+ *
+ * Com `arte`, o objeto renderizado entra GRANDE e a moldura sai: um objeto
+ * com volume e sombra próprios dentro de uma caixa com borda vira figurinha
+ * colada num cartão, e a página inteira volta a parecer formulário. Sem a
+ * arte (ou enquanto o arquivo não existe), fica a pastilha com o ícone de
+ * linha, que precisa da moldura para não boiar no vazio.
+ *
+ * As duas versões existem porque as artes chegam uma a uma — ver
+ * `design/prompts-elementos-ui.md`.
+ */
 export function VazioApp({
   icone: Icone,
+  arte,
   titulo,
   descricao,
   acao,
 }: {
   icone: LucideIcon
+  /** Nome do arquivo em `/sos/vazios/`, sem extensão. */
+  arte?: string
   titulo: string
   descricao?: ReactNode
   acao?: ReactNode
 }) {
+  const pastilha = (
+    <span className="flex size-16 items-center justify-center rounded-[1.4rem] bg-accent-soft text-accent-ink">
+      <Icone className="size-7" strokeWidth={1.9} />
+    </span>
+  )
+  if (!arte) {
+    return (
+      <div className="flex flex-col items-center gap-3 rounded-[1.25rem] border border-line bg-surface px-6 py-9 text-center">
+        {pastilha}
+        <p className="font-display text-[17px] font-bold text-ink">{titulo}</p>
+        {descricao && <p className="max-w-[19rem] text-[14px] leading-relaxed text-ink-2">{descricao}</p>}
+        {acao && <div className="pt-1">{acao}</div>}
+      </div>
+    )
+  }
   return (
-    <div className="flex flex-col items-center gap-3 rounded-[1.25rem] border border-line bg-surface px-6 py-9 text-center">
-      <span className="flex size-16 items-center justify-center rounded-[1.4rem] bg-accent-soft text-accent-ink">
-        <Icone className="size-7" strokeWidth={1.9} />
-      </span>
-      <p className="font-display text-[17px] font-bold text-ink">{titulo}</p>
-      {descricao && <p className="max-w-[19rem] text-[14px] leading-relaxed text-ink-2">{descricao}</p>}
+    <div className="flex flex-col items-center gap-3 px-6 py-10 text-center">
+      <Arte
+        src={`/sos/vazios/${arte}.png`}
+        alt=""
+        recuo={pastilha}
+        classeImagem="size-28 drop-shadow-[0_12px_22px_rgb(3_8_16/0.5)]"
+      />
+      <p className="mt-1 font-display text-[18px] font-bold text-ink">{titulo}</p>
+      {descricao && <p className="max-w-[20rem] text-[14px] leading-relaxed text-ink-2">{descricao}</p>}
       {acao && <div className="pt-1">{acao}</div>}
     </div>
   )
@@ -403,6 +436,11 @@ export interface ItemBarra {
   rota: string
   rotulo: string
   icone: LucideIcon
+  /**
+   * Peça 3D da aba. Opcional: sem ela (ou se o arquivo não carregar) a barra
+   * mostra o ícone de linha, que é o que o app do especialista usa.
+   */
+  peca?: string
   /** Número no ícone (mensagens, pendências). */
   contador?: number
   fim?: boolean
@@ -433,6 +471,7 @@ export function BarraNavegacao({ itens, centro, className }: { itens: ItemBarra[
 
 function ItemNavegacao({ item }: { item: ItemBarra }) {
   const Icone = item.icone
+  const linha = <Icone className="size-6" strokeWidth={1.9} />
   return (
     <NavLink
       to={item.rota}
@@ -440,12 +479,14 @@ function ItemNavegacao({ item }: { item: ItemBarra }) {
       className={({ isActive }) =>
         cn(
           'relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[11px] font-semibold transition-colors',
-          isActive ? 'text-accent-ink' : 'text-ink-3 hover:text-ink-2',
+          isActive ? 'nav-ativa text-accent-ink' : 'text-ink-3 hover:text-ink-2',
         )
       }
     >
       <span className="relative flex size-7 items-center justify-center">
-        <Icone className="size-6" strokeWidth={1.9} />
+        {/* Fora da aba aberta a peça recua: a barra inteira acesa não diria
+            mais onde a pessoa está. */}
+        {item.peca ? <Arte src={item.peca} alt="" recuo={linha} classeImagem="nav-peca size-6" /> : linha}
         {!!item.contador && (
           <span className="num absolute -top-1.5 -right-2.5 flex min-w-[18px] items-center justify-center rounded-full bg-[#ff6600] px-1 text-[10px] leading-[18px] font-bold text-white ring-2 ring-surface">
             {item.contador > 99 ? '99+' : item.contador}
@@ -466,8 +507,8 @@ function ItemNavegacao({ item }: { item: ItemBarra }) {
  */
 export const CampoApp = forwardRef<
   HTMLInputElement,
-  InputHTMLAttributes<HTMLInputElement> & { rotulo: string; erro?: string | null; dica?: ReactNode; icone?: LucideIcon; direita?: ReactNode }
->(function CampoApp({ rotulo, erro, dica, icone: Icone, direita, className, id, ...props }, ref) {
+  InputHTMLAttributes<HTMLInputElement> & { rotulo: string; erro?: string | null; dica?: ReactNode; icone?: LucideIcon; peca?: string; direita?: ReactNode }
+>(function CampoApp({ rotulo, erro, dica, icone: Icone, peca, direita, className, id, ...props }, ref) {
   const idCampo = id ?? `campo-${rotulo.replace(/\W+/g, '-').toLowerCase()}`
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
@@ -480,7 +521,7 @@ export const CampoApp = forwardRef<
           erro && '!border-crit',
         )}
       >
-        {Icone && <Icone className="size-5 shrink-0 text-ink-3" />}
+        {peca ? <Arte src={peca} alt="" classeImagem="size-8 shrink-0 object-contain" recuo={Icone ? <Icone className="size-5 shrink-0 text-ink-3" /> : null} /> : Icone && <Icone className="size-5 shrink-0 text-ink-3" />}
         <input
           ref={ref}
           id={idCampo}

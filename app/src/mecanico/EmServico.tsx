@@ -232,7 +232,7 @@ function Painel({
   const veiculo = modeloVeiculo(d)
 
   function pedirInicio() {
-    // Foto do antes protege o mecânico e a Tecnoar ("isso já estava assim").
+    // Foto do antes protege o especialista e a Tecnoar ("isso já estava assim").
     if (antes.length === 0) return setFolhaIniciar(true)
     iniciar()
   }

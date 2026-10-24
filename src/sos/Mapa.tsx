@@ -41,6 +41,8 @@ export interface MarcadorMapa {
   /** Letra/ícone dentro do pino do mecânico (iniciais). */
   sigla?: string
   selecionado?: boolean
+  /** Marcador ampliado do resumo de localização no app do cliente. */
+  premium?: boolean
   aoClicar?: () => void
 }
 
@@ -69,12 +71,46 @@ export interface MapaSOSProps {
 
 const BRASIL: Ponto = { lat: -15.78, lng: -47.93 }
 
-/* Base: OpenStreetMap, sem chave. (A CARTO passou a exigir chave e estampa
-   "API KEY REQUIRED" no mapa.) O tema escuro é o mesmo mapa com filtro de
-   cor no painel de tiles — ver `mapa.css`. Se o volume crescer, trocar por um
-   provedor com chave (MapTiler, Stadia) só muda esta URL. */
-const URL_TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
-const ATRIBUICAO = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+/* ── a base do mapa ───────────────────────────────────────────────────────
+ *
+ * Era o OpenStreetMap padrão com `filter: invert(1)` por cima no tema
+ * escuro. Duas coisas davam errado, e as duas apareciam na tela:
+ *
+ * 1. INVERTER UM MAPA COLORIDO NÃO PRODUZ UM MAPA ESCURO. Produz um
+ *    NEGATIVO: parque verde vira magenta, água azul vira bege, asfalto vira
+ *    branco sujo. Nenhuma dessas cores foi escolhida por ninguém — elas são
+ *    o que sobra de uma conta matemática. Ao lado de um app navy e laranja,
+ *    o resultado denuncia que o mapa não faz parte do produto.
+ *
+ * 2. O OSM PADRÃO MOSTRA TUDO. Nome de rua, de bairro, de comércio, pintura
+ *    de quadra, uso do solo. Numa tela cujo trabalho é responder "onde está
+ *    meu caminhão e onde está o mecânico", isso é ruído competindo com dois
+ *    pinos e uma rota.
+ *
+ * Agora a base é o Gray Canvas do ArcGIS: cinza dessaturado de propósito,
+ * desenhado para ser FUNDO de dados. As duas versões (clara e escura) são
+ * mapas de verdade, não filtro — então a cor é escolhida, e o laranja da
+ * rota e o ciano do mecânico são as únicas cores saturadas da tela.
+ *
+ * A CARTO foi descartada de novo: `dark_all` e `dark_nolabels` devolvem o
+ * MESMO arquivo (md5 idêntico), que é a imagem de "API KEY REQUIRED".
+ *
+ * As URLs saem de variável de ambiente para trocar de provedor sem mexer em
+ * código — ver a nota sobre licença em `docs/produtos-sos/`.
+ */
+const BASES = {
+  claro: {
+    base: import.meta.env.VITE_MAPA_CLARO ??
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    nomes: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+  },
+  escuro: {
+    base: import.meta.env.VITE_MAPA_ESCURO ??
+      'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    nomes: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+  },
+} as const
+const ATRIBUICAO = '&copy; Esri, HERE, Garmin, OpenStreetMap'
 
 export function MapaSOS({
   marcadores = [],
@@ -110,7 +146,11 @@ export function MapaSOS({
         className="size-full"
         preferCanvas
       >
-        <TileLayer url={URL_TILES} attribution={ATRIBUICAO} maxZoom={19} />
+        {/* Base e nomes em camadas separadas: assim os rótulos podem ser
+            abaixados sem apagar o desenho das vias — e numa estrada à noite
+            o que importa é a FORMA da via, não o nome de cada travessa. */}
+        <TileLayer key={`base-${tema}`} url={BASES[tema].base} attribution={ATRIBUICAO} maxZoom={16} maxNativeZoom={16} />
+        <TileLayer key={`nomes-${tema}`} url={BASES[tema].nomes} maxZoom={16} maxNativeZoom={16} className="mapa-nomes" />
         {rota && rota.length > 1 && (
           <>
             <Polyline positions={rota.map((p) => [p.lat, p.lng])} pathOptions={{ color: '#081830', weight: 8, opacity: 0.18 }} />
@@ -165,11 +205,41 @@ export function MapaSOS({
  */
 const LOGO_TECNOAR = '/brand/tecnoar-positivo.svg'
 
+/**
+ * Qual arte serve a este marcador.
+ *
+ * Os pinos são renderizados (ver `design/prompts-elementos-ui.md`), e cada um
+ * já carrega o SIGNIFICADO desenhado: caminhão, chave, guincho, alerta,
+ * concluído, apagado. Antes, todo pino era a mesma logo numa bolha branca e o
+ * estado vinha só da cor de um anel — o que obrigava a decorar a legenda. Com
+ * a arte, o pino se explica sozinho a dois metros de distância.
+ *
+ * Se o arquivo não existir, o `onerror` devolve o pino em CSS: a arte entra
+ * sem virar dependência de carregamento.
+ */
+function arteDoPino(m: MarcadorMapa): string | null {
+  if (m.tipo === 'mecanico' || m.tipo === 'mecanico_livre' || m.tipo === 'mecanico_ocupado') return 'mecanico'
+  if (m.tipo === 'mecanico_off') return 'inativo'
+  if (m.tipo !== 'cliente' && m.tipo !== 'chamado') return null
+  if (m.critico) return 'alerta'
+  if (m.tom === 'fim') return 'concluido'
+  if (m.tom === 'encerrado') return 'inativo'
+  return 'veiculo'
+}
+
 function htmlPinoMarca(m: MarcadorMapa, pulso: string, sel: string): string {
   const tom = m.tom ? ` tom-${m.tom}` : m.critico ? ' tom-espera' : ''
   const alerta = m.critico ? '<span class="pino-marca-alerta">!</span>' : ''
+  const arte = arteDoPino(m)
+  const premium = m.premium && m.tipo === 'cliente'
+  const src = premium ? '/sos/mobile-3d/pino-veiculo-premium.webp' : `/sos/pinos/${arte}.png`
+  const miolo = arte
+    ? `<img class="pino-arte${premium ? ' pino-arte-premium' : ''}" src="${src}" alt="" draggable="false" ` +
+      `onerror="this.closest('.pino-marca').classList.add('pino-sem-arte');this.remove()">`
+    : ''
   return (
-    `<div class="pino-marca${tom}${sel}">${pulso}<span class="pino-marca-ponta"></span>` +
+    `<div class="pino-marca${tom}${sel}${arte ? '' : ' pino-sem-arte'}">${pulso}${miolo}` +
+    `<span class="pino-marca-ponta"></span>` +
     `<span class="pino-marca-cabeca"><img class="pino-marca-logo" src="${LOGO_TECNOAR}" alt="" draggable="false"></span>${alerta}</div>`
   )
 }
@@ -192,7 +262,12 @@ function htmlPino(m: MarcadorMapa): string {
       const conteudo = m.sigla
         ? `<span class="pino-mec-sigla">${escaparHtml(m.sigla)}</span>`
         : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-      return `<div class="pino-mec${classe}${sel}">${pulso}${conteudo}</div>`
+      const arteMec = arteDoPino(m)
+      const img = arteMec
+        ? `<img class="pino-arte" src="/sos/pinos/${arteMec}.png" alt="" draggable="false" ` +
+          `onerror="this.closest('.pino-mec').classList.add('pino-sem-arte');this.remove()">`
+        : ''
+      return `<div class="pino-mec${classe}${sel}${arteMec ? '' : ' pino-sem-arte'}">${pulso}${img}${conteudo}</div>`
     }
   }
 }
@@ -204,24 +279,30 @@ function escaparHtml(s: string): string {
 /* Pino da marca: cabeça 44×36 com o logo e a ponta embaixo (ver `mapa.css`).
    A âncora é a ponta — é ela que marca o lugar do veículo. */
 const TAMANHO: Record<TipoMarcador, [number, number]> = {
+  // "eu" é um ponto em CSS, não um pino: fica redondo.
   eu: [22, 22],
-  cliente: [44, 46],
-  chamado: [44, 46],
-  mecanico: [42, 42],
-  mecanico_livre: [38, 38],
-  mecanico_ocupado: [38, 38],
-  mecanico_off: [34, 34],
+  // Os demais usam a arte renderizada, que é 192×256 — proporção 3:4. Fugir
+  // dela esticaria o pino, e metal esticado denuncia na hora.
+  cliente: [42, 56],
+  chamado: [42, 56],
+  mecanico: [40, 53],
+  mecanico_livre: [36, 48],
+  mecanico_ocupado: [36, 48],
+  mecanico_off: [32, 43],
 }
 
 function Marcador({ m }: { m: MarcadorMapa }) {
   const icone = useMemo(() => {
-    const [w, h] = TAMANHO[m.tipo]
-    const ancoraBase = m.tipo === 'cliente' || m.tipo === 'chamado'
+    const [w, h] = m.premium && m.tipo === 'cliente' ? [52, 68] : TAMANHO[m.tipo]
+    // Todo pino com arte aponta pela PONTA, que está encostada na base da
+    // imagem (normalizado na exportação). Só o ponto "eu" ancora no centro,
+    // porque ele não aponta — ele É o lugar.
+    const ancoraBase = m.tipo !== 'eu'
     return L.divIcon({
       html: htmlPino(m),
       className: 'pino-sos',
       iconSize: [w, h],
-      iconAnchor: ancoraBase ? [w / 2, h - 2] : [w / 2, h / 2],
+      iconAnchor: ancoraBase ? [w / 2, h] : [w / 2, h / 2],
       // Acima da cabeça mesmo com o pino ampliado (em foco ele cresce 15%).
       tooltipAnchor: ancoraBase ? [0, -h - 4] : [0, -h / 2],
     })

@@ -99,6 +99,17 @@ export interface ChamadoSOS {
   onda_expira_em?: string | null
   /** As ondas terminaram sem ninguém: a central precisa assumir na mão. */
   sem_prestador_em?: string | null
+  /* Cobertura comercial (20261002) — base/filial da oficina → caminhão. NÃO é
+     a distância do mecânico: essa é `distancia_km`. */
+  /** Distância da base mais próxima. null = não medida (sem base ou sem GPS). */
+  cobertura_km?: number | null
+  cobertura_base_id?: string | null
+  /** true dentro da área, false fora, null NÃO MEDIDA — os três são diferentes. */
+  dentro_cobertura?: boolean | null
+  /** Versão da política com que este chamado é despachado, do início ao fim. */
+  politica_versao?: number | null
+  /** Por que a busca automática parou: a central precisa assumir. */
+  excecao_motivo?: MotivoExcecaoSOS | null
   /* Vigia do SOS (`sos_vigiar`, a cada 30 s no servidor). */
   /** Início da espera atual por um mecânico (zera ao atribuir ou voltar para a fila). */
   espera_desde?: string | null
@@ -122,6 +133,16 @@ export interface ChamadoSOS {
   orcamento_observacao?: string | null
   /** Itens mudaram depois da resposta: vale reenviar. */
   orcamento_desatualizado?: boolean
+  /* Orçamento versionado (20261007). */
+  /** Versão vigente, a última enviada. 0 = nenhum orçamento ainda. */
+  orcamento_versao?: number
+  /**
+   * Versão que o cliente aprovou. Autoriza o escopo só enquanto for igual à
+   * vigente e nada tiver mudado — `orcamento_status: 'aprovado'` sozinho NÃO
+   * é autorização: ele é o registro histórico de que aquela versão foi
+   * aceita. Quem decide é `escopoAutorizado()`.
+   */
+  orcamento_versao_aprovada?: number | null
   /* Contrato de frotista: prazo de chegada combinado. */
   contrato_id?: string | null
   sla_chegada_min?: number | null
@@ -185,7 +206,18 @@ export interface MensagemSOS {
   midia_caminho: string | null
   midia_tipo: string | null
   rapida: boolean
+  /** Chegou ao aparelho do outro lado. É o segundo tique cinza. */
+  entregue_em: string | null
   lida_em: string | null
+  /** Lápide: a linha fica, o conteúdo some. Ver a migração 20261009. */
+  apagada_em: string | null
+  /** Id da mensagem citada, quando esta é uma resposta. */
+  responde_a: string | null
+  /** Duração do áudio, em segundos. */
+  duracao_seg: number | null
+  /** Ponto enviado como mensagem. Só existe em par com `local_lng`. */
+  local_lat: number | null
+  local_lng: number | null
   created_at: string
 }
 
@@ -206,10 +238,68 @@ export interface ItemSOS {
   adicionado_por: string | null
   /** 'deslocamento' = lançado sozinho na chegada (taxa por km). */
   origem?: 'manual' | 'deslocamento' | 'ia'
+  /**
+   * Decidido no lançamento, sob trava do produto. Atravessa para a OS sem
+   * tradução. `null` nos serviços, que não têm estoque.
+   */
+  estado?: EstadoPecaOS | null
   created_at: string
 }
 
 export type StatusOrcamento = 'pendente' | 'aprovado' | 'recusado'
+
+/** `substituido`: veio uma versão depois dela, e não uma recusa do cliente. */
+export type StatusVersaoOrcamento = StatusOrcamento | 'substituido'
+
+/**
+ * Uma versão enviada do orçamento, com a FOTO dos itens no momento do envio.
+ * A foto não acompanha mudanças posteriores: é o que o cliente viu quando
+ * aprovou, e é dela que sai qualquer conversa sobre cobrança.
+ */
+export interface VersaoOrcamento {
+  id: string
+  chamado_id: string
+  versao: number
+  valor: number
+  itens: Array<{
+    tipo: 'produto' | 'servico'
+    codigo: string | null
+    descricao: string
+    unidade: string | null
+    quantidade: number
+    valor_unitario: number
+    desconto: number
+    valor_total: number
+  }>
+  observacao: string | null
+  enviado_em: string
+  enviado_por: string | null
+  status: StatusVersaoOrcamento
+  respondido_em: string | null
+  respondido_por: string | null
+  /** Cliente no app, ou central registrando o que ele disse por telefone. */
+  respondido_papel: PapelSOS | null
+  assinatura: string | null
+  substituido_em: string | null
+  created_at: string
+}
+
+/**
+ * O cliente aprovou EXATAMENTE o escopo que está na lista agora.
+ *
+ * Espelha `sos_escopo_autorizado` no banco — a trava de verdade é lá, no
+ * gatilho que impede iniciar o serviço. Aqui é só para a tela não oferecer
+ * um botão que o servidor vai recusar.
+ */
+export function escopoAutorizado(
+  c: Pick<ChamadoSOS, 'orcamento_versao' | 'orcamento_versao_aprovada' | 'orcamento_desatualizado'>,
+): boolean {
+  return (
+    c.orcamento_versao_aprovada != null &&
+    c.orcamento_versao_aprovada === c.orcamento_versao &&
+    !c.orcamento_desatualizado
+  )
+}
 
 /** `sos_contratos` — frotista com prazo de chegada e preço de km próprios. */
 export interface ContratoSOS {
@@ -384,6 +474,13 @@ export interface ProdutoAoVivo {
 export interface ResultadoEstoque {
   disponivel_antes: number
   faltou: boolean
+  /**
+   * A decisão gravada no lançamento, sob trava da linha do produto
+   * (20261006). `reservado` = havia saldo e a peça é deste atendimento;
+   * `necessario` = faltou e a central foi avisada. Não é recalculada depois:
+   * é o mesmo compromisso que chega à OS.
+   */
+  estado?: EstadoPecaOS
 }
 
 /* ── OS do sistema Tecnoar vista pelo app do mecânico ─────────────────────── */
@@ -884,6 +981,8 @@ export interface ConfigSOS {
   onda_emergencia_pct?: number
   /** Posição de mecânico mais velha que isto não vale distância. */
   posicao_valida_min?: number
+  /** Teto da busca automática, em minutos. Estourado, a central assume. */
+  busca_limite_min?: number
   updated_at: string
 }
 
@@ -933,11 +1032,18 @@ export interface PrestadorListado extends PrestadorSOS {
 }
 
 /**
- * Uma onda do despacho. A regra "até 60 km é sempre Tecnoar" é a onda de
- * `ordem: 1` com `tipo_prestador: 'proprio'` e `raio_max_km: 60`.
+ * Uma onda do despacho. A regra "até 80 km é sempre Tecnoar" é a onda de
+ * `ordem: 1` com `tipo_prestador: 'proprio'`, `raio_max_km: 80` e
+ * `exige_cobertura: true`.
+ *
+ * O raio da onda é sobre a PROXIMIDADE da equipe (quem está perto do caminhão
+ * agora). A área comercial da oficina é outra medida, do chamado, e entra por
+ * `exige_cobertura`.
  */
 export interface OndaDespacho {
   id: string
+  /** Versão da política a que esta onda pertence. */
+  versao: number
   ordem: number
   nome: string
   /** null = qualquer prestador. */
@@ -955,6 +1061,12 @@ export interface OndaDespacho {
   max_ofertas: number
   /** Aceita mecânico sem posição recente nem base (ondas de reforço). */
   aceita_sem_posicao: boolean
+  /**
+   * true = onda só para chamado DENTRO da cobertura comercial.
+   * false = onda de expansão: vale também fora da área, e por isso nasce
+   * desligada — ampliar área é decisão, não herança de configuração.
+   */
+  exige_cobertura: boolean
   ativo: boolean
   observacoes: string | null
   created_at: string
@@ -973,6 +1085,15 @@ export interface OfertaSOS {
   eta_min: number | null
   /** A distância saiu da base do prestador, não da posição ao vivo. */
   por_base: boolean
+  /** De onde saiu `distancia_km`. Base é estimativa, não posição ao vivo. */
+  distancia_origem?: OrigemDistanciaSOS
+  /** Posição recente da equipe → caminhão. null = sem GPS válido. */
+  proximidade_km?: number | null
+  /** Base/filial do prestador → caminhão. */
+  cobertura_km?: number | null
+  politica_versao?: number | null
+  /** Em português, por que esta pessoa foi escolhida. */
+  motivo_selecao?: string | null
   enviada_em: string
   expira_em: string | null
   respondida_em: string | null
@@ -999,10 +1120,23 @@ export interface CandidatoOnda {
   pontuacao: number
 }
 
+/**
+ * Por que a busca automática parou e a central tem de assumir.
+ * `fora_da_cobertura`: o caminhão está fora da área e a expansão não está
+ * habilitada. `limite_de_busca`: passou do teto de minutos do robô.
+ */
+export type MotivoExcecaoSOS =
+  | 'sem_ondas'
+  | 'fora_da_cobertura'
+  | 'limite_de_busca'
+  | 'voltas_demais'
+
+export type OrigemDistanciaSOS = 'posicao' | 'base' | 'sem'
+
 /** Retorno de `sos_despachar`. */
 export interface ResultadoDespacho {
   ok: boolean
-  motivo?: 'despacho_em_ondas_desligado' | 'fora_da_fila' | 'sem_ondas' | 'voltas_demais'
+  motivo?: 'despacho_em_ondas_desligado' | 'fora_da_fila' | MotivoExcecaoSOS
   status?: StatusSOS
   onda?: number
   nome?: string
@@ -1010,6 +1144,74 @@ export interface ResultadoDespacho {
   espera_seg?: number
   /** Ondas puladas por não ter ninguém elegível. */
   ondas_vazias?: number
+  /** Ondas puladas porque o chamado está fora da cobertura comercial. */
+  fora_da_cobertura?: number
+  politica_versao?: number
+}
+
+/* ── bases, cobertura e versões da política (20261002) ───────────────────── */
+
+/**
+ * Onde a oficina opera. A cobertura comercial é medida daqui — não da posição
+ * do mecânico. Cada base tem seu raio: a matriz cobre 80 km, uma filial nova
+ * pode cobrir menos enquanto não tem equipe.
+ */
+export interface BaseSOS {
+  id: string
+  prestador_id: string
+  nome: string
+  latitude: number | null
+  longitude: number | null
+  municipio: string | null
+  uf: string | null
+  raio_cobertura_km: number
+  /** A base de referência do prestador (uma por prestador). */
+  principal: boolean
+  ativo: boolean
+  observacoes: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface BaseListada extends BaseSOS {
+  prestador_nome: string
+  prestador_tipo: TipoPrestador
+  mecanicos: number
+}
+
+/** Uma versão publicada da política de ondas. */
+export interface VersaoPolitica {
+  versao: number
+  nome: string
+  vigente: boolean
+  observacoes: string | null
+  criada_em: string
+  criada_por: string | null
+  /** Ondas ativas nesta versão. */
+  ondas: number
+  /** Chamados despachados com esta versão. */
+  chamados: number
+}
+
+export interface PoliticaCompleta {
+  vigente: number
+  versoes: VersaoPolitica[]
+  ondas: OndaDespacho[]
+}
+
+/**
+ * O que falta para a cobertura comercial existir de verdade, e quanto já está
+ * acontecendo sem medição. Contagem do banco: nada estimado.
+ */
+export interface CoberturaPendente {
+  bases: number
+  bases_sem_coordenada: number
+  /** A base da própria Tecnoar tem coordenada? Sem ela não há área medida. */
+  propria_medida: boolean
+  chamados_sem_medicao_30d: number
+  chamados_fora_30d: number
+  /** Existe onda de expansão ativa na versão vigente. */
+  expansao_habilitada: boolean
 }
 
 export interface AgendamentoSOS {

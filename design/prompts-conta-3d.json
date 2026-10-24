@@ -1,0 +1,23 @@
+[
+  {
+    "name": "termos-3d",
+    "prompt": "ONE premium ultrarealistic 3D icon for SOS Tecnoar mobile app, matching the established family: machined brushed silver aluminum, dark navy #031426, thick orange enamel #ff6600, very subtle cyan #00afef edge reflections. Front three-quarter view, strong simple recognizable silhouette legible at 40px. Isolated complete centered object filling 85% of square composition, REAL TRANSPARENT background, no rectangle, no tile, no ground, no shadow outside the object. No text, no letters, no logo, no collage. Subject: a slightly curved legal parchment/document made of brushed metal, with a folded orange top-right corner, three dark engraved horizontal lines and a small silver pen with orange grip leaning against it. No seals, no checkmarks.",
+    "tool": "imagegen",
+    "transparent_background": true,
+    "path": "app/public/sos/mobile-3d/termos-3d.webp"
+  },
+  {
+    "name": "sair-3d",
+    "prompt": "ONE premium ultrarealistic 3D icon for SOS Tecnoar mobile app, matching the established family: machined brushed silver aluminum, dark navy #031426, thick orange enamel #ff6600, very subtle cyan #00afef edge reflections. Front three-quarter view, strong simple recognizable silhouette legible at 40px. Isolated complete centered object filling 85% of square composition, REAL TRANSPARENT background, no rectangle, no tile, no ground, no shadow outside the object. No text, no letters, no logo, no collage. Subject: an open dark navy door in a thick brushed silver frame, with a bold orange three-dimensional arrow pointing outward to the right from the doorway. Unmistakable sign out / exit metaphor, one door and one arrow, compact.",
+    "tool": "imagegen",
+    "transparent_background": true,
+    "path": "app/public/sos/mobile-3d/sair-3d.webp"
+  },
+  {
+    "name": "excluir-3d",
+    "prompt": "ONE premium ultrarealistic 3D icon for SOS Tecnoar mobile app, matching the established family: machined brushed silver aluminum, dark navy #031426, thick orange enamel #ff6600, very subtle cyan #00afef edge reflections. Front three-quarter view, strong simple recognizable silhouette legible at 40px. Isolated complete centered object filling 85% of square composition, REAL TRANSPARENT background, no rectangle, no tile, no ground, no shadow outside the object. No text, no letters, no logo, no collage. Subject: a compact closed dark navy waste bin with a brushed silver lid and thick orange metal rim, realistic fine metal texture, simple orange vertical grooves, no recycling arrows, no fire, no skull, no text.",
+    "tool": "imagegen",
+    "transparent_background": true,
+    "path": "app/public/sos/mobile-3d/excluir-3d.webp"
+  }
+]

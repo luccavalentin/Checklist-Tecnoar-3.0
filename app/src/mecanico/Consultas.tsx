@@ -10,7 +10,7 @@ import { TelaM, TopoM } from './ui'
  * Atalhos "Produtos" e "Serviços" do início: o cadastro do sistema Tecnoar
  * inteiro, com o disponível real. Tocar num item abre "Lançar" — no chamado
  * em atendimento (a peça fica reservada até a OS ser efetivada) ou numa das
- * OS abertas com o mecânico. Sem destino, é consulta de preço e estoque.
+ * OS abertas com o especialista. Sem destino, é consulta de preço e estoque.
  *
  * A lista de OS (atalho "OS") mora em `os/ListaOS.tsx`.
  */

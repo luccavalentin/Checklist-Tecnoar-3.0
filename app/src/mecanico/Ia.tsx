@@ -13,8 +13,8 @@ import { BotaoM, FolhaM } from './ui'
 import { useOnline } from './dados'
 
 /**
- * A IA do SOS no app do mecânico: kit do que levar, texto do atendimento e
- * leitura de fotos. Tudo é sugestão — o mecânico confere e decide. Só aparece
+ * A IA do SOS no app do especialista: kit do que levar, texto do atendimento e
+ * leitura de fotos. Tudo é sugestão — o especialista confere e decide. Só aparece
  * com a IA ligada na central (e cada recurso com a sua chave).
  */
 
@@ -56,7 +56,7 @@ function useGerarKit(chamadoId: string) {
 /**
  * Kit sugerido pela Tecno IA. `compacto`: uma linha que abre a folha (a caminho,
  * por cima do mapa). Senão, um cartão na tela de atendimento — com "Lançar"
- * nas peças do catálogo quando `podeLancar` (mecânico no local).
+ * nas peças do catálogo quando `podeLancar` (especialista no local).
  */
 export function KitIa({ d, podeLancar, compacto }: { d: DetalheChamado; podeLancar: boolean; compacto?: boolean }) {
   const ligada = useIaLigada('kit')
@@ -296,7 +296,7 @@ function ConteudoKit({ d, kit, podeLancar }: { d: DetalheChamado; kit: IaKit; po
 /**
  * "Escrever com a Tecno IA": diagnóstico, serviço e observações a partir do que
  * aconteceu no chamado (relato, conversa, itens, linha do tempo). Com os
- * campos vazios, preenche direto; se o mecânico já escreveu, mostra antes de
+ * campos vazios, preenche direto; se o especialista já escreveu, mostra antes de
  * trocar. Continua tudo editável até finalizar.
  */
 export function BotaoEscreverIa({

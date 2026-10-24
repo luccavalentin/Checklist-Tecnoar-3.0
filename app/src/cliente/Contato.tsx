@@ -1,11 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { CalendarPlus, ChevronRight, MessageCircle, PhoneCall, ShieldAlert, Siren, Brain } from 'lucide-react'
+import { ChevronRight, MessageCircle, PhoneCall, ShieldAlert, Siren, Brain } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { mascaraTelefone } from '@/lib/formatos'
 import { WHATSAPP_SOS_PADRAO, linkTelefone, linkWhatsApp } from '@/sos/rotulos'
 import { CabecalhoTela, Esqueleto, Tela } from '../comum/ui'
 import { useInfoPublica } from './dados'
 import { ErroCarga, GrupoLista, LinhaLista } from './pecas'
+import { Arte } from '../comum/Arte'
+import { ARTE_MOBILE } from '../comum/kit3d'
+import { AcaoAgendar3D } from '../comum/AcaoAgendar3D'
 
 /**
  * Falar com a Tecnoar. Dois botões grandes: ligar e WhatsApp. Emergência na
@@ -21,7 +24,7 @@ export function Contato() {
 
   return (
     <>
-      <CabecalhoTela titulo="Falar com a Tecnoar" voltar />
+      <CabecalhoTela titulo="Falar com a Tecnoar" arte={ARTE_MOBILE.atendimento} voltar />
       <Tela className="entrada-suave">
         {info.isLoading ? (
           <div className="flex flex-col gap-3">
@@ -50,7 +53,7 @@ export function Contato() {
           className="flex items-center gap-4 rounded-[1.25rem] border border-crit/30 bg-surface p-4 text-left active:scale-[0.99]"
         >
           <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#ff6600] text-white">
-            <Siren className="size-6" />
+            <Arte src={ARTE_MOBILE.sirene} alt="" recuo={<Siren className="size-6" />} classeImagem="size-12 object-contain" />
           </span>
           <span className="min-w-0 flex-1">
             <span className="block font-display text-[16.5px] font-bold text-ink">Parado na estrada?</span>
@@ -60,8 +63,8 @@ export function Contato() {
         </button>
 
         <GrupoLista>
-          <LinhaLista para="/tecno-ia" icone={Brain} tomIcone="marca" titulo="Tecno IA" detalhe="Tire dúvidas sobre o veículo agora" />
-          <LinhaLista para="/revisoes?agendar=1" icone={CalendarPlus} tomIcone="marca" titulo="Agendar revisão" detalhe="A Tecnoar confirma o horário" />
+          <LinhaLista para="/tecno-ia" icone={Brain} peca={ARTE_MOBILE.robo} tomIcone="marca" titulo="Tecno IA" detalhe="Tire dúvidas sobre o veículo agora" />
+          <Link to="/revisoes?agendar=1" className="sos-agendar-render flex min-h-14 items-center justify-center px-4"><AcaoAgendar3D /></Link>
         </GrupoLista>
 
         <section className="flex flex-col gap-3 rounded-[1.25rem] border border-line bg-surface p-4">
@@ -69,7 +72,7 @@ export function Contato() {
             <ShieldAlert className="size-5 text-crit" />
             <h2 className="font-display text-[16px] font-bold text-ink">Feridos ou fogo?</h2>
           </div>
-          <p className="text-[14px] leading-snug text-ink-2">Ligue primeiro para o resgate. Depois, peça o socorro mecânico.</p>
+          <p className="text-[14px] leading-snug text-ink-2">Ligue primeiro para o resgate. Depois, peça o socorro.</p>
           <div className="grid grid-cols-4 gap-2">
             {[
               ['193', 'Bombeiros'],
@@ -116,7 +119,7 @@ function CanalGrande({
   const conteudo = (
     <>
       <span className={cn('flex size-12 shrink-0 items-center justify-center rounded-2xl', corIcone)}>
-        <Icone className="size-6" />
+        <Arte src={titulo === 'WhatsApp' ? ARTE_MOBILE.whatsapp : ARTE_MOBILE.telefone} alt="" recuo={<Icone className="size-6" />} classeImagem="size-12 rounded-xl object-contain" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block font-display text-[19px] leading-tight font-bold">{titulo}</span>

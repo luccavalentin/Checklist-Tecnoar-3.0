@@ -1,0 +1,182 @@
+/* Identidade Tecnoar. O render é decorativo; o SOS funciona antes da imagem. */
+.ini-premium {
+  --i-fundo: #f5f7fb;
+  --i-texto: #0d1c33;
+  --i-texto-2: #40516b;
+  --i-texto-3: #52647c;
+  --i-cartao: #fff;
+  --i-chip: #e9eef6;
+  --i-borda: #dce3ee;
+  --premium-ease: cubic-bezier(.23, 1, .32, 1);
+  position: relative;
+  isolation: isolate;
+  min-height: 100svh;
+  background: var(--i-fundo);
+}
+.dark .ini-premium {
+  --i-fundo: #0d1c33;
+  --i-texto: #fff;
+  --i-texto-2: #c4d3e5;
+  --i-texto-3: #a3b9d3;
+  --i-cartao: #162a45;
+  --i-chip: #203953;
+  --i-borda: #2c4260;
+  background: var(--i-fundo);
+}
+.ini-premium ::selection { color: #0d1c33; background: #00afef; }
+.ini-premium :is(a, button):focus-visible {
+  outline: 3px solid #00afef;
+  outline-offset: 5px;
+}
+.ini-premium :is(.ini-topo, .ini-palco, .ini-rodape) { max-width: 460px; }
+.ini-premium .ini-topo {
+  padding-top: calc(.85rem + env(safe-area-inset-top) + var(--faixa-rede, 0px));
+  padding-inline: 22px;
+  min-height: 80px;
+}
+.ini-premium .ini-botao {
+  width: 48px;
+  height: 48px;
+  border: 0;
+  color: var(--i-texto-2);
+  background: var(--i-chip);
+  transition: transform 140ms var(--premium-ease), background-color 140ms ease;
+}
+.ini-premium .ini-botao:active { transform: scale(.94); }
+.ini-premium .ini-selo-sino { background: #ff6600; color: #0d1c33; box-shadow: none; }
+.ini-premium .ini-palco { justify-content: center; padding: 0 22px; gap: 0; }
+.ini-premium .ini-avisos:not(:empty) { margin-top: 10px; }
+.ini-premium .ini-acao { position: relative; width: 100%; padding: 0 0 8px; }
+.ini-frota {
+  pointer-events: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% + 28px);
+  height: clamp(112px, 15svh, 142px);
+  margin: 0 -14px 2px;
+  animation: ini-frota-chegar 680ms var(--premium-ease) both;
+}
+.ini-frota img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.ini-premium .ini-chamada {
+  max-width: 16ch;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(27px, 7.2vw, 34px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+.ini-premium .ini-chamada span { display: block; color: #ad4300; }
+.dark .ini-premium .ini-chamada span { color: #ff6600; }
+/* O alvo é a tela. Vale o espaço que toma: quem pede socorro acha sem mirar. */
+.ini-premium .ini-beacon {
+  width: clamp(168px, 21svh, 196px);
+  margin: 8px 0 8px;
+  animation: ini-sos-aparecer 460ms var(--premium-ease) both;
+}
+.ini-sos-descricao { color: var(--i-texto); font-size: 17px; font-weight: 600; letter-spacing: -.018em; }
+.ini-premium .ini-prontidao { max-width: none; width: 100%; margin-top: 5px; font-size: 14px; line-height: 1.45; }
+.ini-contatos { display: flex; justify-content: center; flex-wrap: wrap; gap: 2px; margin-top: 5px; }
+.ini-contatos .ini-ligar { padding-inline: 9px; margin-top: 0; }
+.ini-premium .ini-ligar { min-height: 48px; margin-top: 5px; font-size: 14px; color: #006895; }
+.dark .ini-premium .ini-ligar { color: #70d5fa; }
+.ini-premium .ini-ligar-forte { color: var(--c-warn-ink); margin-top: 12px; }
+.ini-premium .ini-rodape {
+  gap: 8px;
+  padding: 8px 22px calc(5.5rem + env(safe-area-inset-bottom));
+}
+.ini-premium .ini-veiculo { min-height: 66px; padding: 10px 14px; border: 0; border-radius: 16px; box-shadow: 0 7px 20px -14px #00206142; }
+.ini-premium .ini-veiculo-icone { width: 44px; height: 44px; background: var(--i-chip); border-radius: 13px; color: var(--i-texto); }
+.ini-premium .ini-veiculo-icone img { width: 30px; height: 30px; }
+.ini-premium .ini-veiculo-nome { font-size: 15px; font-weight: 600; }
+.ini-premium .ini-veiculo-sub { font-size: 13px; margin-top: 4px; }
+.ini-premium .ini-pastilhas { gap: 8px; }
+/* Cartão, não pastilha: a peça em cima, o nome e a linha que explica o que há
+   lá dentro. Coluna, para caber em três num celular estreito. */
+.ini-premium .ini-pastilha {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: 112px;
+  gap: 0;
+  padding: 11px 11px 12px;
+  border: 1px solid var(--i-borda);
+  border-radius: 16px;
+  white-space: normal;
+  background: var(--i-cartao);
+  box-shadow: 0 6px 18px -14px #00206138;
+}
+.ini-premium .ini-pastilha-nome {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--i-texto);
+}
+.ini-premium .ini-pastilha-texto {
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--i-texto-3);
+}
+.ini-premium .ini-pastilha-icone { color: #006895; }
+.dark .ini-premium .ini-pastilha-icone { color: #70d5fa; }
+/* Atalho é apoio, não concorrente do SOS: a peça entra pequena e recuada, e
+   só se acende quando o dedo encosta. */
+.ini-pastilha-peca {
+  width: 28px;
+  height: 28px;
+  filter: saturate(.82);
+  opacity: .94;
+  transition: filter 160ms ease, opacity 160ms ease, transform 160ms var(--premium-ease);
+}
+.ini-premium .ini-pastilha:active .ini-pastilha-peca { filter: none; opacity: 1; transform: scale(1.08); }
+/* Nos contatos a peça substitui o ícone de linha, no tamanho do texto. */
+.ini-contato-peca { width: 24px; height: 24px; flex-shrink: 0; }
+.ini-premium .ini-pastilha-contador { top: 0; right: 0; color: #0d1c33; background: #ff6600; }
+.ini-premium .ini-alertas { border-radius: 12px; box-shadow: none; }
+@keyframes ini-frota-chegar {
+  from { opacity: .3; transform: translate3d(0, 14px, 0) scale(.98); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+@keyframes ini-sos-aparecer {
+  from { opacity: .6; transform: translateY(7px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (hover: hover) and (pointer: fine) {
+  .ini-premium .ini-botao:hover, .ini-premium .ini-pastilha:hover { background: var(--i-chip); }
+}
+@media (max-height: 740px) {
+  .ini-premium .ini-topo { min-height: 70px; padding-top: calc(8px + env(safe-area-inset-top) + var(--faixa-rede, 0px)); }
+  .ini-frota { height: 84px; margin-bottom: 0; }
+  .ini-premium .ini-chamada { font-size: 25px; }
+  .ini-premium .ini-beacon { width: 146px; margin: 6px 0 4px; }
+  .ini-premium .ini-rodape { gap: 4px; padding-top: 0; }
+  .ini-premium .ini-veiculo { min-height: 58px; }
+  .ini-premium .ini-pastilha { min-height: 44px; }
+}
+/* Tela larga (tablet, celular deitado, navegador no computador): o app
+   continua uma coluna de celular, mas a coluna inteira se centraliza em vez
+   de grudar o rodapé lá embaixo. Sem isso abria um buraco de 150 px entre os
+   contatos e o cartão do veículo, e a composição se desmanchava. */
+@media (min-width: 620px) {
+  .ini-app.ini-premium { justify-content: center; }
+  .ini-premium .ini-palco { flex: 0 0 auto; }
+  .ini-premium .ini-rodape { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width: 359px) {
+  .ini-premium .ini-topo, .ini-premium .ini-palco { padding-inline: 16px; }
+  .ini-premium .ini-rodape { padding-inline: 16px; }
+  .ini-premium .ini-botao { width: 44px; height: 48px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ini-premium *, .ini-premium *::before, .ini-premium *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

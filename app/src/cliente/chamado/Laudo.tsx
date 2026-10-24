@@ -6,7 +6,7 @@ import { useLaudoSOS } from '@/sos/useLaudo'
 import type { StatusSOS } from '@/sos/tipos'
 import { useOnline } from '../../comum/Pwa'
 
-/** O laudo só existe depois que o mecânico finaliza o serviço. */
+/** O laudo só existe depois que o especialista finaliza o serviço. */
 export function temLaudo(status: StatusSOS | null | undefined): boolean {
   return status === 'servico_finalizado' || status === 'concluido'
 }

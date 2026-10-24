@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef, useState, type PointerEvent as EventoPontei
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import {
-  ChevronLeft,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   CircleSlash,
   Clock,
   FileText,
@@ -27,11 +28,10 @@ import { moeda } from '@/lib/formatos'
 import { useToast } from '@/componentes/ui/Toast'
 import { sosDetalhe } from '@/sos/api'
 import { tocarAlerta, vibrarAlerta } from '@/sos/alerta'
-import { Conversa, EnviarMidia, Estrelas, GaleriaAnexos, ItensAtendimento, LinhaDoTempo } from '@/sos/componentes'
+import { Estrelas, GaleriaAnexos, ItensAtendimento, LinhaDoTempo } from '@/sos/componentes'
 import { calcularRota, distanciaKm, pontoDe, type Ponto, type Rota } from '@/sos/geo'
 import { BotaoMapa, CapturaMapa, MapaSOS, enquadrarMapa, type MapaLeaflet, type MarcadorMapa } from '@/sos/Mapa'
 import {
-  MENSAGENS_RAPIDAS_CLIENTE,
   OCORRENCIAS,
   STATUS_SOS,
   chamadoAtivo,
@@ -50,7 +50,10 @@ import { useRastreioChamado } from '@/sos/useRastreio'
 import { CHAVES_SOS, useTempoRealChamado } from '@/sos/tempoReal'
 import type { DetalheChamado, StatusSOS } from '@/sos/tipos'
 import { useCliente } from '../sessao'
-import { Avatar, BotaoApp, BotaoCircular, Esqueleto, Faixa } from '../comum/ui'
+import { ARTE3D, ARTE_MOBILE, sumirSeFalhar } from '../comum/kit3d'
+import { Arte } from '../comum/Arte'
+import { Midia3D } from '../comum/Midia3D'
+import { Avatar, BotaoApp, BotaoCircular, Esqueleto, Faixa, LogoSOS } from '../comum/ui'
 import { compartilharAcompanhamento, nomeVeiculo, temaMapa, useInfoPublica } from './dados'
 import { ErroCarga, IconeOcorrencia, PlacaVeiculo } from './pecas'
 import { TelaAvaliacao } from './chamado/Avaliacao'
@@ -59,16 +62,17 @@ import { BotaoLaudo, temLaudo } from './chamado/Laudo'
 import { LinhaTempoCliente } from './chamado/LinhaTempo'
 import { CartaoOrcamento, FolhaOrcamento } from './chamado/Orcamento'
 import { Radar } from './chamado/Radar'
+import './chamado/acompanhamento-premium.css'
 
 type PosicaoMec = Ponto & { em: number }
 
 /**
  * Acompanhamento do socorro, no estilo dos apps de mobilidade: mapa grande,
- * o mecânico andando ao vivo e uma folha embaixo com o que importa — status,
+ * o especialista andando ao vivo e uma folha embaixo com o que importa — status,
  * previsão, quem vem, como falar com ele, a linha do tempo.
  *
  * O estado completo vem de `sos_detalhe_chamado`; o tempo real invalida essa
- * consulta a cada mudança. A posição do mecânico é a exceção: chega direto do
+ * consulta a cada mudança. A posição do especialista é a exceção: chega direto do
  * evento e move o pino sem recarregar nada.
  */
 export function ChamadoCliente() {
@@ -79,7 +83,7 @@ export function ChamadoCliente() {
   const info = useInfoPublica()
   const mapa = useRef<MapaLeaflet | null>(null)
   const conteudo = useRef<HTMLDivElement>(null)
-  const chat = useRef<HTMLDivElement>(null)
+  const chat = useRef<HTMLButtonElement>(null)
   // Relógio da tela: "posição de 4 min atrás" precisa andar sem evento novo.
   const [agora, setAgora] = useState(() => Date.now())
   useEffect(() => {
@@ -140,7 +144,7 @@ export function ChamadoCliente() {
   const emRota = status === 'aceito' || status === 'a_caminho'
   const mostrarMecanico = !!posMecanico && !!status && ['aceito', 'a_caminho', 'no_local', 'servico_iniciado'].includes(status)
 
-  // Rota pelas ruas, recalculada só quando o mecânico andou mais de ~150 m.
+  // Rota pelas ruas, recalculada só quando o especialista andou mais de ~150 m.
   const [rota, setRota] = useState<Rota | null>(null)
   const origemRota = useRef<Ponto | null>(null)
   const pedidoRota = useRef(0)
@@ -163,13 +167,13 @@ export function ChamadoCliente() {
   const distancia = rota?.real ? rota.distanciaKm : (c?.distancia_km ?? rota?.distanciaKm ?? null)
 
   const marcadores: MarcadorMapa[] = []
-  if (destino) marcadores.push({ id: 'cliente', tipo: 'cliente', ponto: destino, rotulo: 'Seu veículo' })
+  if (destino) marcadores.push({ id: 'cliente', tipo: 'cliente', ponto: destino, rotulo: 'Seu veículo', premium: true })
   if (mostrarMecanico && posMecanico)
     marcadores.push({
       id: 'mecanico',
       tipo: 'mecanico',
       ponto: posMecanico,
-      rotulo: d?.mecanico?.nome ?? 'Mecânico',
+      rotulo: d?.mecanico?.nome ?? 'Especialista',
       sigla: iniciais(d?.mecanico?.nome),
       pulsar: status === 'a_caminho',
     })
@@ -186,6 +190,7 @@ export function ChamadoCliente() {
   // previsão vêm primeiro. Aberta, a mensagem nova fica à vista.
   const carregou = !!detalhe.data
   const qtdMensagens = detalhe.data?.mensagens.length ?? 0
+  const naoLidasConversa = (detalhe.data?.mensagens ?? []).filter((m) => !m.lida_em && m.autor_id !== usuarioId).length
   const primeiraCarga = useRef(true)
   const expandidaRef = useRef(expandida)
   expandidaRef.current = expandida
@@ -315,9 +320,9 @@ export function ChamadoCliente() {
   const emServico = status === 'no_local' || status === 'servico_iniciado'
 
   return (
-    <div className="fixed inset-0 flex flex-col bg-canvas md:flex-row-reverse">
+    <div className="acomp-premium fixed inset-0 flex flex-col bg-canvas md:flex-row-reverse">
       {/* ── mapa ── */}
-      <div className="relative min-h-0 flex-1">
+      <div className="acomp-mapa relative min-h-0 flex-1">
         <div className="absolute inset-0">
           <MapaSOS marcadores={marcadores} rota={rota?.pontos ?? null} rotaEstimada={!!rota && !rota.real} zoom={15} tema={temaMapa()} className="size-full">
             <CapturaMapa destino={mapa} />
@@ -330,11 +335,12 @@ export function ChamadoCliente() {
             <button type="button" onClick={voltar} aria-label="Voltar" className={BOTAO_MAPA}>
               <ChevronLeft className="size-6" />
             </button>
-            <span className="num pointer-events-auto rounded-full border border-line bg-surface px-3.5 py-2 text-[12.5px] font-semibold text-ink shadow-[0_4px_14px_rgb(8_24_48/0.15)]">
-              {c.protocolo}
+            <span className="sos-protocolo-3d acomp-protocolo-3d num pointer-events-auto flex min-h-11 min-w-0 items-center gap-1.5 px-2 py-1 text-[12px] font-semibold">
+              <Arte src={ARTE_MOBILE.sirene} alt="" classeImagem="size-7 shrink-0 object-contain" recuo={null} />
+              <span className="truncate">{c.protocolo}</span>
             </span>
             <button type="button" onClick={() => void compartilhar()} disabled={compartilhando} aria-label="Compartilhar acompanhamento" className={cn(BOTAO_MAPA, 'disabled:opacity-60')}>
-              {compartilhando ? <Loader2 className="size-5 animate-spin" /> : <Share2 className="size-5" />}
+              {compartilhando ? <Loader2 className="size-5 animate-spin" /> : <Arte src={ARTE_MOBILE.compartilhar} alt="" classeImagem="size-8 object-contain" recuo={<Share2 className="size-5" />} />}
             </button>
           </div>
         </div>
@@ -347,7 +353,7 @@ export function ChamadoCliente() {
           )}
           {destino && (
             <BotaoMapa rotulo="Centralizar no veículo" onClick={() => enquadrarMapa(mapa.current, [destino])}>
-              <LocateFixed />
+              <Arte src={ARTE_MOBILE.centralizar} alt="" classeImagem="size-8 object-contain" recuo={<LocateFixed />} />
             </BotaoMapa>
           )}
         </div>
@@ -356,7 +362,7 @@ export function ChamadoCliente() {
       {/* ── folha ── */}
       <section
         className={cn(
-          'relative z-20 -mt-6 flex flex-col rounded-t-[1.75rem] border-t border-line bg-canvas shadow-[0_-12px_32px_-18px_rgb(8_24_48/0.4)] transition-[height] duration-300 ease-out md:mt-0 md:h-full md:w-[26rem] md:shrink-0 md:rounded-none md:border-t-0 md:border-r md:pt-[env(safe-area-inset-top)] md:shadow-none lg:w-[28rem]',
+          'acomp-folha relative z-20 -mt-6 flex flex-col rounded-t-[1.75rem] border-t border-line bg-canvas shadow-[0_-12px_32px_-18px_rgb(8_24_48/0.4)] transition-[height] duration-300 ease-out md:mt-0 md:h-full md:w-[26rem] md:shrink-0 md:rounded-none md:border-t-0 md:border-r md:pt-[env(safe-area-inset-top)] md:shadow-none lg:w-[28rem]',
           expandida ? 'h-[86dvh]' : 'h-[52dvh]',
         )}
         aria-label="Detalhes do socorro"
@@ -383,20 +389,48 @@ export function ChamadoCliente() {
             const y = e.touches[0]?.clientY
             if (!expandida && toque.current != null && y != null && toque.current - y > 24) setExpandida(true)
           }}
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] md:pt-5"
+          className="acomp-conteudo min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(1.25rem+env(safe-area-inset-bottom))] md:pt-5"
         >
           <div className="mx-auto flex w-full max-w-lg flex-col gap-4">
             {/* status */}
-            <header className="flex flex-col gap-1.5">
+            <header className="acomp-status flex flex-col gap-1.5">
+              <div className="acomp-marca"><LogoSOS negativo altura={23} /></div>
+              {ativo && (
+                <img src={ARTE_MOBILE.seloSOS} className="acomp-pino" width={84} height={100} alt="" aria-hidden="true" draggable={false} onError={sumirSeFalhar} />
+              )}
               <div className="flex flex-wrap items-center gap-2">
                 <PilulaStatus status={status} />
-                {c.prioridade === 'emergencia' && ativo && <span className="rounded-full bg-crit-soft px-2.5 py-1 text-[11.5px] font-bold text-crit-ink">Emergência</span>}
+                {c.prioridade === 'emergencia' && ativo && <span className="acomp-emergencia-3d inline-flex items-center gap-1.5 rounded-xl px-2 py-1 text-[11.5px] font-bold"><Arte src={ARTE_MOBILE.sirene} alt="" classeImagem="size-6 shrink-0 object-contain" recuo={null} />Emergência</span>}
               </div>
               <h1 className="font-display text-[24px] leading-[1.15] font-bold text-ink">{titulo(d)}</h1>
               <p className="text-[14.5px] leading-snug text-ink-2">{subtitulo(d, info.data?.mensagem_espera ?? null)}</p>
             </header>
 
-            {/* Orçamento aguardando resposta vem antes de tudo: o mecânico está parado esperando. */}
+            {/* A conversa é a segunda coisa da tela, não a penúltima. Falar com
+                quem está vindo é o que mais acalma quem está parado — e, no
+                desenho antigo, era o que exigia mais rolagem para alcançar. */}
+            <button
+              type="button"
+              ref={chat}
+              onClick={() => navegar(`/chamado/${c.id}/conversa`)}
+              className="cli-abrir-conversa scroll-mt-4"
+            >
+              <span className="cli-abrir-conversa-icone">
+                <Arte src={ARTE_MOBILE.atendimento} alt="" classeImagem="size-12 object-contain" recuo={<MessageSquareText className="size-[21px]" />} />
+              </span>
+              <span className="min-w-0 flex-1 text-left">
+                <span className="cli-abrir-conversa-titulo">
+                  {d.mecanico?.nome ? `Falar com ${d.mecanico.nome.split(' ')[0]}` : 'Falar com a Tecnoar'}
+                </span>
+                <span className="cli-abrir-conversa-sub">
+                  {ultimaMensagem(d.mensagens) ?? 'Mande um áudio, uma foto ou sua localização'}
+                </span>
+              </span>
+              {naoLidasConversa > 0 && <span className="cli-abrir-conversa-selo num">{naoLidasConversa}</span>}
+              <ChevronRight className="size-5 shrink-0 opacity-50" />
+            </button>
+
+            {/* Orçamento aguardando resposta vem antes de tudo: o especialista está parado esperando. */}
             {orcamentoPendente && <CartaoOrcamento detalhe={d} aoAbrir={() => setVendoOrcamento(true)} />}
 
             {/* O vigia do servidor escalou: ninguém aceitou no prazo. */}
@@ -407,7 +441,7 @@ export function ChamadoCliente() {
                   <p className="mt-1 text-[13.5px] leading-snug text-ink-2">
                     {(c.alerta_nivel ?? 0) >= 2
                       ? 'A central da Tecnoar está cuidando do seu chamado pessoalmente e pode te ligar.'
-                      : 'Já avisamos de novo os mecânicos e a central da Tecnoar. Seu pedido não foi esquecido.'}
+                      : 'Já avisamos de novo os especialistas e a central da Tecnoar. Seu pedido não foi esquecido.'}
                   </p>
                 </div>
                 {telCentral && (
@@ -420,7 +454,7 @@ export function ChamadoCliente() {
 
             {/* previsão de chegada */}
             {emRota && (
-              <section aria-label="Previsão de chegada" className="grid grid-cols-2 divide-x divide-line rounded-[1.25rem] border border-line bg-surface">
+              <section aria-label="Previsão de chegada" className="acomp-previsao grid grid-cols-2 divide-x divide-line rounded-[1.25rem] border border-line bg-surface">
                 <div className="p-4">
                   <p className="flex items-center gap-1.5 text-[12.5px] font-medium text-ink-3">
                     <Clock className="size-4" /> Chega em
@@ -441,17 +475,17 @@ export function ChamadoCliente() {
             )}
             {emRota && posAntiga && (
               <Faixa tom="atencao" icone={WifiOff}>
-                O celular do mecânico está sem sinal agora (comum na estrada). Ele continua a caminho; a previsão volta a se atualizar quando o sinal voltar.
+                O celular do especialista está sem sinal agora (comum na estrada). Ele continua a caminho; a previsão volta a se atualizar quando o sinal voltar.
               </Faixa>
             )}
 
-            {/* perfil do mecânico */}
+            {/* perfil de quem vai atender */}
             {d.mecanico && (
-              <section className="flex flex-col gap-4 rounded-[1.25rem] border border-line bg-surface p-4" aria-label="Seu mecânico">
+              <section className="acomp-mecanico flex flex-col gap-4 rounded-[1.25rem] border border-line bg-surface p-4" aria-label="Seu especialista">
                 <div className="flex items-center gap-3.5">
                   <Avatar nome={d.mecanico.nome} url={d.mecanico.avatar_url} tamanho="lg" />
                   <div className="min-w-0 flex-1">
-                    <p className="text-[12.5px] font-medium text-ink-3">Seu mecânico Tecnoar</p>
+                    <p className="text-[12.5px] font-medium text-ink-3">Especialista em socorro de caminhão</p>
                     <p className="truncate font-display text-[19px] leading-tight font-bold text-ink">{d.mecanico.nome}</p>
                     <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[13px] text-ink-2">
                       {d.mecanico.nota != null && (
@@ -475,7 +509,7 @@ export function ChamadoCliente() {
                   <BotaoCircular rotulo="Mensagem" icone={MessageSquareText} onClick={irParaChat} variante="primario" />
                   <BotaoCircular rotulo="Compartilhar" icone={Share2} onClick={() => void compartilhar()} />
                 </div>
-                {ativo && !telMecanico && <p className="-mt-1 text-center text-[12px] text-ink-3">O mecânico preferiu não mostrar o telefone. Fale pela mensagem ou com a Tecnoar.</p>}
+                {ativo && !telMecanico && <p className="-mt-1 text-center text-[12px] text-ink-3">O especialista preferiu não mostrar o telefone. Fale pela mensagem ou com a Tecnoar.</p>}
               </section>
             )}
 
@@ -483,12 +517,12 @@ export function ChamadoCliente() {
             {aguardando && (
               <section className="flex flex-col gap-2.5 rounded-[1.25rem] border border-line bg-surface p-4">
                 <p className="flex items-center gap-2 font-display text-[15.5px] font-bold text-ink">
-                  <ShieldCheck className="size-5 text-ok" /> Enquanto isso
+                  <Arte src={ARTE3D.seguranca} alt="" classeImagem="size-8 object-contain" recuo={<ShieldCheck className="size-5 text-ok" />} /> Enquanto isso
                 </p>
                 <ul className="flex flex-col gap-1.5 text-[14px] leading-snug text-ink-2">
                   <li>• Deixe o pisca-alerta ligado e o triângulo na via.</li>
                   <li>• Se puder, fique fora da pista, em local seguro.</li>
-                  <li>• Uma foto do problema ajuda o mecânico a trazer a peça certa.</li>
+                  <li>• Uma foto do problema ajuda o especialista a trazer a peça certa.</li>
                 </ul>
               </section>
             )}
@@ -506,7 +540,7 @@ export function ChamadoCliente() {
               <button type="button" onClick={() => setAvaliando(true)} className="flex min-h-16 items-center gap-3 rounded-[1.25rem] border border-accent/30 bg-accent-soft px-4 text-left">
                 <Star className="size-6 shrink-0 fill-[#f5a524] text-[#f5a524]" />
                 <span className="min-w-0 flex-1">
-                  <span className="block font-display text-[15.5px] font-bold text-ink">Avaliar o mecânico</span>
+                  <span className="block font-display text-[15.5px] font-bold text-ink">Avaliar o especialista</span>
                   <span className="block text-[12.5px] text-ink-2">Leva 5 segundos e ajuda a Tecnoar.</span>
                 </span>
               </button>
@@ -528,7 +562,7 @@ export function ChamadoCliente() {
             )}
             {rastreio.erroGps === 'negado' && ativo && (
               <Faixa tom="atencao" icone={MapPin}>
-                Sua localização está bloqueada. O mecânico vai até o ponto marcado no pedido.
+                Sua localização está bloqueada. O especialista vai até o ponto marcado no pedido.
               </Faixa>
             )}
 
@@ -537,15 +571,10 @@ export function ChamadoCliente() {
               <LinhaTempoCliente chamado={c} />
             </Bloco>
 
-            <div ref={chat} className="scroll-mt-4">
-              <Bloco titulo="Conversa com o mecânico" icone={MessageSquareText}>
-                <Conversa chamadoId={c.id} mensagens={d.mensagens} meuId={usuarioId} rapidas={MENSAGENS_RAPIDAS_CLIENTE} encerrado={!ativo} alturaMaxima="max-h-[42dvh]" />
-              </Bloco>
-            </div>
 
             <Bloco titulo="Fotos, vídeos e áudios">
               <GaleriaAnexos anexos={d.anexos} meuId={usuarioId} chamadoId={c.id} vazio="Nenhum arquivo ainda. Uma foto ajuda muito." />
-              {ativo && <EnviarMidia chamadoId={c.id} />}
+              {ativo && <Midia3D chamadoId={c.id} />}
             </Bloco>
 
             {!emServico && d.itens.length > 0 && (
@@ -555,7 +584,7 @@ export function ChamadoCliente() {
             )}
 
             {!finalizado && (c.diagnostico || c.servico_realizado || c.observacoes_finais) && (
-              <Bloco titulo="O que o mecânico encontrou">
+              <Bloco titulo="O que o especialista encontrou">
                 {c.diagnostico && <Texto rotulo="Diagnóstico">{c.diagnostico}</Texto>}
                 {c.servico_realizado && <Texto rotulo="Serviço realizado">{c.servico_realizado}</Texto>}
                 {c.observacoes_finais && <Texto rotulo="Observações">{c.observacoes_finais}</Texto>}
@@ -604,8 +633,8 @@ export function ChamadoCliente() {
             {/* ajuda e cancelamento */}
             <div className="flex flex-col gap-2 pt-1">
               {telCentral && (
-                <a href={telCentral} className="flex min-h-14 items-center justify-center gap-2.5 rounded-2xl bg-[#0D1C33] font-display text-[16px] font-bold text-white active:scale-[0.99] dark:bg-[#002061]">
-                  <PhoneCall className="size-5" /> Ligar para a Tecnoar
+                <a href={telCentral} className="sos-button-3d sos-button-3d-escuro flex min-h-16 items-center justify-center gap-3 rounded-2xl px-3 py-1 font-display text-[15px] font-semibold active:scale-[0.99]">
+                  <Arte src={ARTE_MOBILE.ligarCentral} alt="" classeImagem="size-10 shrink-0 object-contain" recuo={<PhoneCall className="size-6" />} /><span>Ligar para a Tecnoar</span>
                 </a>
               )}
               {whatsCentral && (
@@ -613,24 +642,24 @@ export function ChamadoCliente() {
                   href={whatsCentral}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-line-strong bg-surface font-display text-[15px] font-bold text-ink"
+                  className="sos-button-3d sos-button-3d-ok flex min-h-16 items-center justify-center gap-3 rounded-2xl px-3 py-1 font-display text-[15px] font-semibold"
                 >
-                  <MessageCircle className="size-5 text-ok" /> WhatsApp da Tecnoar
+                  <Arte src={ARTE_MOBILE.whatsapp} alt="" classeImagem="size-10 shrink-0 object-contain" recuo={<MessageCircle className="size-6" />} /><span>WhatsApp da Tecnoar</span>
                 </a>
               )}
               {podeCancelar && (
-                <BotaoApp variante="fantasma" tamanho="md" largo icone={CircleSlash} onClick={() => setCancelando(true)} className="text-crit-ink">
-                  Cancelar o socorro
+                <BotaoApp variante="perigo" tamanho="lg" largo onClick={() => setCancelando(true)} className="min-h-16 gap-3 px-3 py-1 text-[15px]">
+                  <Arte src={ARTE_MOBILE.cancelarSocorro} alt="" classeImagem="size-10 shrink-0 object-contain" recuo={<CircleSlash className="size-6" />} /><span>Cancelar o socorro</span>
                 </BotaoApp>
               )}
               {ativo && !podeCancelar && (
                 /* A central decide até que etapa o cliente cancela sozinho. Dizer
-                   "o serviço já começou" com o mecânico ainda dirigindo informava
+                   "o serviço já começou" com o especialista ainda dirigindo informava
                    algo falso a quem está parado na estrada. */
                 <p className="text-center text-[12.5px] text-ink-3">
                   {ordemStatus(status) >= ordemStatus('servico_iniciado')
                     ? 'O serviço já começou. Para cancelar, fale com a Tecnoar.'
-                    : 'O mecânico já está acionado para você. Para cancelar agora, fale com a Tecnoar.'}
+                    : 'O especialista já está acionado para você. Para cancelar agora, fale com a Tecnoar.'}
                 </p>
               )}
               {!ativo && (
@@ -674,11 +703,23 @@ const COR_STATUS: Record<StatusSOS, string> = {
   cancelado: 'bg-ink-3',
 }
 
+/** Prévia da última mensagem, como numa lista de conversas. */
+function ultimaMensagem(ms: { texto: string | null; midia_tipo: string | null; local_lat: number | null; apagada_em: string | null }[]): string | null {
+  const m = ms[ms.length - 1]
+  if (!m) return null
+  if (m.apagada_em) return 'Mensagem apagada'
+  if (m.texto) return m.texto
+  if (m.midia_tipo?.startsWith('audio')) return 'Áudio'
+  if (m.midia_tipo?.startsWith('image')) return 'Foto'
+  if (m.local_lat != null) return 'Localização'
+  return null
+}
+
 function PilulaStatus({ status }: { status: StatusSOS }) {
   const vivo = chamadoAtivo(status)
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-[12.5px] font-semibold text-ink">
-      <span className={cn('size-2 rounded-full', COR_STATUS[status], vivo && 'sos-piscar')} />
+    <span className="acomp-etapa-3d inline-flex items-center gap-1.5 rounded-xl border border-line bg-surface px-2 py-1 text-[12.5px] font-semibold text-ink">
+      <Arte src={status === 'concluido' || status === 'servico_finalizado' ? ARTE3D.concluido : vivo ? ARTE3D.tempo : ARTE_MOBILE.seloSOS} alt="" classeImagem="size-6 shrink-0 object-contain" recuo={<span className={cn('size-2 rounded-full', COR_STATUS[status])} />} />
       {STATUS_SOS[status].curto}
     </span>
   )
@@ -737,9 +778,9 @@ function titulo(d: DetalheChamado): string {
   switch (c.status) {
     case 'recebido':
     case 'procurando_mecanico':
-      return 'Procurando o mecânico mais próximo'
+      return 'Procurando o especialista mais próximo'
     case 'aceito':
-      return 'Mecânico a caminho'
+      return 'Especialista a caminho'
     case 'servico_finalizado':
       return 'Serviço finalizado'
     case 'concluido':
@@ -761,11 +802,11 @@ function subtitulo(d: DetalheChamado, espera: string | null): string {
       return espera || 'Recebemos seu pedido. Você acompanha tudo por aqui.'
     case 'aceito':
     case 'a_caminho':
-      return nome ? `${nome} está indo até você. Acompanhe no mapa.` : 'O mecânico está indo até você.'
+      return nome ? `${nome} está indo até você. Acompanhe no mapa.` : 'O especialista está indo até você.'
     case 'no_local':
-      return nome ? `${nome} chegou ao local do veículo.` : 'O mecânico chegou ao local.'
+      return nome ? `${nome} chegou ao local do veículo.` : 'O especialista chegou ao local.'
     case 'servico_iniciado':
-      return 'O mecânico está trabalhando no veículo. O que ele usar aparece abaixo.'
+      return 'O especialista está trabalhando no veículo. O que ele usar aparece abaixo.'
     case 'servico_finalizado':
       return 'Tudo pronto. Confira o resumo e conte como foi.'
     case 'concluido':

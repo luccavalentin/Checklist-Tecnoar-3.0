@@ -27,7 +27,7 @@ export const AJUDA_RESERVA = 'No chamado a peça fica reservada até a OS ser ef
 
 /**
  * Produtos e serviços do cadastro do sistema Tecnoar (o mesmo do Checklist,
- * com o estoque sincronizado com a Omie). O mecânico não cadastra nada: abre
+ * com o estoque sincronizado com a Omie). O especialista não cadastra nada: abre
  * a lista, filtra se quiser e lança. O número de estoque é o DISPONÍVEL —
  * o que ainda não está comprometido em OS aberta ou em chamado.
  *
@@ -407,7 +407,7 @@ function LinhaCatalogo({
               aoEscolher()
             }}
             aria-label={`Lançar ${i.descricao}`}
-            className="sos-premium-action flex min-h-11 shrink-0 items-center gap-1 rounded-2xl px-3.5 font-display text-[14px] font-semibold tracking-tight text-white active:bg-accent-hover"
+            className="sos-button-3d sos-button-3d-primario sos-premium-action flex min-h-11 shrink-0 items-center gap-1 rounded-2xl px-3.5 font-display text-[14px] font-semibold tracking-tight text-white active:bg-accent-hover"
           >
             <Plus className="size-4" strokeWidth={3} />
             Lançar
@@ -421,7 +421,7 @@ function LinhaCatalogo({
               type="button"
               onClick={aoAdicionar}
               disabled={ocupado}
-              className="sos-premium-action flex min-h-12 shrink-0 items-center gap-1 rounded-2xl px-3.5 font-display text-[14px] font-semibold tracking-tight text-white active:bg-accent-hover disabled:opacity-50"
+              className="sos-button-3d sos-button-3d-primario sos-premium-action flex min-h-12 shrink-0 items-center gap-1 rounded-2xl px-3.5 font-display text-[14px] font-semibold tracking-tight text-white active:bg-accent-hover disabled:opacity-50"
             >
               {carregando ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" strokeWidth={3} />}
               Adicionar

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Bell, ChevronRight, ExternalLink, Eye, LogOut, Monitor, Moon, Phone, Radio, Save, ShieldCheck, Sun, Truck, Volume2 } from 'lucide-react'
+import { Bell, ChevronRight, ExternalLink, Eye, LogOut, Monitor, Moon, Phone, Radio, Save, ShieldCheck, Sun, Truck } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { mascaraTelefone } from '@/lib/formatos'
 import { useToast } from '@/componentes/ui/Toast'
@@ -14,6 +14,8 @@ import { useMecanico } from '../sessao'
 import { CartaoModoApp } from '../ModoApp'
 import { Avatar } from '../comum/ui'
 import { CartaoAparelho } from '../comum/Aparelho'
+import { IconeM3D } from './ArteMecanico'
+import { ARTE_MOBILE } from '../comum/kit3d'
 import { atualizarFicha, temaEscuroAgora, useHomeMecanico } from './dados'
 import { Interruptor, PontoSituacao } from './pecas'
 import { aplicarTemaMecanico, lerTemaMecanico, type TemaMecanico } from './tema'
@@ -26,7 +28,7 @@ const TEMAS: Array<{ id: TemaMecanico; rotulo: string; icone: typeof Sun }> = [
 ]
 
 /**
- * Perfil do mecânico: o que o cliente vê dele (veículo de apoio, telefone),
+ * Perfil do especialista: o que o cliente vê dele (veículo de apoio, telefone),
  * os chamados (aceitar SOS, testar alerta, notificações), a aparência e a
  * conta. Nome e foto continuam sendo editados no Checklist — é o mesmo usuário.
  */
@@ -114,7 +116,7 @@ export function PerfilMecanico() {
       <TopoM titulo="Perfil" />
       <TelaM>
         <section className="sos-native-card flex items-center gap-4 rounded-[1.55rem] p-4">
-          <Avatar nome={perfil.nome} url={perfil.avatar_url} tamanho="lg" />
+          <span className="conta-avatar-aro"><Avatar nome={perfil.nome} url={perfil.avatar_url} tamanho="lg" /></span>
           <div className="min-w-0 flex-1">
             <p className="truncate font-display text-[20px] font-extrabold text-ink">{perfil.nome}</p>
             <p className="mt-1 flex items-center gap-2 text-[14px] text-ink-2">
@@ -180,7 +182,7 @@ export function PerfilMecanico() {
             />
             <button type="button" onClick={testarAlerta} className="sos-premium-row flex min-h-16 w-full items-center gap-3 py-3 text-left">
               <span className="sos-subtle-chip flex size-10 shrink-0 items-center justify-center rounded-xl text-ink-2">
-                <Volume2 className="size-5" />
+                <IconeM3D icone={Bell} peca={ARTE_MOBILE.sirene} className="size-10" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-semibold text-ink">Testar o alerta de SOS</span>
@@ -189,7 +191,7 @@ export function PerfilMecanico() {
             </button>
             <Link to="/notificacoes" className="sos-premium-row flex min-h-16 w-full items-center gap-3 py-3">
               <span className="sos-subtle-chip flex size-10 shrink-0 items-center justify-center rounded-xl text-ink-2">
-                <Bell className="size-5" />
+                <IconeM3D icone={Bell} className="size-10" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-semibold text-ink">Avisos recebidos</span>
@@ -200,8 +202,8 @@ export function PerfilMecanico() {
           </div>
         </SecaoM>
 
-        <SecaoM titulo="App e notificações">
-          <CartaoAparelho />
+        <SecaoM titulo="Notificações">
+          <CartaoAparelho mostrarInstalacao={false} />
         </SecaoM>
 
         <SecaoM titulo="Aparência">
@@ -220,7 +222,7 @@ export function PerfilMecanico() {
                     tema === t.id ? 'border-accent text-accent-ink' : 'border-line text-ink-2',
                   )}
                 >
-                  <Icone className="size-5" /> {t.rotulo}
+                  <IconeM3D icone={Icone} peca={t.id === 'sistema' ? ARTE_MOBILE.temaAuto : undefined} className="size-9" /> {t.rotulo}
                 </button>
               )
             })}
@@ -234,7 +236,7 @@ export function PerfilMecanico() {
                 Quem opera a central vai direto para o SOS de lá. */}
             <a href={perfil.central ? `${URL_CHECKLIST}/sos` : URL_CHECKLIST} className="sos-premium-row flex min-h-16 w-full items-center gap-3 py-3">
               <span className="sos-subtle-chip flex size-10 shrink-0 items-center justify-center rounded-xl text-accent-ink">
-                <ShieldCheck className="size-5" />
+                <IconeM3D icone={ShieldCheck} className="size-10" />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-semibold text-ink">{perfil.central ? 'Central SOS' : 'Sistema Tecnoar (Checklist)'}</span>
@@ -246,7 +248,7 @@ export function PerfilMecanico() {
             </a>
             <button type="button" onClick={() => setConfirmarSair(true)} className="sos-premium-row flex min-h-16 w-full items-center gap-3 py-3 text-left">
               <span className="sos-subtle-chip flex size-10 shrink-0 items-center justify-center rounded-xl text-crit-ink">
-                <LogOut className="size-5" />
+                <IconeM3D icone={LogOut} className="size-9" />
               </span>
               <span className="min-w-0 flex-1 text-[15px] font-semibold text-crit-ink">Sair</span>
             </button>

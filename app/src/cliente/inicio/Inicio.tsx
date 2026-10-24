@@ -1,12 +1,16 @@
 import type { ReactNode } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowRight, Bell, Brain, CalendarCheck, CarFront, ChevronRight, MapPin, ShieldCheck, type LucideIcon } from 'lucide-react'
+import { Bell, Brain, CalendarCheck, ChevronRight, History, MessageCircle, PhoneCall, WifiOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { HomeCliente as DadosHome } from '@/sos/tipos'
+import { Arte } from '../../comum/Arte'
+import { ARTE3D, ARTE_MOBILE } from '../../comum/kit3d'
 import { Avatar, Esqueleto, LogoSOS } from '../../comum/ui'
 import { nomeVeiculo } from '../dados'
-import { AlertasVeiculo, BotaoTema, OrbeSOS } from './pecasInicio'
+import { BotaoSOS } from './BotaoSOS'
+import { AlertasVeiculo, BotaoTema, IconeVeiculo } from './pecasInicio'
 import './inicio.css'
+import './inicio-premium.css'
 
 export interface PropsInicio {
   nome: string
@@ -20,189 +24,220 @@ export interface PropsInicio {
   /** Convite para avaliar o último atendimento. */
   avaliar: ReactNode
   chamadoAtivo: boolean
+  /** Conexão do aparelho. Sem ela o pedido fica guardado e o telefone sobe. */
+  online: boolean
+  /** Emergência 24h, já em formato `tel:`. */
+  telefone: string | null
+  whatsapp?: string | null
   aoSOS: () => void
 }
 
 /**
- * Início do cliente: saudação, o cartão "Preciso de ajuda" com o SOS, avisos,
- * três atalhos e a faixa da Tecnoar. O mesmo desenho nos dois temas — só as
- * cores e a foto do cartão mudam.
+ * Início do cliente.
+ *
+ * O DESENHO, E POR QUÊ
+ *
+ * Quem abre esta tela pode estar parado no acostamento, no escuro, com pressa
+ * e com medo. Isso decide tudo:
+ *
+ * 1. A TELA É A AÇÃO. O beacon não mora dentro de um cartão com foto, ele é o
+ *    centro do aparelho — alvo enorme, que se acha sem ler e sem mirar. Antes
+ *    havia um SOS translúcido no canto de uma foto E outro na barra de baixo:
+ *    duas ações primárias para a mesma coisa, nenhuma delas evidente.
+ *
+ * 2. UMA COISA DE CADA VEZ. Saíram o lema vertical, os dois rótulos
+ *    decorativos e os três cartões iguais de ícone+título+texto que eram a
+ *    estrutura da página. Veículo, IA, Revisões e Histórico continuam a um
+ *    toque, numa faixa discreta embaixo — secundários de verdade, não
+ *    competindo com o pedido de socorro.
+ *
+ * 3. A TELA DIZ SE PODE AJUDAR. O subtítulo do beacon é estado real, não
+ *    slogan: com internet promete a localização; sem internet avisa que o
+ *    pedido fica guardado e PROMOVE o telefone, que é o canal que funciona
+ *    quando o app não funciona. Prometer o que não se pode cumprir é o pior
+ *    que esta tela poderia fazer.
+ *
+ * 4. COM SOCORRO EM ANDAMENTO, a tela inteira vira o acompanhamento: o beacon
+ *    sai e entra o cartão ao vivo. Não se pede socorro duas vezes.
  */
-export function Inicio({ nome, naoLidas, d, carregando, avisos, socorro, avaliar, chamadoAtivo, aoSOS }: PropsInicio) {
+export function Inicio({
+  nome,
+  naoLidas,
+  d,
+  carregando,
+  avisos,
+  socorro,
+  avaliar,
+  chamadoAtivo,
+  online,
+  telefone,
+  whatsapp,
+  aoSOS,
+}: PropsInicio) {
   const navegar = useNavigate()
-  const primeiro = nome.split(/\s+/)[0] || ''
   const v = d?.veiculo ?? null
 
   return (
-    <div className="ini-app">
-      <header className="pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))]">
-        <div className="flex items-start justify-between gap-3 px-4 pt-3">
-          <div className="flex flex-col items-start">
-            <span className="hidden dark:block">
-              <LogoSOS negativo altura={40} />
-            </span>
-            <span className="dark:hidden">
-              <LogoSOS altura={40} />
-            </span>
-            <span className="ini-marca">Sempre com você</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <BotaoTema para="escuro" className="ini-botao ini-so-claro" />
-            <BotaoTema para="claro" className="ini-botao ini-so-escuro" />
-            <button
-              type="button"
-              onClick={() => navegar('/notificacoes')}
-              aria-label={naoLidas ? `Notificações, ${naoLidas} não lidas` : 'Notificações'}
-              className="ini-botao relative"
-            >
-              <Bell className="size-[21px]" strokeWidth={1.8} />
-              {naoLidas > 0 && (
-                <span className="num absolute -top-1 -right-1 flex min-w-[20px] items-center justify-center rounded-full bg-[#FF6A00] px-1 text-[11px] leading-5 font-bold text-white shadow-[0_0_12px_rgb(255_106_0/0.7)]">
-                  {naoLidas > 99 ? '99+' : naoLidas}
-                </span>
-              )}
-            </button>
-            <button type="button" onClick={() => navegar('/perfil')} aria-label="Minha conta" className="ini-botao p-0 active:scale-95">
-              <Avatar nome={nome} className="ini-avatar size-full bg-transparent text-[15px] dark:bg-transparent" />
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-4 flex items-start justify-between gap-3 px-4">
-          <div className="min-w-0">
-            <h1 className="ini-ola truncate">Olá{primeiro ? `, ${primeiro}` : ''}</h1>
-            <p className="ini-ola-sub">Socorro e revisões sempre à mão.</p>
-          </div>
-          <p className="ini-lema">
-            Mais
-            <br />
-            mobilidade
-            <br />
-            para o seu
-            <br />
-            caminho
-          </p>
+    <div className="ini-app ini-premium">
+      <header className="ini-topo">
+        <span>
+          <LogoSOS negativo altura={58} />
+        </span>
+        <div className="flex items-center gap-2">
+          <BotaoTema para="escuro" className="ini-botao ini-so-claro" />
+          <BotaoTema para="claro" className="ini-botao ini-so-escuro" />
+          <button
+            type="button"
+            onClick={() => navegar('/notificacoes')}
+            aria-label={naoLidas ? `Notificações, ${naoLidas} não lidas` : 'Notificações'}
+            className="ini-botao relative"
+          >
+            <Arte src={ARTE_MOBILE.sino} alt="" recuo={<Bell className="size-[21px]" strokeWidth={1.8} />} classeImagem="ini-topo-peca" />
+            {naoLidas > 0 && (
+              <span className="ini-selo-sino num">{naoLidas > 99 ? '99+' : naoLidas}</span>
+            )}
+          </button>
+          <button type="button" onClick={() => navegar('/perfil')} aria-label="Minha conta" className="ini-botao p-0 active:scale-95">
+            <Avatar nome={nome} className="ini-avatar size-full bg-transparent text-[15px] dark:bg-transparent" />
+          </button>
         </div>
       </header>
 
-      <main className="ini-conteudo entrada-suave">
-        {avisos}
-
-        {socorro ?? (
-          <button type="button" onClick={aoSOS} className="ini-hero" aria-label={chamadoAtivo ? 'Acompanhar o socorro em andamento' : 'Preciso de ajuda. Pedir socorro (SOS)'}>
-            <span className="ini-hero-texto">
-              <span className="ini-sobre">
-                Em qualquer lugar,
-                <br />
-                sempre com você
-              </span>
-              <span className="ini-titulo">
-                Preciso
-                <br />
-                de ajuda
-              </span>
-              <span className="ini-sub">
-                Toque e a Tecnoar
-                <br />
-                localiza você.
-              </span>
-              <span className="ini-local">
-                <span className="ini-local-icone">
-                  <MapPin className="size-[55%]" strokeWidth={1.9} />
-                </span>
-                <span>
-                  Sua localização será
-                  <br />
-                  detectada automaticamente.
-                </span>
-              </span>
-            </span>
-            <OrbeSOS tema="escuro" ativo={chamadoAtivo} className="ini-hero-orbe" />
-          </button>
+      <main className="ini-palco">
+        {(avisos || avaliar) && (
+          <div className="ini-avisos">
+            {avisos}
+            {avaliar}
+          </div>
         )}
 
-        {avaliar}
-        <AlertasVeiculo d={d} />
+        {socorro ?? (
+          <section className="ini-acao">
+            <div className="ini-cena-estrada" aria-hidden="true" />
+            <h1 className="ini-chamada">Socorro para <span>seguir viagem.</span></h1>
+            <BotaoSOS modo={chamadoAtivo ? 'vivo' : 'pronto'} aoTocar={aoSOS} className="ini-beacon" />
+            <p className="ini-sos-descricao">Pedir socorro</p>
+            {/* Estado, não slogan. Ver a nota 3 no topo do arquivo. */}
+            <p className={cn('ini-prontidao', !online && 'ini-prontidao-off')}>
+              {online ? (
+                <>
+                  Confirme o local antes de enviar.
+                </>
+              ) : (
+                <>
+                  <WifiOff aria-hidden className="size-[15px] shrink-0" />
+                  Sem internet. Seu pedido fica guardado e sai quando a conexão voltar.
+                </>
+              )}
+            </p>
 
-        {naoLidas > 0 && (
-          <Link to="/notificacoes" className="ini-aviso">
-            <span className="ini-aviso-icone">
-              <Bell className="size-5" strokeWidth={1.8} />
+            <div className="ini-contatos">
+            {telefone && (
+              <a
+                href={telefone}
+                className={cn('ini-ligar', !online && 'ini-ligar-forte')}
+                aria-label="Ligar para a Tecnoar"
+              >
+                <Arte src={ARTE3D.ligar} alt="" recuo={<PhoneCall className="size-[18px]" strokeWidth={2} />} classeImagem="ini-contato-peca" />
+                Ligar para a Tecnoar
+              </a>
+            )}
+            {online && whatsapp && (
+              <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="ini-ligar" aria-label="Falar com a Tecnoar no WhatsApp">
+                <Arte src={ARTE_MOBILE.whatsapp} alt="" recuo={<MessageCircle className="size-[18px]" aria-hidden="true" />} classeImagem="ini-contato-peca" />
+                WhatsApp
+              </a>
+            )}
+            </div>
+          </section>
+        )}
+      </main>
+
+      <footer className="ini-rodape">
+        <AlertasVeiculo d={d} className="ini-alertas" />
+
+        {carregando ? (
+          <Esqueleto className="h-[3.4rem] rounded-[1.1rem]" />
+        ) : (
+          <Link to={v ? '/veiculos' : '/veiculos?novo=1'} className="ini-veiculo">
+            <span className="ini-veiculo-icone">
+              <IconeVeiculo tipo={v?.tipo} className="size-[22px]" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="ini-aviso-titulo">{naoLidas === 1 ? '1 aviso novo' : `${naoLidas} avisos novos`}</span>
-              <span className="ini-aviso-sub">Confira suas notificações</span>
+              <span className="ini-veiculo-nome">{v ? nomeVeiculo(v) : 'Cadastrar meu veículo'}</span>
+              <span className="ini-veiculo-sub">
+                {v ? v.placa : 'Com a placa salva, o socorro sai mais rápido.'}
+              </span>
             </span>
-            <ChevronRight className="size-5 shrink-0 opacity-80" />
+            <ChevronRight aria-hidden className="size-5 shrink-0 opacity-50" />
           </Link>
         )}
 
-        <nav aria-label="Atalhos" className="ini-atalhos">
-          {carregando ? (
-            <>
-              <Esqueleto className="h-[10.5rem] rounded-[1.2rem]" />
-              <Esqueleto className="h-[10.5rem] rounded-[1.2rem]" />
-              <Esqueleto className="h-[10.5rem] rounded-[1.2rem]" />
-            </>
-          ) : (
-            <>
-              {v ? (
-                <CartaoAtalho para="/veiculos" icone={CarFront} titulo="Meu veículo" texto={`${nomeVeiculo(v)} · ${v.placa}`} fundo="ini-card-veiculo" />
-              ) : (
-                <CartaoAtalho para="/veiculos?novo=1" icone={CarFront} titulo="Cadastrar veículo" texto="Com a placa salva, o socorro sai mais rápido." fundo="ini-card-veiculo" />
-              )}
-              <CartaoAtalho para="/tecno-ia" icone={Brain} titulo="Tecno IA" texto="Tire dúvidas sobre o seu veículo com nossa inteligência artificial." fundo="ini-card-ia" selo="IA" />
-              <CartaoAtalho para="/revisoes" icone={CalendarCheck} titulo="Revisões" texto="Agende a preventiva e mantenha seu veículo sempre em dia." fundo="ini-card-revisoes" contador={d?.lembretes} />
-            </>
-          )}
+        <nav aria-label="Atalhos" className="ini-pastilhas">
+          <Pastilha
+            para="/tecno-ia"
+            icone={<Brain />}
+            peca={ARTE3D.ia}
+            rotulo="Tecno IA"
+            texto="Tire dúvidas na hora"
+          />
+          <Pastilha
+            para="/revisoes"
+            icone={<CalendarCheck />}
+            peca={ARTE3D.revisoes}
+            rotulo="Revisões"
+            texto="Agende a preventiva"
+            contador={d?.lembretes}
+          />
+          <Pastilha
+            para="/historico"
+            icone={<History />}
+            peca={ARTE3D.historico}
+            rotulo="Histórico"
+            texto="Seus atendimentos"
+          />
         </nav>
-
-        <Link to="/contato" className="ini-faixa">
-          <ShieldCheck className="size-8 shrink-0 text-[#FF7A1A] drop-shadow-[0_0_8px_rgb(255_122_26/0.7)]" strokeWidth={1.6} />
-          <span className="ini-faixa-texto">
-            Mais que assistência,
-            <br />
-            tranquilidade na sua jornada.
-          </span>
-        </Link>
-      </main>
+      </footer>
     </div>
   )
 }
 
-function CartaoAtalho({
+/**
+ * Atalho secundário, em cartão.
+ *
+ * Era uma pastilha de uma linha só, com o nome e mais nada. Quem nunca tinha
+ * aberto o app não descobria o que havia ali dentro — "Tecno IA" não diz a
+ * ninguém que existe uma triagem que funciona sem internet. A linha de apoio
+ * devolve isso, e a peça 3D dá ao cartão o mesmo material do resto da tela.
+ *
+ * Continua secundário: fica abaixo do veículo, não disputa altura com o SOS, e
+ * a linha de apoio é curta de propósito — num celular de 320 px, três colunas
+ * deixam cerca de 90 px para cada uma.
+ */
+function Pastilha({
   para,
-  icone: Icone,
-  titulo,
+  icone,
+  peca,
+  rotulo,
   texto,
-  fundo,
-  selo,
   contador,
 }: {
   para: string
-  icone: LucideIcon
-  titulo: string
+  icone: ReactNode
+  /** Peça 3D do atalho; sem ela (ou se falhar) fica o ícone de linha. */
+  peca: string
+  rotulo: string
   texto: string
-  fundo: string
-  selo?: string
   contador?: number
 }) {
   return (
-    <Link to={para} className={cn('ini-card', fundo)}>
-      <span className="ini-card-icone">
-        <Icone className="size-[52%]" strokeWidth={1.7} />
-        {selo && <span className="ini-selo-ia">{selo}</span>}
+    <Link to={para} className="ini-pastilha">
+      <span aria-hidden className="ini-pastilha-icone">
+        <Arte src={peca} alt="" recuo={icone} classeImagem="ini-pastilha-peca" />
       </span>
-      <span className="ini-card-titulo">{titulo}</span>
-      <span className="ini-card-texto">{texto}</span>
-      <span aria-hidden className="ini-card-seta">
-        <ArrowRight className="size-[18px]" strokeWidth={2} />
-      </span>
-      {!!contador && (
-        <span className="num absolute top-2.5 right-2.5 flex min-w-[20px] items-center justify-center rounded-full bg-[#FF6A00] px-1.5 text-[11px] leading-5 font-semibold text-white">
-          {contador > 99 ? '99+' : contador}
-        </span>
-      )}
+      <span className="ini-pastilha-nome">{rotulo}</span>
+      <span className="ini-pastilha-texto">{texto}</span>
+      {!!contador && <span className="ini-pastilha-contador num">{contador > 99 ? '99+' : contador}</span>}
     </Link>
   )
 }

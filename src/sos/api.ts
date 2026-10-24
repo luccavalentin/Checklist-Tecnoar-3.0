@@ -54,6 +54,11 @@ import type {
   PrestadorListado,
   PrestadorSOS,
   ResultadoDespacho,
+  BaseListada,
+  BaseSOS,
+  CoberturaPendente,
+  PoliticaCompleta,
+  VersaoOrcamento,
 } from './tipos'
 
 /**
@@ -252,7 +257,15 @@ export const sosAcompanhar = (token: string) => rpc<AcompanhamentoPublico>('sos_
 export const sosEnviarMensagem = (
   chamadoId: string,
   texto: string,
-  opcoes?: { midiaCaminho?: string | null; midiaTipo?: string | null; rapida?: boolean },
+  opcoes?: {
+    midiaCaminho?: string | null
+    midiaTipo?: string | null
+    rapida?: boolean
+    respondeA?: string | null
+    duracaoSeg?: number | null
+    lat?: number | null
+    lng?: number | null
+  },
 ) =>
   rpc<string>('sos_enviar_mensagem', {
     p_chamado: chamadoId,
@@ -260,10 +273,26 @@ export const sosEnviarMensagem = (
     p_midia_caminho: opcoes?.midiaCaminho ?? null,
     p_midia_tipo: opcoes?.midiaTipo ?? null,
     p_rapida: opcoes?.rapida ?? false,
+    p_responde_a: opcoes?.respondeA ?? null,
+    p_duracao_seg: opcoes?.duracaoSeg ?? null,
+    p_lat: opcoes?.lat ?? null,
+    p_lng: opcoes?.lng ?? null,
   })
 
 export const sosMarcarMensagensLidas = (chamadoId: string) =>
   rpc<void>('sos_marcar_mensagens_lidas', { p_chamado: chamadoId })
+
+/**
+ * Segundo tique cinza. Chamado quando o chamado CARREGA, não quando a
+ * conversa abre — é essa a diferença entre "chegou no aparelho dele" e "ele
+ * leu". Quem está parado no acostamento precisa das duas respostas.
+ */
+export const sosMarcarMensagensEntregues = (chamadoId: string) =>
+  rpc<void>('sos_marcar_mensagens_entregues', { p_chamado: chamadoId })
+
+/** Apaga para todos, deixando a lápide. Só a própria, e só até uma hora. */
+export const sosApagarMensagem = (mensagemId: string) =>
+  rpc<void>('sos_apagar_mensagem', { p_mensagem: mensagemId })
 
 /* ── atendimento: catálogo do Checklist e mídia ─────────────────────────── */
 
@@ -574,10 +603,32 @@ export const sosListarPrestadores = () => rpc<PrestadorListado[]>('sos_listar_pr
 export const sosSalvarPrestador = (p: Partial<PrestadorSOS>) =>
   rpc<PrestadorSOS>('sos_salvar_prestador', { p })
 
-/** As ondas do despacho, em ordem. É aqui que moram os 60 km da Tecnoar. */
+/** As ondas da versão VIGENTE, em ordem. É aqui que moram os 80 km da Tecnoar. */
 export const sosListarPolitica = () => rpc<OndaDespacho[]>('sos_listar_politica')
 
+/**
+ * Altera (ou acrescenta) uma onda. Isto PUBLICA UMA VERSÃO NOVA da política:
+ * a vigente é copiada, a mudança entra na cópia, e a cópia passa a valer. Os
+ * chamados que já estão na estrada continuam na versão com que nasceram, e o
+ * histórico mostra com que regra cada um foi despachado.
+ */
 export const sosSalvarOnda = (p: Partial<OndaDespacho>) => rpc<OndaDespacho>('sos_salvar_politica', { p })
+
+/** A política inteira: versão vigente, histórico de versões e todas as ondas. */
+export const sosPoliticaCompleta = () => rpc<PoliticaCompleta>('sos_politica_completa')
+
+/** Bases e filiais de onde a cobertura comercial é medida. */
+export const sosListarBases = () => rpc<BaseListada[]>('sos_listar_bases')
+
+export const sosSalvarBase = (p: Partial<BaseSOS>) => rpc<BaseSOS>('sos_salvar_base', { p })
+
+/**
+ * O que falta para a cobertura existir, e quanto já roda sem medição. Enquanto
+ * nenhuma base tiver coordenada, o despacho segue pela proximidade da equipe e
+ * esta é a pendência que a Gestão SOS precisa mostrar — em vez de a área de
+ * 80 km parecer ativa sem estar.
+ */
+export const sosCoberturaPendente = () => rpc<CoberturaPendente>('sos_cobertura_pendente')
 
 /**
  * Quem seria chamado nesta onda, do melhor para o pior. Só consulta — a
@@ -591,6 +642,13 @@ export const sosCandidatos = (chamadoId: string, ondaId: string) =>
  * esperar o prazo). Onda sem ninguém elegível é pulada na hora.
  */
 export const sosDespachar = (chamadoId: string) => rpc<ResultadoDespacho>('sos_despachar', { p_chamado: chamadoId })
+
+/**
+ * As versões do orçamento deste chamado, da mais nova para a mais antiga.
+ * Cada uma traz a foto dos itens no envio — o que o cliente viu ao aprovar.
+ */
+export const sosOrcamentosDoChamado = (chamadoId: string) =>
+  rpc<VersaoOrcamento[]>('sos_orcamentos_do_chamado', { p_chamado: chamadoId })
 
 /** Saúde do vigia (última execução no pg_cron). */
 export const sosVigiaStatus = () => rpc<VigiaStatus>('sos_vigia_status')

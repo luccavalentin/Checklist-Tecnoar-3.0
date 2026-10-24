@@ -36,24 +36,14 @@
 
 /* A composição é desenhada para o celular: em tela larga ela para de crescer
    em 430 px e fica centralizada. */
-.ini-app > header,
-.ini-conteudo {
+.ini-topo,
+.ini-palco,
+.ini-rodape {
   max-width: 430px;
   margin-inline: auto;
 }
 
 /* ── topo ───────────────────────────────────────────────────────────────── */
-
-.ini-marca {
-  margin-top: 0.4rem;
-  font-size: 8.5px;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: 0.36em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--i-texto-3);
-}
 
 .ini-botao {
   display: flex;
@@ -85,42 +75,6 @@
   color: var(--i-texto);
 }
 
-.ini-ola {
-  font-size: clamp(22px, 6.2vw, 30px);
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: var(--i-texto);
-}
-
-.ini-ola-sub {
-  margin-top: 0.25rem;
-  font-size: 13.5px;
-  line-height: 1.3;
-  color: var(--i-texto-2);
-}
-
-.ini-lema {
-  flex-shrink: 0;
-  padding-top: 0.2rem;
-  font-size: 7.5px;
-  font-weight: 500;
-  line-height: 1.75;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--i-texto-3);
-}
-
-.ini-lema::after {
-  content: '';
-  display: block;
-  width: 1.6rem;
-  height: 2px;
-  margin-top: 0.45rem;
-  border-radius: 2px;
-  background: #00afef;
-}
-
 @media (max-width: 359px) {
   .ini-lema {
     display: none;
@@ -132,478 +86,6 @@
 }
 
 /* ── conteúdo ───────────────────────────────────────────────────────────── */
-
-.ini-conteudo {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  margin-top: 1.2rem;
-  padding: 0 max(1rem, env(safe-area-inset-right)) calc(8.5rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
-}
-
-/* cartão do socorro */
-
-.ini-hero {
-  position: relative;
-  display: block;
-  width: 100%;
-  aspect-ratio: 879 / 498;
-  container-type: inline-size;
-  border-radius: 1.35rem;
-  text-align: left;
-  background: var(--i-cartao) var(--i-hero) center / cover no-repeat;
-  box-shadow: var(--i-sombra);
-  transition: transform 0.15s;
-}
-
-.ini-hero:active {
-  transform: scale(0.99);
-}
-
-/* Escurece (ou clareia) o lado do texto, como na referência. */
-.ini-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--i-veu);
-}
-
-/* Borda fina que acende em laranja no canto do SOS. */
-.ini-hero::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  padding: 1.5px;
-  border-radius: inherit;
-  background: var(--i-hero-borda);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-.ini-hero-texto {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  max-width: 60cqw;
-  padding: 5cqw 0 5.2cqw 5.6cqw;
-}
-
-.ini-sobre {
-  font-size: max(8px, 1.85cqw);
-  font-weight: 500;
-  line-height: 1.55;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--i-texto-2);
-}
-
-.ini-sobre::after {
-  content: '';
-  display: block;
-  width: 5.1cqw;
-  min-width: 1.4rem;
-  height: 2px;
-  margin-top: 0.45rem;
-  border-radius: 2px;
-  background: #00afef;
-}
-
-.ini-titulo {
-  margin-top: 4.6cqw;
-  font-size: clamp(27px, 8.9cqw, 46px);
-  font-weight: 760;
-  line-height: 0.98;
-  letter-spacing: -0.03em;
-  color: var(--i-texto);
-}
-
-.ini-sub {
-  margin-top: 2.2cqw;
-  font-size: clamp(12px, 3.5cqw, 18px);
-  line-height: 1.22;
-  color: var(--i-texto-2);
-}
-
-.ini-local {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-top: 3.4cqw;
-  font-size: max(10px, 2.5cqw);
-  line-height: 1.3;
-  color: var(--i-texto-2);
-}
-
-.ini-local-icone {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: max(22px, 5.8cqw);
-  height: max(22px, 5.8cqw);
-  border: 1px solid rgb(0 175 239 / 0.35);
-  border-radius: 999px;
-  color: #00afef;
-  background: rgb(0 175 239 / 0.08);
-}
-
-/* ── botão SOS ──────────────────────────────────────────────────────────── */
-
-.ini-orbe {
-  position: relative;
-  display: grid;
-  aspect-ratio: 1;
-  place-items: center;
-  border-radius: 999px;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.ini-orbe > span {
-  grid-area: 1 / 1;
-}
-
-.ini-orbe.ini-hero-orbe {
-  position: absolute;
-  z-index: 1;
-  top: 61%;
-  left: 78.4%;
-  width: 37.5cqw;
-  translate: -50% -50%;
-  font-size: calc(37.5cqw * 0.16);
-}
-
-.ini-orbe-anel-fora {
-  width: 100%;
-  height: 100%;
-  border: 1px solid rgb(255 140 60 / 0.5);
-  border-radius: 999px;
-  box-shadow: 0 0 18px rgb(255 110 0 / 0.18) inset;
-  animation: ini-respira 3.2s ease-in-out infinite;
-}
-
-.ini-orbe-anel {
-  width: 88%;
-  height: 88%;
-  border: 1.5px solid rgb(255 150 70 / 0.8);
-  border-radius: 999px;
-  box-shadow:
-    0 0 24px rgb(255 110 0 / 0.4),
-    0 0 14px rgb(255 110 0 / 0.3) inset;
-}
-
-.ini-orbe-nucleo {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4%;
-  width: 74.4%;
-  height: 74.4%;
-  border-radius: 999px;
-  color: #fff;
-  background: radial-gradient(circle at 50% 42%, #ff8d24 0%, #ff6a00 55%, #f25200 100%);
-  box-shadow:
-    0 0 0 2px rgb(255 190 120 / 0.55) inset,
-    0 0 26px rgb(255 106 0 / 0.75),
-    0 0 60px rgb(255 106 0 / 0.35);
-  animation: ini-pulso 1.8s ease-in-out infinite;
-}
-
-.ini-orbe:active .ini-orbe-nucleo {
-  scale: 0.96;
-}
-
-.ini-orbe:focus-visible {
-  outline: none;
-}
-
-.ini-orbe:focus-visible .ini-orbe-nucleo {
-  outline: 3px solid #00afef;
-  outline-offset: 4px;
-}
-
-/* A onda que sai do botão. */
-.ini-orbe::after {
-  content: '';
-  grid-area: 1 / 1;
-  width: 74.4%;
-  height: 74.4%;
-  border: 2px solid rgb(255 130 40 / 0.75);
-  border-radius: 999px;
-  pointer-events: none;
-  animation: ini-onda 1.8s ease-out infinite;
-}
-
-.ini-orbe-icone {
-  width: 28%;
-  height: 28%;
-}
-
-.ini-orbe-texto {
-  font-size: 1em;
-  font-weight: 780;
-  line-height: 1;
-  letter-spacing: 0.01em;
-}
-
-@keyframes ini-respira {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.035);
-    opacity: 0.75;
-  }
-}
-
-@keyframes ini-pulso {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.05);
-  }
-}
-
-@keyframes ini-onda {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
-
-/* ── aviso ──────────────────────────────────────────────────────────────── */
-
-.ini-aviso {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  min-height: 3.6rem;
-  padding: 0.55rem 0.9rem;
-  overflow: hidden;
-  border: 1px solid var(--i-borda);
-  border-radius: 1.2rem;
-  color: var(--i-texto);
-  background: linear-gradient(90deg, rgb(255 106 0 / 0.14) 0%, var(--i-cartao) 42%);
-  box-shadow: var(--i-sombra);
-}
-
-.ini-aviso::before {
-  content: '';
-  position: absolute;
-  top: 12%;
-  bottom: 12%;
-  left: 0;
-  width: 3px;
-  border-radius: 0 3px 3px 0;
-  background: #ff6a00;
-  box-shadow: 0 0 14px 2px rgb(255 106 0 / 0.7);
-}
-
-.ini-aviso-icone {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 1px solid var(--i-borda);
-  border-radius: 999px;
-  color: var(--i-texto);
-  background: var(--i-chip);
-}
-
-.ini-aviso-titulo {
-  display: block;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-.ini-aviso-sub {
-  display: block;
-  font-size: 12.5px;
-  color: var(--i-texto-3);
-}
-
-/* ── atalhos ────────────────────────────────────────────────────────────── */
-
-.ini-atalhos {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.5rem;
-}
-
-.ini-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 10.5rem;
-  padding: 0.7rem 0.65rem 0.65rem;
-  overflow: hidden;
-  border: 1px solid var(--i-borda);
-  border-radius: 1.2rem;
-  color: var(--i-texto);
-  background-color: var(--i-cartao);
-  background-position: center bottom;
-  background-repeat: no-repeat;
-  background-size: cover;
-  box-shadow: var(--i-sombra);
-  transition: transform 0.15s;
-}
-
-.ini-card:active {
-  transform: scale(0.98);
-}
-
-/* As artes de fundo são desenhadas para o escuro. */
-.dark .ini-card-veiculo {
-  background-image: url('/sos/home/escuro-card-veiculo.webp');
-}
-
-.dark .ini-card-ia {
-  background-image: url('/sos/home/escuro-card-ia.webp');
-}
-
-.dark .ini-card-revisoes {
-  background-image: url('/sos/home/escuro-card-revisoes.webp');
-}
-
-.ini-card-icone {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.35rem;
-  height: 2.35rem;
-  border: 1px solid rgb(0 175 239 / 0.4);
-  border-radius: 0.75rem;
-  color: #0a7fc4;
-  background: rgb(0 175 239 / 0.08);
-}
-
-.dark .ini-card-icone {
-  color: #e8f4ff;
-  background: linear-gradient(160deg, rgb(0 60 120 / 0.55), rgb(4 24 52 / 0.8));
-  box-shadow: 0 0 16px -4px rgb(0 175 239 / 0.45);
-}
-
-.ini-selo-ia {
-  position: absolute;
-  right: -0.45rem;
-  bottom: -0.35rem;
-  padding: 0.1rem 0.28rem;
-  border-radius: 999px;
-  font-size: 9.5px;
-  font-weight: 700;
-  line-height: 1.2;
-  color: #fff;
-  background: #0e8fe0;
-  box-shadow: 0 0 0 2px #fff;
-}
-
-.dark .ini-selo-ia {
-  box-shadow: 0 0 0 2px #0c1d38;
-}
-
-.ini-card-titulo {
-  margin-top: 0.65rem;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-}
-
-.ini-card-texto {
-  margin-top: 0.3rem;
-  margin-bottom: 0.6rem;
-  font-size: 10.5px;
-  line-height: 1.35;
-  color: var(--i-texto-3);
-  overflow-wrap: anywhere;
-}
-
-.ini-card-seta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.8rem;
-  height: 1.8rem;
-  margin-top: auto;
-  border: 1px solid var(--i-borda);
-  border-radius: 999px;
-  color: var(--i-texto);
-}
-
-@media (max-width: 359px) {
-  .ini-card-texto {
-    display: none;
-  }
-
-  .ini-card {
-    min-height: 9rem;
-  }
-}
-
-/* ── faixa ──────────────────────────────────────────────────────────────── */
-
-.ini-faixa {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  min-height: 3.6rem;
-  padding: 0.55rem 5rem 0.55rem 1rem;
-  overflow: hidden;
-  border: 1px solid var(--i-borda);
-  border-radius: 1.2rem;
-  box-shadow: var(--i-sombra);
-  background:
-    linear-gradient(90deg, rgb(255 106 0 / 0.1) 0%, #fff 30%, rgb(255 255 255 / 0.75) 62%, rgb(255 255 255 / 0.35) 100%),
-    #fff url('/sos/home/claro-banner.webp') right center / cover no-repeat;
-}
-
-.dark .ini-faixa {
-  background:
-    linear-gradient(90deg, rgb(255 106 0 / 0.14) 0%, rgb(8 20 39 / 0.9) 30%, rgb(8 20 39 / 0.2) 70%, rgb(8 20 39 / 0.3) 100%),
-    #081427 url('/sos/home/escuro-banner.webp') right center / cover no-repeat;
-}
-
-.ini-faixa::before {
-  content: '';
-  position: absolute;
-  top: 14%;
-  bottom: 14%;
-  left: 0;
-  width: 3px;
-  border-radius: 0 3px 3px 0;
-  background: #ff6a00;
-  box-shadow: 0 0 14px 2px rgb(255 106 0 / 0.6);
-}
-
-.ini-faixa-texto {
-  position: relative;
-  font-size: 13px;
-  line-height: 1.3;
-  color: var(--i-texto);
-}
 
 /* ── avisos do veículo ──────────────────────────────────────────────────── */
 
@@ -658,32 +140,516 @@
 }
 
 .cli-nav .sos-center-fab {
-  background: radial-gradient(circle at 50% 40%, #ff8d24 0%, #ff6a00 60%, #f25200 100%);
-  animation: ini-brilho 1.8s ease-in-out infinite;
+  padding: 10%;
+  background:
+    /* cubo e face, pela mesma luz de 315° do disco grande */
+    radial-gradient(circle at 50% 50%, #ffb047 0 26%, #fc6400 26% 37%, #b03c00 37% 41%, transparent 41%),
+    radial-gradient(circle at 34% 26%, #434c5a 0%, #262d38 55%, #10151c 100%),
+    conic-gradient(
+      from 296deg,
+      #11161d 0deg, #7a8696 26deg, #d6e1ee 44deg, #6b7684 74deg,
+      #171d25 118deg, #76828f 174deg, #2a313c 224deg, #0e1319 268deg,
+      #6b7684 322deg, #11161d 360deg
+    );
+  background-clip: content-box, content-box, border-box;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.45),
+    inset 0 -1px 1px rgb(0 0 0 / 0.6),
+    0 8px 16px -6px rgb(3 8 16 / 0.7);
+  animation: ini-brilho 4.4s cubic-bezier(0.4, 0, 0.5, 1) infinite;
 }
 
 @keyframes ini-brilho {
   0%,
   100% {
-    box-shadow:
-      0 0 0 0 rgb(255 90 10 / 0.5),
-      0 10px 22px -10px rgb(255 61 18 / 0.75);
+    filter: drop-shadow(0 0 6px rgb(252 100 0 / 0.35));
   }
   50% {
-    box-shadow:
-      0 0 0 9px rgb(255 90 10 / 0),
-      0 10px 22px -10px rgb(255 61 18 / 0.75);
+    filter: drop-shadow(0 0 14px rgb(252 100 0 / 0.75));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ini-orbe-anel-fora,
-  .ini-orbe-nucleo,
   .cli-nav .sos-center-fab {
     animation: none !important;
   }
 
-  .ini-orbe::after {
+  /* O degrau ativo não depende de movimento para dizer que está ativo. */
+  .sin-pulso {
+    animation: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   A COMPOSIÇÃO: a tela é a ação
+   ═══════════════════════════════════════════════════════════════════════════
+   Três faixas numa coluna de altura cheia — topo mínimo, palco com o beacon
+   no centro óptico, rodapé com o que é secundário. O palco cresce e encolhe
+   com a tela; o beacon continua no meio em qualquer aparelho, do iPhone SE ao
+   Max, sem rolagem no estado normal.                                        */
+
+.ini-app {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+
+/* ── topo ─────────────────────────────────────────────────────────────── */
+
+.ini-topo {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding:
+    calc(env(safe-area-inset-top) + var(--faixa-rede, 0px) + 0.6rem)
+    max(1rem, env(safe-area-inset-right)) 0 max(1rem, env(safe-area-inset-left));
+}
+
+.ini-selo-sino {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  display: flex;
+  min-width: 20px;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 0.25rem;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 20px;
+  color: #fff;
+  background: #ff6a00;
+  box-shadow: 0 0 12px rgb(255 106 0 / 0.7);
+}
+
+/* ── palco ────────────────────────────────────────────────────────────── */
+
+.ini-palco {
+  display: flex;
+  width: 100%;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem max(1rem, env(safe-area-inset-right)) 0 max(1rem, env(safe-area-inset-left));
+}
+
+.ini-avisos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ini-acao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Sobe um pouco do centro geométrico: o centro ÓPTICO de uma coluna fica
+     acima do meio, e o rodapé puxa o olho para baixo. */
+  padding-block: 0.5rem 1.25rem;
+  text-align: center;
+}
+
+/* O beacon. Grande o bastante para ser achado sem mirar — com luva, no
+   escuro, com a mão tremendo. O teto em `rem` impede que vire um disco
+   absurdo no tablet. */
+.ini-beacon {
+  width: min(62vw, 15.5rem);
+  margin-bottom: 1.5rem;
+}
+
+.ini-chamada {
+  font-family: var(--fonte-display, inherit);
+  font-size: clamp(26px, 7.2vw, 32px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--i-texto);
+}
+
+.ini-prontidao {
+  display: flex;
+  max-width: 19rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+  font-size: 14px;
+  line-height: 1.45;
+  text-wrap: balance;
+  color: var(--i-texto-2);
+}
+
+/* Sem internet o aviso ganha a cor de atenção: é a diferença entre "pode
+   tocar" e "toque, mas o pedido vai esperar". */
+.ini-prontidao-off {
+  color: var(--c-warn-ink);
+}
+
+/* ── a ligação ────────────────────────────────────────────────────────── */
+
+/* Quieta enquanto o app funciona. Sem internet ela é o caminho que funciona,
+   e vira botão de verdade. */
+.ini-ligar {
+  display: inline-flex;
+  min-height: 2.9rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.1rem;
+  padding-inline: 1.1rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--i-texto-2);
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.ini-ligar:active {
+  transform: scale(0.98);
+}
+
+@media (hover: hover) {
+  .ini-ligar:hover {
+    border-color: var(--i-borda);
+    background: var(--i-chip);
+  }
+}
+
+.ini-ligar-forte {
+  min-height: 3.25rem;
+  padding-inline: 1.5rem;
+  border-color: var(--c-warn);
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--c-warn-ink);
+  background: var(--c-warn-soft);
+}
+
+/* ── rodapé ───────────────────────────────────────────────────────────── */
+
+.ini-rodape {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding:
+    0.5rem max(1rem, env(safe-area-inset-right))
+    calc(9.6rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+}
+
+.ini-alertas:empty {
+  display: none;
+}
+
+.ini-veiculo {
+  display: flex;
+  min-height: 3.4rem;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--i-borda);
+  border-radius: 1.1rem;
+  background: var(--i-cartao);
+  transition: transform 160ms ease;
+}
+
+.ini-veiculo:active {
+  transform: scale(0.99);
+}
+
+.ini-veiculo-icone {
+  display: flex;
+  width: 2.3rem;
+  height: 2.3rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.8rem;
+  color: var(--i-texto-2);
+  background: var(--i-chip);
+}
+
+.ini-veiculo-nome {
+  display: block;
+  overflow: hidden;
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--i-texto);
+}
+
+.ini-veiculo-sub {
+  display: block;
+  margin-top: 0.1rem;
+  overflow: hidden;
+  font-size: 12.5px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--i-texto-3);
+}
+
+/* ── pastilhas ────────────────────────────────────────────────────────── */
+
+.ini-pastilhas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+/* 44 px de alvo mesmo sendo secundário: dedo com luva não distingue
+   importância. */
+.ini-pastilha {
+  position: relative;
+  display: flex;
+  min-height: 2.9rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding-inline: 0.4rem;
+  border: 1px solid var(--i-borda);
+  border-radius: 0.9rem;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--i-texto-2);
+  background: var(--i-cartao);
+  transition: transform 160ms ease;
+}
+
+.ini-pastilha:active {
+  transform: scale(0.97);
+}
+
+.ini-pastilha-icone {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--i-texto-3);
+}
+
+.ini-pastilha-icone svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.8;
+}
+
+.ini-pastilha-contador {
+  position: absolute;
+  top: -0.3rem;
+  right: -0.3rem;
+  display: flex;
+  min-width: 18px;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 0.25rem;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  line-height: 18px;
+  color: #fff;
+  background: #ff6a00;
+}
+
+/* Tela baixa (SE, aparelho antigo): o beacon cede primeiro, porque continua
+   sendo o maior alvo da tela mesmo menor. */
+@media (max-height: 700px) {
+  .ini-beacon {
+    width: min(46vw, 11.5rem);
+    margin-bottom: 1rem;
+  }
+
+  .ini-chamada {
+    font-size: 24px;
+  }
+
+  .ini-acao {
+    padding-block: 0.25rem 0.75rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   A ONDA DO SOCORRO
+   ───────────────────────────────────────────────────────────────────────────
+   Sobrou do botão de freio usinado que o BotaoSOS substituiu. Continua aqui
+   porque a escada de contingência usa a mesma batida no degrau ativo: uma
+   saída longa, de equipamento ligado, não de alarme.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes sos-onda {
+  0% {
+    opacity: 0.9;
+    transform: scale(1.005);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.22);
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   A ESCADA DE CONTINGÊNCIA
+   ───────────────────────────────────────────────────────────────────────────
+   Três caminhos para o mesmo pedido, do que acontece sozinho ao que a pessoa
+   precisa tocar. Não são três cartões iguais lado a lado: são DEGRAUS numa
+   corrente vertical, porque a ordem entre eles é a informação. Cada degrau
+   diz em que pé está — e o que só vai acontecer depois não finge que já
+   aconteceu.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.sin-escada {
+  position: relative;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.sin-degrau {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 0.85rem 0.9rem 0.85rem 0;
+  text-align: left;
+  border-radius: 1rem;
+  transition: background-color 140ms ease;
+}
+
+button.sin-degrau:active {
+  background: rgb(125 145 180 / 0.1);
+}
+
+/* A corrente que liga os degraus. Nasce no nó e morre no próximo. */
+.sin-degrau:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 2.65rem;
+  bottom: -0.15rem;
+  left: 1.09rem;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, var(--sin-fio, rgb(125 145 180 / 0.3)), rgb(125 145 180 / 0.12));
+}
+
+.sin-no {
+  position: relative;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 999px;
+  /* Mesmo aço do disco, em escala de botão: a família se reconhece. */
+  background:
+    radial-gradient(circle at 34% 26%, #434c5a 0%, #262d38 58%, #141a22 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
+    inset 0 -1px 1px rgb(0 0 0 / 0.55),
+    0 0 0 1px rgb(0 0 0 / 0.5),
+    0 3px 7px -2px rgb(3 8 16 / 0.6);
+  color: rgb(214 228 245 / 0.72);
+}
+
+.sin-no svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+/* Degrau que está acontecendo agora. */
+.sin-degrau-ativo .sin-no {
+  background: radial-gradient(circle at 34% 26%, #ffb047 0%, #fc6400 48%, #b84100 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 226 190 / 0.65),
+    inset 0 -3px 7px rgb(110 30 0 / 0.5),
+    0 0 0 1px rgb(0 0 0 / 0.4),
+    0 3px 9px -2px rgb(252 100 0 / 0.55);
+  color: #fff;
+}
+
+.sin-degrau-ativo {
+  --sin-fio: rgb(252 100 0 / 0.5);
+}
+
+.sin-pulso {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgb(252 100 0 / 0.45);
+  animation: sos-onda 2.8s cubic-bezier(0.1, 0.6, 0.25, 1) infinite;
+}
+
+.sin-titulo {
+  font-family: var(--font-display, inherit);
+  font-size: 15.5px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--i-texto);
+}
+
+.sin-sub {
+  margin-top: 0.15rem;
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: var(--i-texto-2);
+}
+
+.sin-acao {
+  margin-top: 0.1rem;
+  font-family: var(--font-display, inherit);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fc6400;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sin-pulso {
     display: none;
   }
+}
+
+/* ── a tela sem sinal rola ────────────────────────────────────────────────
+   O Início cabe inteiro na dobra de propósito: lá só existe uma coisa a
+   fazer. Aqui existem três, e empilhá-las à força numa tela sem rolagem
+   esconderia justamente o telefone, que é o último recurso de quem já está
+   sem internet. Então o palco rola, e o disco encolhe para dar o espaço —
+   ele continua sendo a âncora, só não precisa mais ser o alvo. */
+
+.ini-palco:has(.sin-escada) {
+  justify-content: flex-start;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: calc(8.5rem + env(safe-area-inset-bottom));
+}
+
+.sin-escada ~ * {
+  width: 100%;
+}
+
+.ini-acao:has(.sin-escada) .ini-beacon {
+  width: min(38vw, 9.5rem);
+  margin-bottom: 1rem;
+}
+
+.ini-acao:has(.sin-escada) .ini-chamada {
+  font-size: clamp(22px, 6vw, 26px);
+}
+
+.ini-acao:has(.sin-escada) {
+  gap: 0;
+  padding-block: 0.5rem 0;
+}
+
+.ini-acao:has(.sin-escada) .ini-prontidao {
+  margin-bottom: 1.1rem;
 }

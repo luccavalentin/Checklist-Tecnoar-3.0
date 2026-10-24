@@ -16,9 +16,15 @@ import {
 import type { OcorrenciaSOS, PrioridadeSOS, SituacaoMecanico, StatusSOS } from './tipos'
 
 /**
- * Vocabulário do SOS, o mesmo no app do cliente, no do mecânico e na central.
- * Uma palavra por estado: quem liga para a Tecnoar e quem atende precisam
- * estar falando da mesma coisa.
+ * Vocabulário do SOS, o mesmo no app do cliente, no de quem atende e na
+ * central. Uma palavra por estado: quem liga para a Tecnoar e quem atende
+ * precisam estar falando da mesma coisa.
+ *
+ * QUEM ATENDE É ESPECIALISTA, NÃO MECÂNICO. A Tecnoar é oficina de freio de
+ * caminhão; quem sai para a estrada é especialista em socorro de caminhão. O
+ * cargo aparece por extenso onde é apresentação — o cartão de quem vai te
+ * atender — e como "especialista" no meio das frases, que é como se fala.
+ * Chaves de estado (`procurando_mecanico`) são do banco e não mudam com isso.
  */
 
 export type TomSOS = 'neutro' | 'info' | 'atencao' | 'critico' | 'ok' | 'destaque'
@@ -27,14 +33,14 @@ export const STATUS_SOS: Record<StatusSOS, { rotulo: string; curto: string; tom:
   solicitado: { rotulo: 'SOS solicitado', curto: 'Solicitado', tom: 'neutro', cliente: 'Enviando seu pedido…' },
   recebido: { rotulo: 'SOS recebido', curto: 'Recebido', tom: 'critico', cliente: 'A Tecnoar recebeu seu pedido.' },
   procurando_mecanico: {
-    rotulo: 'Procurando mecânico',
+    rotulo: 'Procurando especialista',
     curto: 'Aguardando',
     tom: 'critico',
-    cliente: 'Estamos acionando o mecânico mais próximo.',
+    cliente: 'Estamos acionando o especialista mais próximo.',
   },
-  aceito: { rotulo: 'Mecânico aceitou', curto: 'Aceito', tom: 'atencao', cliente: 'Um mecânico aceitou seu chamado.' },
-  a_caminho: { rotulo: 'Mecânico a caminho', curto: 'A caminho', tom: 'atencao', cliente: 'O mecânico está a caminho.' },
-  no_local: { rotulo: 'Mecânico no local', curto: 'No local', tom: 'info', cliente: 'O mecânico chegou.' },
+  aceito: { rotulo: 'Especialista aceitou', curto: 'Aceito', tom: 'atencao', cliente: 'Um especialista aceitou seu chamado.' },
+  a_caminho: { rotulo: 'Especialista a caminho', curto: 'A caminho', tom: 'atencao', cliente: 'O especialista está a caminho.' },
+  no_local: { rotulo: 'Especialista no local', curto: 'No local', tom: 'info', cliente: 'O especialista chegou.' },
   servico_iniciado: { rotulo: 'Serviço iniciado', curto: 'Em serviço', tom: 'info', cliente: 'O serviço está em andamento.' },
   servico_finalizado: {
     rotulo: 'Serviço finalizado',
@@ -89,7 +95,7 @@ export function chamadoAtivo(s: StatusSOS): boolean {
   return STATUS_ATIVOS.includes(s)
 }
 
-/** Próxima etapa que o mecânico dispara, com o texto do botão. */
+/** Próxima etapa que o especialista dispara, com o texto do botão. */
 export const PROXIMA_ETAPA: Partial<Record<StatusSOS, { status: StatusSOS; botao: string }>> = {
   aceito: { status: 'a_caminho', botao: 'Estou a caminho' },
   a_caminho: { status: 'no_local', botao: 'Cheguei ao local' },
@@ -165,7 +171,7 @@ export const OCORRENCIAS: Record<OcorrenciaSOS, InfoOcorrencia> = {
   },
   desconhecido: {
     rotulo: 'Não sei o que é',
-    descricao: 'O mecânico descobre para você',
+    descricao: 'O especialista descobre para você',
     icone: CircleHelp,
     cor: 'text-ink-2',
     prioridade: 'normal',

@@ -10,6 +10,7 @@ import { useToast } from '@/componentes/ui/Toast'
 import { haQuanto } from '@/sos/rotulos'
 import { useSessao } from '../sessao'
 import { BotaoApp, CabecalhoTela, CartaoApp, Esqueleto, Faixa, Tela, VazioApp } from './ui'
+import { semMarcacao } from './avisos'
 
 const db = supabase as unknown as SupabaseClient
 
@@ -179,7 +180,7 @@ export function Notificacoes() {
                 >
                   <span className={cn('mt-1.5 size-2.5 shrink-0 rounded-full', n.lida_em ? 'bg-transparent' : 'bg-accent')} />
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[14.5px] font-semibold text-ink">{n.titulo}</span>
+                    <span className="block text-[14.5px] font-semibold text-ink">{semMarcacao(n.titulo)}</span>
                     {n.mensagem && <span className="block text-[13.5px] leading-snug text-ink-2">{n.mensagem}</span>}
                     <span className="mt-1 block text-[11.5px] text-ink-3">{haQuanto(n.created_at)}</span>
                   </span>

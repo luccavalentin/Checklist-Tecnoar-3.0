@@ -1,0 +1,76 @@
+/* Controles e movimento compartilhados somente pelo aplicativo SOS. */
+
+/* A peça 3D da aba. Apagada fora da aba aberta, acesa e um fio maior dentro
+   dela: é o mesmo recurso das pastilhas e dos tipos de pane, para a barra
+   continuar dizendo onde a pessoa está sem precisar de cor extra. */
+.nav-peca {
+  filter: saturate(0.5);
+  opacity: 0.74;
+  transition: filter 160ms ease, opacity 160ms ease, transform 160ms cubic-bezier(.23, 1, .32, 1);
+}
+.nav-ativa .nav-peca {
+  filter: drop-shadow(0 3px 6px rgb(255 102 0 / 0.45));
+  opacity: 1;
+  transform: translateY(-1px) scale(1.1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-peca { transition: none; }
+}
+
+.sos-motion-button {
+  transition-duration: 140ms;
+  transition-timing-function: cubic-bezier(.23, 1, .32, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+.sos-motion-button.sos-premium-action {
+  color: #0d1c33;
+  background: #ff6600;
+  box-shadow: inset 0 1px 0 #ffffff4d, 0 8px 18px -14px #8b330099;
+}
+.sos-motion-button.sos-premium-action:disabled { box-shadow: none; }
+.sos-motion-button:focus-visible {
+  outline: 3px solid #0086bd;
+  outline-offset: 4px;
+}
+.sos-motion-button:not(:disabled):active { transform: scale(.98); }
+.sos-sheet.sos-sobe {
+  animation: sos-folha-entrar 240ms cubic-bezier(.32, .72, 0, 1) both;
+}
+.sos-motion-backdrop { animation: sos-fundo-entrar 180ms ease-out both; }
+.sos-page-motion { animation: sos-pagina-entrar 180ms cubic-bezier(.23, 1, .32, 1) both; }
+.cli-premium .cli-nav {
+  background: #fff;
+  border-color: transparent;
+  border-radius: 18px;
+  box-shadow: 0 8px 28px -17px #00206166;
+  backdrop-filter: none;
+}
+.dark .cli-premium .cli-nav { background: #162a45; box-shadow: 0 8px 24px -12px #0009; }
+.cli-premium .cli-nav a { min-height: 48px; transition: color 140ms ease, transform 140ms cubic-bezier(.23, 1, .32, 1); }
+.cli-premium .cli-nav a:active { transform: scale(.95); }
+.cli-premium .cli-nav a[aria-current='page'] { color: #ac4200 !important; }
+.cli-premium .cli-nav a[aria-current='page'] > span:first-child { color: inherit; }
+.dark .cli-premium .cli-nav a[aria-current='page'] { color: #ff8a3d !important; }
+.cli-premium .cli-nav a[aria-current='page']::after { background: #ff6600; box-shadow: none; height: 3px; bottom: 4px; }
+.cli-premium .cli-nav .sos-center-fab { animation: none; }
+.cli-premium .cli-nav :is(button, a):focus-visible { outline: 3px solid #00afef; outline-offset: -3px; border-radius: 10px; }
+#raiz .cv-topo { background: #0d1c33; color: #fff; border-bottom-color: #2c4260; }
+#raiz .cv-topo-nome { color: #fff; }
+#raiz .cv-topo-estado { color: #b8d4eb; }
+#raiz .cv-voltar { color: #fff; }
+#raiz .cv-tela :is(button, a):focus-visible { outline: 3px solid #00afef; outline-offset: 3px; }
+@keyframes sos-folha-entrar { from { opacity: .5; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes sos-fundo-entrar { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sos-pagina-entrar { from { opacity: .7; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@media (hover: hover) and (pointer: fine) {
+  .sos-motion-button.sos-premium-action:not(:disabled):hover { background: #ff7b24; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sos-motion-button, .sos-sheet.sos-sobe, .sos-motion-backdrop, .sos-page-motion,
+  .cli-premium .cli-nav a, #raiz .cv-tela * {
+    animation: none !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .cli-premium :is(.animate-ping, .sos-piscar) { animation: none !important; }
+}

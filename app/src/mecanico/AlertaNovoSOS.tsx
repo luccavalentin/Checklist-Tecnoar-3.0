@@ -2,8 +2,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlertTriangle, Ban, Check, Clock, Loader2, Siren, Volume2, VolumeX, X } from 'lucide-react'
+import { AlertTriangle, Ban, Check, Clock, Siren, Volume2, VolumeX, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ARTE_MOBILE, PECA_OCORRENCIA, sumirSeFalhar } from '../comum/kit3d'
+import { Arte } from '../comum/Arte'
 import { sosAceitar, sosConfigAtual, sosDetalhe, sosRecusar } from '@/sos/api'
 import { destravarAudio, pararAlerta, pararTitulo, piscarTitulo, tocarAlerta, vibrarAlerta } from '@/sos/alerta'
 import { calcularRota, distanciaKm, pontoDe, posicaoAtual, type LeituraGPS, type Ponto } from '@/sos/geo'
@@ -22,6 +24,7 @@ import { useMecanico } from '../sessao'
 import { useAgora, useHomeMecanico } from './dados'
 import { Placa } from './pecas'
 import { BotaoM, RotuloM, SeloM } from './ui'
+import './mecanico3d.css'
 
 /**
  * NOVO SOS TECNOAR — a tela que para tudo.
@@ -86,7 +89,7 @@ export function AlertaNovoSOS({
     retry: false,
     refetchInterval: 15_000,
   })
-  // A configuração só é lida por quem também é da central; para o mecânico
+  // A configuração só é lida por quem também é da central; para o especialista
   // vem nula e valem os padrões do banco (120 s, 40 km/h).
   const config = useQuery({ queryKey: CHAVES_SOS.config, queryFn: sosConfigAtual, staleTime: 10 * 60_000, retry: false })
 
@@ -109,10 +112,10 @@ export function AlertaNovoSOS({
   const aguardando = !status || status === 'recebido' || status === 'procurando_mecanico'
   const escalado = paraMim && !!status && STATUS_EM_CAMPO.includes(status)
   const msgErroDetalhe = detalhe.error ? (detalhe.error as Error).message : null
-  // Sem acesso depois de ter visto = outro mecânico assumiu (a RLS esconde).
+  // Sem acesso depois de ter visto = outro especialista assumiu (a RLS esconde).
   const semAcesso = !!msgErroDetalhe && /sem acesso/i.test(msgErroDetalhe)
   const perdido = semAcesso || (!!d && !escalado && (!aguardando || (!!c.mecanico_id && !paraMim)))
-  const motivoPerdido = status === 'cancelado' ? 'O chamado foi cancelado.' : 'Outro mecânico já assumiu este chamado.'
+  const motivoPerdido = status === 'cancelado' ? 'O chamado foi cancelado.' : 'Outro especialista já assumiu este chamado.'
   const semDados = !d && !inicial && detalhe.isError && !semAcesso
 
   /* ── som, vibração e título piscando ── */
@@ -135,7 +138,7 @@ export function AlertaNovoSOS({
     }
     tocar()
     vibrarAlerta('sos')
-    piscarTitulo('🚨 NOVO SOS')
+    piscarTitulo('NOVO SOS')
     // Repete a sirene algumas vezes (≈ 2 min) — quem está debaixo do caminhão
     // pode não ouvir a primeira.
     const sirene = window.setInterval(() => vezes < 4 && tocar(), 30_000)
@@ -224,7 +227,7 @@ export function AlertaNovoSOS({
       aoAceitar()
     } catch (e) {
       // "Este chamado não está mais disponível…", "…atribuído a outro
-      // mecânico", "Termine o atendimento atual…": o banco já explica.
+      // especialista", "Termine o atendimento atual…": o banco já explica.
       setErro((e as Error).message)
       setFase('erro')
       void qc.invalidateQueries({ queryKey: CHAVES_SOS.homeMecanico })
@@ -260,12 +263,12 @@ export function AlertaNovoSOS({
       aria-modal="true"
       aria-labelledby="alerta-sos-titulo"
       aria-describedby="alerta-sos-cliente"
-      className="mec fixed inset-0 z-[95] flex flex-col overflow-hidden bg-canvas text-ink"
+      className="mec ma-studio fixed inset-0 z-[95] flex flex-col overflow-hidden bg-canvas text-ink"
     >
       {/* Faixa vermelha do SOS, por baixo do relógio do iPhone. */}
-      <div className="relative shrink-0 bg-[#ff6600] text-white">
+      <div className="ma-studio-cabecalho relative shrink-0 bg-[#ff6600] text-white">
         <div className="mx-auto flex w-full max-w-md items-center gap-2 px-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] pb-3">
-          <Siren className="sos-piscar size-6 shrink-0" strokeWidth={2.4} />
+          <Arte src={ARTE_MOBILE.sirene} alt="" classeImagem="size-8 shrink-0 object-contain" recuo={<Siren className="size-6 shrink-0" strokeWidth={2.4} />} />
           <h2 id="alerta-sos-titulo" className="min-w-0 flex-1 truncate font-display text-[19px] leading-tight font-black tracking-[0.02em] uppercase max-[400px]:text-[16.5px] max-[359px]:text-[15px]">
             {cabecalho}
           </h2>
@@ -289,6 +292,9 @@ export function AlertaNovoSOS({
       {/* O que decide: quem, o quê, onde e quanto falta. Nada além disso. */}
       <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <div className="mx-auto flex w-full max-w-md flex-col gap-5 px-4 pt-4 pb-4">
+          <div className="ma-studio-cena" aria-hidden="true">
+            <img src={ARTE_MOBILE.seloSOS} alt="" draggable={false} width={104} height={104} onError={sumirSeFalhar} />
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             {emergencia && <SeloM tom="vermelho">Emergência</SeloM>}
             {c.prioridade === 'alta' && <SeloM tom="ambar">Prioridade alta</SeloM>}
@@ -325,7 +331,7 @@ export function AlertaNovoSOS({
           <div>
             <RotuloM>Problema informado</RotuloM>
             <p className="mt-1.5 flex items-center gap-2.5 font-display text-[20px] leading-tight font-bold text-ink">
-              <IconeProblema className={cn('size-6 shrink-0', emergencia ? 'text-crit' : 'text-accent')} strokeWidth={2.3} />
+              <Arte src={(c.tipo_ocorrencia ? PECA_OCORRENCIA[c.tipo_ocorrencia] : null) ?? ARTE_MOBILE.sirene} alt="" classeImagem="size-9 shrink-0 object-contain" recuo={<IconeProblema className={cn('size-6 shrink-0', emergencia ? 'text-crit' : 'text-accent')} strokeWidth={2.3} />} />
               {c.ocorrencia_rotulo ?? info.rotulo}
             </p>
             {c.descricao && <p className="mt-1.5 line-clamp-2 text-[15px] leading-snug text-ink-2">“{c.descricao}”</p>}
@@ -441,9 +447,9 @@ export function AlertaNovoSOS({
                     silenciar()
                     setFase('recusar')
                   }}
-                  className="flex min-h-[4.5rem] items-center justify-center rounded-[1.35rem] bg-[#ff6600] px-2 font-display text-[17px] font-extrabold tracking-[0.05em] text-white uppercase transition-transform active:scale-[0.98] active:bg-[#cc5200] disabled:opacity-40 max-[359px]:text-[15px]"
+                  className="sos-button-3d sos-button-3d-neutro flex min-h-16 items-center justify-center gap-1.5 rounded-[1.35rem] px-2 font-display text-[15px] font-semibold transition-transform active:scale-[0.98] disabled:opacity-40"
                 >
-                  Recusar
+                  <Arte src={ARTE_MOBILE.cancelarSocorro} alt="" classeImagem="size-6 shrink-0 object-contain" recuo={null} /><span>Recusar</span>
                 </button>
                 <BotaoAceitar onClick={() => void aceitar()} carregando={fase === 'aceitando'} desabilitado={emOutroAtendimento} rotulo="Aceitar" />
               </div>
@@ -473,15 +479,9 @@ function NumeroAlerta({ rotulo, valor, sub }: { rotulo: string; valor: string; s
 
 function BotaoAceitar({ onClick, carregando, desabilitado, rotulo }: { onClick: () => void; carregando?: boolean; desabilitado?: boolean; rotulo: string }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={carregando || desabilitado}
-      className="flex min-h-[4.5rem] w-full items-center justify-center gap-2.5 rounded-[1.35rem] bg-[#00afef] px-3 font-display text-[19px] font-extrabold tracking-[0.05em] text-white uppercase transition-transform mec-sombra-verde active:scale-[0.98] active:bg-[#009bd6] disabled:opacity-45 max-[359px]:text-[17px]"
-    >
-      {carregando ? <Loader2 className="size-7 animate-spin" /> : <Check className="size-7 shrink-0" strokeWidth={3} />}
+    <BotaoM variante="laranja" tamanho="lg" largo icone={Check} onClick={onClick} disabled={desabilitado} carregando={carregando} className="min-h-16 px-3 text-[16px]">
       {carregando ? 'Aceitando…' : rotulo}
-    </button>
+    </BotaoM>
   )
 }
 
@@ -518,7 +518,7 @@ export function useAlertaSOS() {
 }
 
 /**
- * Ouve o tempo real do mecânico e mostra o alerta por cima do app.
+ * Ouve o tempo real do especialista e mostra o alerta por cima do app.
  *
  * Quem toca a sirene segue a mesma regra do banco para o push:
  * - chamado na fila automática (`procurando_mecanico`) → só quem está

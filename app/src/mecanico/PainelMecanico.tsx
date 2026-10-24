@@ -16,7 +16,6 @@ import {
   Package,
   Pause,
   Phone,
-  PhoneCall,
   RefreshCw,
   Star,
   Sun,
@@ -31,6 +30,8 @@ import { enderecoDoPonto } from '@/sos/geo'
 import { STATUS_SOS, formatarDistancia, haQuanto } from '@/sos/rotulos'
 import type { HomeMecanico, SituacaoMecanico } from '@/sos/tipos'
 import { useMecanico } from '../sessao'
+import { sumirSeFalhar } from '../comum/kit3d'
+import { IconeM3D } from './ArteMecanico'
 import { Avatar, LogoSOS } from '../comum/ui'
 import { useAlertaSOS } from './AlertaNovoSOS'
 import { useCasca } from './contexto'
@@ -42,9 +43,10 @@ import { modeloVeiculo } from './PecasAtendimento'
 import { aplicarTemaMecanico } from './tema'
 import { BotaoM, EsqueletoM, FolhaM, RotuloM, SecaoM, SeloM } from './ui'
 import './inicioMecanico.css'
+import './mecanico3d.css'
 
 /**
- * Início do mecânico — extremamente operacional.
+ * Início do especialista — extremamente operacional.
  *
  * De cima para baixo: quem é (com a foto de campo), o status com a chave
  * liga/desliga (DISPONÍVEL recebe chamados; INDISPONÍVEL não), a área de
@@ -81,29 +83,17 @@ export function PainelMecanico() {
   }
 
   return (
-    <div className="mi">
+    <div className="mi mi-studio">
       <header className="mi-topo pt-[calc(env(safe-area-inset-top)+0.6rem)]">
-        <div aria-hidden className="mi-foto" />
-        <img aria-hidden src="/brand/tecnoar-negativo.svg" alt="" className="mi-logo-camisa" draggable={false} />
-        <p aria-hidden className="mi-lema">
-          Você
-          <br />
-          sempre em
-          <br />
-          movimento
-        </p>
 
         <div className="mi-barra">
-          <span className="hidden dark:block">
+          <span>
             <LogoSOS negativo altura={52} />
-          </span>
-          <span className="dark:hidden">
-            <LogoSOS altura={52} />
           </span>
           <div className="flex items-center gap-2">
             <button type="button" onClick={alternarTema} aria-label="Trocar entre modo claro e escuro" className="mi-redondo">
-              <Moon className="size-[19px] dark:hidden" strokeWidth={1.8} />
-              <Sun className="hidden size-[19px] dark:block" strokeWidth={1.8} />
+              <span className="dark:hidden"><IconeM3D icone={Moon} /></span>
+              <span className="hidden dark:block"><IconeM3D icone={Sun} /></span>
             </button>
             <button
               type="button"
@@ -111,7 +101,7 @@ export function PainelMecanico() {
               aria-label={naoLidas ? `Avisos, ${naoLidas} não lidos` : 'Avisos'}
               className="mi-redondo mi-sino relative"
             >
-              <Bell className="size-[20px]" strokeWidth={1.8} />
+              <IconeM3D icone={Bell} />
               {naoLidas > 0 && <span aria-hidden className="mi-sino-ponto" />}
             </button>
             <Link to="/perfil" aria-label="Seu perfil" className="mi-redondo mi-avatar active:scale-95">
@@ -123,9 +113,13 @@ export function PainelMecanico() {
         <div className="mi-saudacao">
           <p className="mi-data">{new Date(agora).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}</p>
           <h1 className="mi-ola">
-            Olá, <span className="text-[#FF6A00]">{nome || 'mecânico'}!</span>
+            Olá, <span className="text-[#FF6A00]">{nome || 'especialista'}!</span>
           </h1>
           <p className="mi-sub">Pronto para o próximo atendimento?</p>
+        </div>
+        <div className="mi-studio-cena" aria-hidden="true">
+          <span className="mi-studio-pista" />
+          <img src="/sos/mobile-3d/veiculo-utilitario.webp" alt="" draggable={false} width={256} height={256} fetchPriority="high" onError={sumirSeFalhar} />
         </div>
       </header>
 
@@ -155,7 +149,7 @@ export function PainelMecanico() {
 
             <NumerosDoDia h={h} emAndamento={chamadoAtual ? 1 : 0} />
 
-            {/* Além de aceitar da fila, o mecânico abre o próprio chamado. */}
+            {/* Além de aceitar da fila, o especialista abre o próprio chamado. */}
             <AbrirChamado atual={chamadoAtual} />
 
             {fila.length > 0 && (
@@ -216,7 +210,7 @@ function ControleStatus({
   const navegar = useNavigate()
   if (carregando) return <EsqueletoM className="mi-status h-[5.4rem] rounded-[1.2rem]" />
 
-  // Em atendimento: o status é do chamado, não da mão do mecânico.
+  // Em atendimento: o status é do chamado, não da mão do especialista.
   if (chamadoId || situacao === 'em_atendimento') {
     return (
       <button type="button" onClick={() => chamadoId && navegar(`/chamado/${chamadoId}`)} className="mi-cartao mi-status mi-status-campo text-left">
@@ -265,7 +259,7 @@ function ControleStatus({
   )
 }
 
-/** Onde o mecânico está recebendo chamados agora (cidade pela posição do GPS). */
+/** Onde o especialista está recebendo chamados agora (cidade pela posição do GPS). */
 function CartaoArea() {
   const { gps } = useCasca()
   const [cidade, setCidade] = useState<string | null>(null)
@@ -286,7 +280,7 @@ function CartaoArea() {
   return (
     <Link to="/perfil" className="mi-cartao mi-area">
       <span className="mi-area-icone">
-        <MapPin className="size-5" strokeWidth={1.9} />
+        <IconeM3D icone={MapPin} className="size-8" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="mi-area-titulo">
@@ -365,7 +359,7 @@ function CartaoChamadoAtual({ chamado }: { chamado: NonNullable<HomeMecanico['ch
 /* ── abrir chamado ──────────────────────────────────────────────────────── */
 
 /**
- * Chamado aberto pelo mecânico em campo (cliente parou, ligou direto, achou
+ * Chamado aberto pelo especialista em campo (cliente parou, ligou direto, achou
  * na estrada). Com um atendimento em andamento, o banco não deixa abrir
  * outro — o botão avisa e leva ao atendimento atual.
  */
@@ -375,9 +369,9 @@ function AbrirChamado({ atual }: { atual: { id: string; protocolo: string; clien
   const ocupado = !!atual
   return (
     <>
-      <button type="button" onClick={() => (ocupado ? setAviso(true) : navegar('/novo-chamado'))} className={cn('mi-novo', ocupado && 'mi-novo-ocupado')}>
+      <button type="button" onClick={() => (ocupado ? setAviso(true) : navegar('/novo-chamado'))} className={cn('mi-novo sos-button-3d', ocupado ? 'mi-novo-ocupado sos-button-3d-neutro' : 'sos-button-3d-primario')}>
         <span className="mi-novo-icone">
-          <BellRing className="size-7" strokeWidth={1.9} />
+          <IconeM3D icone={BellRing} className="size-10" />
         </span>
         <span className="min-w-0 flex-1">
           <span className="mi-novo-titulo">Novo chamado</span>
@@ -451,7 +445,7 @@ function CartaoFila({ chamado: c, agora, aoAbrir }: { chamado: HomeMecanico['agu
 
 const TODOS_ATALHOS: Array<{ rotulo: string; icone: LucideIcon; para: string }> = [
   { rotulo: 'Histórico de chamados', icone: ClipboardList, para: '/chamados' },
-  // Todas as OS do mecânico; a do chamado atual está no próprio atendimento.
+  // Todas as OS do especialista; a do chamado atual está no próprio atendimento.
   { rotulo: 'Ordens de serviço', icone: Wrench, para: '/os' },
   { rotulo: 'Produtos e estoque', icone: Package, para: '/catalogo/produtos' },
   { rotulo: 'Serviços', icone: FileText, para: '/catalogo/servicos' },
@@ -487,7 +481,7 @@ function AcessosRapidos({ aoPausa }: { aoPausa: () => void }) {
                 className="flex min-h-12 items-center gap-3 rounded-2xl px-2 text-[15px] font-medium text-ink active:bg-surface-2"
               >
                 <span className="sos-subtle-chip flex size-9 shrink-0 items-center justify-center rounded-full text-accent-ink">
-                  <Icone className="size-[18px]" />
+                  <IconeM3D icone={Icone} />
                 </span>
                 <span className="min-w-0 flex-1 truncate">{i.rotulo}</span>
                 <ChevronRight className="size-4 text-ink-3" />
@@ -504,7 +498,7 @@ function Acesso({ para, aoTocar, icone: Icone, rotulo }: { para?: string; aoToca
   const miolo = (
     <>
       <span className="mi-acesso-icone">
-        <Icone className="size-[19px]" strokeWidth={1.8} />
+        <IconeM3D icone={Icone} className="size-9" />
       </span>
       <span className="mi-acesso-rotulo">
         {rotulo[0]}
@@ -554,7 +548,7 @@ function UltimosChamados({ h, agora }: { h: HomeMecanico | undefined; agora: num
             <li key={c.id}>
               <Link to={`/chamado/${c.id}`} className="mi-cartao mi-ultimo">
                 <span className={cn('mi-ultimo-icone', `mi-tom-${tom}`)}>
-                  <Phone className="size-5" strokeWidth={2} />
+                  <IconeM3D icone={Phone} />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
@@ -595,7 +589,7 @@ function AvisoNotificacoes({ usuarioId }: { usuarioId: string | null }) {
   return (
     <section className="mi-cartao mi-aviso">
       <span className="mi-aviso-icone">
-        <PhoneCall className="size-6" strokeWidth={1.7} />
+        <IconeM3D icone={Bell} />
       </span>
       <div className="min-w-0 flex-1">
         <p className="mi-aviso-titulo">{permissao === 'denied' ? 'Notificações bloqueadas' : 'Receba SOS com o app fechado'}</p>

@@ -50,9 +50,9 @@ export function linkChecklistOS(osId: string): string {
 }
 
 /**
- * ORDEM DE SERVIÇO — o mecânico não cria cadastro nenhum dentro do SOS.
+ * ORDEM DE SERVIÇO — o especialista não cria cadastro nenhum dentro do SOS.
  * Toca em GERAR OS e o sistema Tecnoar abre a OS real com o que o chamado já
- * tem (cliente, veículo, placa, SOS, mecânico, data, horário e a descrição
+ * tem (cliente, veículo, placa, SOS, especialista, data, horário e a descrição
  * original). Produtos e serviços lançados depois entram direto nela.
  */
 export function OrdemServico({ d, podeGerar = true }: { d: DetalheChamado; podeGerar?: boolean }) {
@@ -214,7 +214,7 @@ export function OrdemServico({ d, podeGerar = true }: { d: DetalheChamado; podeG
           <Dado rotulo="Veículo" valor={modeloVeiculo(d) ?? (semVeiculo ? 'Sem veículo no chamado' : '—')} />
           <Dado rotulo="Placa" valor={<span className="num">{d.veiculo?.placa ? formatarPlacaExibicao(d.veiculo.placa) : '—'}</span>} />
           <Dado rotulo="SOS" valor={<span className="num">{c.protocolo}</span>} />
-          <Dado rotulo="Mecânico" valor={perfil.nome} />
+          <Dado rotulo="Especialista" valor={perfil.nome} />
           {!os && (
             <>
               <Dado rotulo="Data" valor={<span className="num">{data.toLocaleDateString('pt-BR')}</span>} />

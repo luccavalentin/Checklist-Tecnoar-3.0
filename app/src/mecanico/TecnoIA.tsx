@@ -10,9 +10,10 @@ import { useIaPublico } from './Ia'
 import { modeloVeiculo } from './PecasAtendimento'
 import { Placa } from './pecas'
 import { EsqueletoM, TopoM, VazioM } from './ui'
+import { IconeM3D } from './ArteMecanico'
 
 /**
- * TECNO IA técnica do mecânico: conversa de oficina, mais técnica que a do
+ * TECNO IA técnica do especialista: conversa de oficina, mais técnica que a do
  * cliente. Com um chamado aberto, a IA já recebe o veículo, o problema e o
  * que foi registrado; responde organizado por sistema (pneumático,
  * vazamentos, pressão, desgaste, válvulas, atuadores, histórico). É apoio:
@@ -148,7 +149,7 @@ export function ConversaTecnica({ chamado, chaveConversa, topo }: { chamado: Det
         {chamado && (
           <div className="sos-native-card flex items-center gap-3 rounded-[1.55rem] px-3.5 py-3">
             <span className="sos-subtle-chip flex size-11 shrink-0 items-center justify-center rounded-2xl text-cyan-ink">
-              <Brain className="size-5" />
+              <IconeM3D icone={Brain} className="size-9" />
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[14.5px] font-bold text-ink">{veiculo ?? 'Veículo do chamado'}</p>
@@ -163,7 +164,7 @@ export function ConversaTecnica({ chamado, chaveConversa, topo }: { chamado: Det
         <section className="sos-native-card overflow-hidden rounded-[1.7rem] p-4">
           <div className="flex items-start gap-3">
             <span className="sos-subtle-chip flex size-11 shrink-0 items-center justify-center rounded-2xl text-cyan-ink">
-              <Brain className="size-5" />
+              <IconeM3D icone={Brain} className="size-9" />
             </span>
             <div className="min-w-0 flex-1">
               <p className="font-display text-[20px] leading-tight font-semibold text-ink">Assistente técnico Tecnoar</p>
@@ -274,7 +275,7 @@ export function ConversaTecnica({ chamado, chaveConversa, topo }: { chamado: Det
               disabled={!online || perguntar.isPending}
               className="sos-soft-action flex size-12 shrink-0 items-center justify-center rounded-2xl text-ink-2 disabled:opacity-45"
             >
-              <Camera className="size-5" />
+              <IconeM3D icone={Camera} className="size-10" />
             </button>
             <textarea
               value={texto}
@@ -297,7 +298,7 @@ export function ConversaTecnica({ chamado, chaveConversa, topo }: { chamado: Det
               disabled={(!texto.trim() && !foto) || perguntar.isPending || !online}
               className="sos-premium-action flex size-12 shrink-0 items-center justify-center rounded-2xl text-white active:bg-accent-hover disabled:opacity-40"
             >
-              {perguntar.isPending ? <Loader2 className="size-5 animate-spin" /> : <Send className="size-5" />}
+              {perguntar.isPending ? <Loader2 className="size-5 animate-spin" /> : <IconeM3D icone={Send} className="size-12" />}
             </button>
           </form>
           <input ref={arquivo} type="file" accept="image/*" capture="environment" hidden onChange={(e) => void escolherFoto(e.target.files).finally(() => (e.target.value = ''))} />

@@ -60,13 +60,13 @@ export function termosDeUso(ctx: ContextoLegal): DocumentoLegalDados {
   const e = ctx.empresa
   return {
     titulo: 'Termos de uso',
-    subtitulo: `As regras para usar o SOS Tecnoar, o app de socorro mecânico da ${e}.`,
+    subtitulo: `As regras para usar o SOS Tecnoar, o app de socorro da ${e}.`,
     resumo: [
-      `O SOS Tecnoar serve para pedir socorro mecânico à ${e}, acompanhar o atendimento e cuidar do histórico do seu veículo.`,
+      `O SOS Tecnoar serve para pedir socorro à ${e}, acompanhar o atendimento e cuidar do histórico do seu veículo.`,
       'Em acidente com feridos, fogo ou risco à vida, ligue primeiro para 193 (Bombeiros), 192 (SAMU) ou 191 (PRF).',
-      'Tempos de chegada são estimativas: dependem de mecânicos disponíveis, distância, trânsito e condições da via.',
+      'Tempos de chegada são estimativas: dependem de especialistas disponíveis, distância, trânsito e condições da via.',
       'Peças, serviços e deslocamento aparecem no orçamento, item por item. Você aprova assinando na tela — ou recusa.',
-      'A TECNO IA orienta, mas não substitui a avaliação de um mecânico.',
+      'A TECNO IA orienta, mas não substitui a avaliação de um especialista.',
     ],
     secoes: [
       {
@@ -89,8 +89,8 @@ export function termosDeUso(ctx: ContextoLegal): DocumentoLegalDados {
           <>
             <P>Pelo app você pode:</P>
             <Itens>
-              <li>pedir socorro mecânico com a sua localização e acompanhar o mecânico ao vivo no mapa;</li>
-              <li>conversar com o mecânico e com a central e enviar fotos, áudios e vídeos do problema;</li>
+              <li>pedir socorro com a sua localização e acompanhar o especialista ao vivo no mapa;</li>
+              <li>conversar com o especialista e com a central e enviar fotos, áudios e vídeos do problema;</li>
               <li>receber orçamentos, aprová-los com a sua assinatura na tela ou recusá-los;</li>
               <li>baixar o laudo do atendimento em PDF;</li>
               <li>consultar o histórico de serviços e socorros dos seus veículos, receber lembretes de revisão e pedir agendamentos;</li>
@@ -107,7 +107,7 @@ export function termosDeUso(ctx: ContextoLegal): DocumentoLegalDados {
           <Itens>
             <li>O app é para maiores de 18 anos: motoristas, frotistas e responsáveis por veículos.</li>
             <li>
-              Informe dados verdadeiros e mantenha-os atualizados — principalmente o <F>celular</F>, que é por onde o mecânico fala com você.
+              Informe dados verdadeiros e mantenha-os atualizados — principalmente o <F>celular</F>, que é por onde o especialista fala com você.
             </li>
             <li>A conta é pessoal. Guarde sua senha e não a compartilhe; você responde pelo que for feito com a sua conta.</li>
             <li>Se suspeitar de uso indevido, troque a senha e avise a Tecnoar.</li>
@@ -121,7 +121,7 @@ export function termosDeUso(ctx: ContextoLegal): DocumentoLegalDados {
           <>
             <Destaque>
               O SOS Tecnoar é um serviço de <strong>assistência mecânica</strong>, não um serviço público de emergência. Em acidente com vítima, fogo,
-              vazamento de produto perigoso ou risco à vida, ligue primeiro para 193, 192, 190 ou 191 e só depois peça o socorro mecânico.
+              vazamento de produto perigoso ou risco à vida, ligue primeiro para 193, 192, 190 ou 191 e só depois peça o socorro.
             </Destaque>
             <Itens>
               <li>Informe o local, o veículo e o problema com a maior precisão possível e confira o ponto no mapa antes de enviar.</li>
@@ -130,9 +130,9 @@ export function termosDeUso(ctx: ContextoLegal): DocumentoLegalDados {
                 Previsões de chegada e distâncias são <F>estimativas</F> calculadas com GPS e mapas e mudam com trânsito, clima, condições da via e sinal de
                 celular. A Tecnoar não garante um horário de chegada, salvo quando houver prazo previsto em contrato de frota.
               </li>
-              <li>O atendimento depende da disponibilidade de mecânicos e da área de cobertura. Se não for possível atender, a Tecnoar avisa você.</li>
+              <li>O atendimento depende da disponibilidade de especialistas e da área de cobertura. Se não for possível atender, a Tecnoar avisa você.</li>
               <li>Você pode cancelar pelo app enquanto a opção “Cancelar o socorro” aparecer; depois disso, fale com a central.</li>
-              <li>Pedidos falsos ou de má-fé tiram um mecânico de quem precisa e podem levar à suspensão da conta e às medidas legais cabíveis.</li>
+              <li>Pedidos falsos ou de má-fé tiram um especialista de quem precisa e podem levar à suspensão da conta e às medidas legais cabíveis.</li>
             </Itens>
           </>
         ),
@@ -152,7 +152,7 @@ export function termosDeUso(ctx: ContextoLegal): DocumentoLegalDados {
             <li>
               O app não processa pagamentos. A forma e o prazo de pagamento são combinados diretamente com a {e}, que emite os documentos fiscais do serviço.
             </li>
-            <li>Em caso de dúvida sobre valores, fale com o mecânico pela conversa do chamado ou com a central antes de responder.</li>
+            <li>Em caso de dúvida sobre valores, fale com o especialista pela conversa do chamado ou com a central antes de responder.</li>
           </Itens>
         ),
       },
@@ -163,7 +163,7 @@ export function termosDeUso(ctx: ContextoLegal): DocumentoLegalDados {
           <>
             <P>
               A TECNO IA faz uma <F>triagem automática</F> com base no que você descreve e nas fotos que envia, e pode sugerir pedir socorro ou agendar
-              uma revisão. Ela pode errar: não é diagnóstico e não substitui a avaliação de um mecânico. Quem decide o que fazer é você.
+              uma revisão. Ela pode errar: não é diagnóstico e não substitui a avaliação de um especialista. Quem decide o que fazer é você.
             </P>
             <Itens>
               <li>Na dúvida ou em situação de risco, pare em local seguro e peça o SOS.</li>
@@ -184,7 +184,7 @@ export function termosDeUso(ctx: ContextoLegal): DocumentoLegalDados {
               os registros do serviço.
             </li>
             <li>É proibido enviar conteúdo ofensivo, ilegal ou que exponha outras pessoas sem necessidade.</li>
-            <li>Trate mecânicos e equipe com respeito. Ofensas e ameaças podem levar ao bloqueio da conta.</li>
+            <li>Trate especialistas e equipe com respeito. Ofensas e ameaças podem levar ao bloqueio da conta.</li>
           </Itens>
         ),
       },
@@ -194,7 +194,7 @@ export function termosDeUso(ctx: ContextoLegal): DocumentoLegalDados {
         conteudo: (
           <P>
             Durante um socorro você pode gerar um link de acompanhamento ao vivo para enviar a quem quiser (família, gestor da frota). Quem tiver o link vê
-            a etapa do atendimento, a previsão de chegada e as posições do mecânico e do veículo — sem o seu telefone e sem as mensagens. O link expira
+            a etapa do atendimento, a previsão de chegada e as posições do especialista e do veículo — sem o seu telefone e sem as mensagens. O link expira
             em 12 horas. Você escolhe com quem compartilha.
           </P>
         ),
@@ -264,7 +264,7 @@ export function politicaDePrivacidade(ctx: ContextoLegal): DocumentoLegalDados {
     resumo: [
       'Usamos seus dados para prestar o socorro, falar com você e manter o histórico do seu veículo.',
       'Sua localização só é usada durante um pedido de socorro. O trajeto registrado é apagado 30 dias depois que o chamado termina.',
-      `Quem vê seus dados é a equipe da ${e} e o mecânico que atende você. Nada é vendido nem usado para publicidade.`,
+      `Quem vê seus dados é a equipe da ${e} e o especialista que atende você. Nada é vendido nem usado para publicidade.`,
       'Você vê, corrige e exclui sua conta pelo próprio app, em Perfil.',
     ],
     secoes: [
@@ -274,8 +274,7 @@ export function politicaDePrivacidade(ctx: ContextoLegal): DocumentoLegalDados {
         conteudo: (
           <>
             <P>
-              A <F>{e}</F> (“Tecnoar”) é a controladora dos dados pessoais tratados no aplicativo SOS Tecnoar (“app”), usado por clientes para pedir socorro
-              mecânico, acompanhar o atendimento, consultar o histórico do veículo e agendar serviços.
+              A <F>{e}</F> (“Tecnoar”) é a controladora dos dados pessoais tratados no aplicativo SOS Tecnoar (“app”), usado por clientes para pedir socorro, acompanhar o atendimento, consultar o histórico do veículo e agendar serviços.
             </P>
             <P>
               Esta política explica quais dados coletamos, para quê, com quem compartilhamos, por quanto tempo guardamos e como você exerce seus direitos,
@@ -299,11 +298,11 @@ export function politicaDePrivacidade(ctx: ContextoLegal): DocumentoLegalDados {
             </li>
             <li>
               <F>Localização — só durante um socorro:</F> o ponto do pedido (coordenadas, precisão e endereço aproximado) e, enquanto o socorro está em
-              andamento, a posição do seu aparelho enviada de tempos em tempos para o mecânico encontrar você. Fora de um socorro o app não coleta sua
+              andamento, a posição do seu aparelho enviada de tempos em tempos para o especialista encontrar você. Fora de um socorro o app não coleta sua
               localização, nem em segundo plano.
             </li>
             <li>
-              <F>O que você envia:</F> descrição do problema, fotos, áudios e vídeos do chamado, mensagens trocadas com o mecânico e a central, avaliação do
+              <F>O que você envia:</F> descrição do problema, fotos, áudios e vídeos do chamado, mensagens trocadas com o especialista e a central, avaliação do
               atendimento e a assinatura feita na tela para aprovar um orçamento.
             </li>
             <li>
@@ -332,11 +331,11 @@ export function politicaDePrivacidade(ctx: ContextoLegal): DocumentoLegalDados {
         conteudo: (
           <>
             <Itens>
-              <li>Receber e atender o pedido de socorro: localizar o veículo, acionar o mecânico, estimar distância e chegada e permitir que vocês se falem.</li>
+              <li>Receber e atender o pedido de socorro: localizar o veículo, acionar o especialista, estimar distância e chegada e permitir que vocês se falem.</li>
               <li>Enviar orçamentos, registrar a sua aprovação ou recusa e emitir o laudo e a ordem de serviço do atendimento.</li>
               <li>Ligar sua conta ao seu cadastro na Tecnoar e mostrar o histórico de serviços e socorros dos seus veículos.</li>
               <li>Lembrar revisões e receber pedidos de agendamento.</li>
-              <li>Avisar sobre o seu atendimento (mecânico a caminho, orçamento, conclusão) e sobre revisões.</li>
+              <li>Avisar sobre o seu atendimento (especialista a caminho, orçamento, conclusão) e sobre revisões.</li>
               <li>Oferecer a triagem da TECNO IA, quando você a usa.</li>
               <li>Manter o app seguro, evitar fraudes e pedidos falsos e resolver problemas técnicos.</li>
               <li>Cumprir obrigações legais, como as fiscais e as de defesa do consumidor, e defender direitos em processos.</li>
@@ -387,11 +386,11 @@ export function politicaDePrivacidade(ctx: ContextoLegal): DocumentoLegalDados {
           <>
             <Itens>
               <li>
-                <F>Equipe da {e}:</F> a central de atendimento e os mecânicos. Os mecânicos acionados veem o necessário para decidir se aceitam e para chegar
-                até você; o mecânico que atende vê seu nome, telefone de contato, veículo, localização, descrição, fotos e mensagens do chamado.
+                <F>Equipe da {e}:</F> a central de atendimento e os especialistas. Os especialistas acionados veem o necessário para decidir se aceitam e para chegar
+                até você; o especialista que atende vê seu nome, telefone de contato, veículo, localização, descrição, fotos e mensagens do chamado.
               </li>
               <li>
-                <F>Quem você escolher:</F> o link de acompanhamento que você compartilha mostra a etapa, a previsão e as posições do mecânico e do veículo — sem
+                <F>Quem você escolher:</F> o link de acompanhamento que você compartilha mostra a etapa, a previsão e as posições do especialista e do veículo — sem
                 seu telefone e sem as mensagens — e expira em 12 horas.
               </li>
               <li>

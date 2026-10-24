@@ -35,7 +35,7 @@ const CORES: Record<TomToast, string> = {
   critico: 'text-crit border-l-crit',
 }
 
-export function ProvedorToast({ children }: { children: ReactNode }) {
+export function ProvedorToast({ children, centralizado = false, marca, icones }: { children: ReactNode; centralizado?: boolean; marca?: ReactNode; icones?: Partial<Record<TomToast, ReactNode>> }) {
   const [toasts, setToasts] = useState<Toast[]>([])
   const seq = useRef(0)
 
@@ -46,10 +46,10 @@ export function ProvedorToast({ children }: { children: ReactNode }) {
   const adicionar = useCallback(
     (tom: TomToast, titulo: string, mensagem?: string) => {
       const id = ++seq.current
-      setToasts((atual) => [...atual.slice(-3), { id, tom, titulo, mensagem }])
+      setToasts((atual) => [...(centralizado ? [] : atual.slice(-3)), { id, tom, titulo, mensagem }])
       window.setTimeout(() => remover(id), tom === 'critico' ? 8000 : 5000)
     },
-    [remover],
+    [remover, centralizado],
   )
 
   const api = useMemo<ApiToast>(
@@ -69,31 +69,31 @@ export function ProvedorToast({ children }: { children: ReactNode }) {
         <div
           aria-live="polite"
           aria-atomic="false"
-          className="pointer-events-none fixed inset-x-0 bottom-0 z-[70] flex flex-col items-center gap-2 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-0 sm:items-end"
+          className={centralizado ? 'sos-toast-central pointer-events-none fixed inset-0 z-[110] flex flex-col items-center justify-center gap-2 p-5' : 'pointer-events-none fixed inset-x-0 bottom-0 z-[70] flex flex-col items-center gap-2 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:inset-x-auto sm:right-0 sm:items-end'}
         >
           {toasts.map((t) => (
             <div
               key={t.id}
               role={t.tom === 'critico' ? 'alert' : 'status'}
               className={cn(
-                'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-lg border border-line-strong border-l-3',
-                'bg-surface px-4 py-3 shadow-e3',
+                centralizado ? 'sos-toast-painel pointer-events-auto relative flex w-full max-w-sm flex-col items-center gap-3 rounded-3xl border border-line-strong bg-surface px-6 py-5 text-center shadow-e3' : 'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-lg border border-line-strong border-l-3 bg-surface px-4 py-3 shadow-e3',
                 CORES[t.tom],
               )}
               style={{ animation: 'tec-toast .18s ease-out both' }}
             >
-              <span aria-hidden className="mt-px shrink-0 [&_svg]:size-[17px]">
-                {ICONES[t.tom]}
+              {centralizado && marca && <div className="sos-toast-marca flex w-full justify-center border-b border-line pb-3">{marca}</div>}
+              <span aria-hidden className={centralizado ? 'flex size-14 shrink-0 items-center justify-center [&_svg]:size-9' : 'mt-px shrink-0 [&_svg]:size-[17px]'}>
+                {icones?.[t.tom] ?? ICONES[t.tom]}
               </span>
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <p className="font-display text-[13px] font-semibold text-ink">{t.titulo}</p>
+                <p className={cn('font-display font-semibold text-ink', centralizado ? 'text-[19px]' : 'text-[13px]')}>{t.titulo}</p>
                 {t.mensagem && <p className="text-[12.5px] leading-relaxed text-ink-2">{t.mensagem}</p>}
               </div>
               <button
                 type="button"
                 aria-label="Dispensar"
                 onClick={() => remover(t.id)}
-                className="-mr-1 shrink-0 rounded p-1 text-ink-3 transition-colors hover:text-ink"
+                className={centralizado ? 'absolute top-3 right-3 flex size-10 items-center justify-center rounded-full text-ink-3 hover:text-ink' : '-mr-1 shrink-0 rounded p-1 text-ink-3 transition-colors hover:text-ink'}
               >
                 <X aria-hidden className="size-3.5" />
               </button>

@@ -452,11 +452,13 @@ export function EnviarMidia({
   etapa,
   compacto,
   aoEnviar,
+  icones,
 }: {
   chamadoId: string
   etapa?: EtapaAnexo
   compacto?: boolean
   aoEnviar?: () => void
+  icones?: { foto: ReactNode; audio: ReactNode; video: ReactNode }
 }) {
   const qc = useQueryClient()
   const foto = useRef<HTMLInputElement>(null)
@@ -483,14 +485,16 @@ export function EnviarMidia({
     for (const f of Array.from(lista ?? [])) await subir(await reduzirImagem(f), 'foto')
   }
 
-  const botao =
-    'flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-line-strong bg-surface px-3 text-[13px] font-semibold text-ink transition-colors hover:border-accent active:scale-[0.99] disabled:opacity-50'
+  const botao = cn(
+    'flex min-h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-xl border border-line-strong bg-surface px-3 text-[13px] font-semibold text-ink transition-colors hover:border-accent active:scale-[0.99] disabled:opacity-50',
+    icones && 'sos-button-3d sos-button-3d-neutro min-h-[76px] flex-col gap-1 px-1 py-2',
+  )
 
   return (
     <div className="flex flex-col gap-2">
       <div className={cn('flex gap-2', compacto && 'flex-wrap')}>
         <button type="button" className={botao} disabled={!!enviando} onClick={() => foto.current?.click()}>
-          {enviando === 'foto' ? <Loader2 className="size-4 animate-spin" /> : <Camera className="size-4 text-accent" />} Foto
+          {enviando === 'foto' ? <Loader2 className="size-4 animate-spin" /> : icones?.foto ?? <Camera className="size-4 text-accent" />} Foto
         </button>
         {gravador.gravando ? (
           <button type="button" className={cn(botao, 'border-crit bg-crit-soft text-crit-ink')} onClick={async () => {
@@ -501,11 +505,11 @@ export function EnviarMidia({
           </button>
         ) : (
           <button type="button" className={botao} disabled={!!enviando || !gravador.suportado} onClick={() => void gravador.iniciar().catch((e: Error) => setErro(e.message))}>
-            {enviando === 'audio' ? <Loader2 className="size-4 animate-spin" /> : <Mic className="size-4 text-cyan" />} Áudio
+            {enviando === 'audio' ? <Loader2 className="size-4 animate-spin" /> : icones?.audio ?? <Mic className="size-4 text-cyan" />} Áudio
           </button>
         )}
         <button type="button" className={botao} disabled={!!enviando} onClick={() => video.current?.click()}>
-          {enviando === 'video' ? <Loader2 className="size-4 animate-spin" /> : <Film className="size-4 text-ink-2" />} Vídeo
+          {enviando === 'video' ? <Loader2 className="size-4 animate-spin" /> : icones?.video ?? <Film className="size-4 text-ink-2" />} Vídeo
         </button>
       </div>
       <input ref={foto} type="file" accept="image/*" capture="environment" multiple hidden onChange={(e) => void aoEscolherFoto(e.target.files).finally(() => (e.target.value = ''))} />

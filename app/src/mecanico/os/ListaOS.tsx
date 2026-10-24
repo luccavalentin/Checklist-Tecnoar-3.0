@@ -13,7 +13,7 @@ const ABAS: Array<{ id: SituacaoOS; rotulo: string }> = [
 ]
 
 /**
- * As OS do sistema Tecnoar com o mecânico: as que a oficina o escalou e as
+ * As OS do sistema Tecnoar com o especialista: as que a oficina o escalou e as
  * dos socorros que ele atendeu. Mesmas OS do Checklist — o que ele lança
  * aqui aparece lá na hora. Encerradas: últimos 90 dias.
  */

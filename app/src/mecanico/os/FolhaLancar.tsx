@@ -19,7 +19,7 @@ const chaveDestino = (d: DestinoLancamento) => `${d.tipo}:${d.id}`
 /**
  * Folha "Lançar": quantidade e destino, um toque para confirmar. O banco
  * responde se havia estoque; se faltou, a peça entra como necessária e a
- * central já foi avisada — o mecânico só fica sabendo, não precisa ligar.
+ * central já foi avisada — o especialista só fica sabendo, não precisa ligar.
  */
 export function FolhaLancar({
   item,

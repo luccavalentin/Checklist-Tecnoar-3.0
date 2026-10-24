@@ -4,6 +4,11 @@ import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import './estilo.css'
+import './comum/mobile-cinematico.css'
+import './comum/botoes-3d.css'
+import './comum/refinamentos-premium.css'
+import { Arte } from './comum/Arte'
+import { ARTE3D, ARTE_MOBILE, PECA_SINTOMA } from './comum/kit3d'
 import { ProvedorToast } from '@/componentes/ui/Toast'
 import { BarreiraErro } from '@/componentes/BarreiraErro'
 import { destravarNoPrimeiroToque } from '@/sos/alerta'
@@ -57,7 +62,7 @@ createRoot(raiz).render(
   <StrictMode>
     <BarreiraErro>
       <QueryClientProvider client={cliente}>
-        <ProvedorToast>
+        <ProvedorToast centralizado marca={<><img src="/brand/tecnoar-positivo.svg" alt="Tecnoar" className="sos-dialogo-logo h-8 w-auto" /><img src="/brand/tecnoar-negativo.svg" alt="Tecnoar" className="sos-dialogo-logo-negativo hidden h-8 w-auto" /></>} icones={{ok: <Arte src={ARTE3D.concluido} alt="" classeImagem="size-14 object-contain" recuo={null} />, info: <Arte src={ARTE_MOBILE.seloSOS} alt="" classeImagem="size-14 object-contain" recuo={null} />, atencao: <Arte src={PECA_SINTOMA.painel} alt="" classeImagem="size-14 object-contain" recuo={null} />, critico: <Arte src={ARTE_MOBILE.cancelarSocorro} alt="" classeImagem="size-14 object-contain" recuo={null} />}}>
           <ProvedorSessao>
             <BrowserRouter>
               <AppSOS />

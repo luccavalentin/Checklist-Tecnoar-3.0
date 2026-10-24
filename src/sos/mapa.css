@@ -5,7 +5,7 @@
 .mapa-sos .leaflet-container {
   width: 100%;
   height: 100%;
-  background: #e8ecef;
+  background: #eceff3;
   font-family: var(--font-sans, system-ui, sans-serif);
   -webkit-tap-highlight-color: transparent;
 }
@@ -303,10 +303,34 @@
    invertido e puxado para o azul-marinho da marca. O filtro vale só para os
    tiles — pinos, rota e balões continuam com as cores reais. */
 .mapa-sos-escuro .leaflet-container {
-  background: #0a1628;
+  background: #2b2b2b;
 }
+/* O `invert(1)` saiu: agora o escuro é um MAPA escuro, não um negativo.
+   Ver a nota no topo de Mapa.tsx. */
+
+/* Os nomes ficam legíveis, mas param de competir com os pinos. Numa tela
+   cujo trabalho é responder "onde está meu caminhão", nome de travessa é
+   contexto — e contexto não pode gritar mais alto que o dado. */
+.mapa-nomes {
+  opacity: 0.55;
+}
+
+.mapa-sos-escuro .mapa-nomes {
+  opacity: 0.42;
+}
+
+/* O mapa entra na família de cor do app.
+   Cinza puro não tem matiz, então `hue-rotate` sozinho não faz nada nele: é
+   preciso o `sepia` primeiro para INJETAR um matiz, e só então girá-lo até o
+   azul-marinho da marca. O resultado continua sendo um mapa legível — muda
+   só a temperatura, não o desenho. É o oposto do `invert`, que destruía as
+   cores em vez de deslocá-las. */
 .mapa-sos-escuro .leaflet-tile-pane {
-  filter: invert(1) hue-rotate(195deg) brightness(0.82) contrast(0.92) saturate(0.55);
+  filter: brightness(0.74) sepia(0.42) hue-rotate(178deg) saturate(1.45) contrast(1.02);
+}
+
+.mapa-sos .leaflet-tile-pane {
+  filter: sepia(0.18) hue-rotate(178deg) saturate(1.15);
 }
 .mapa-sos-escuro .leaflet-control-attribution {
   background: rgb(8 24 48 / 0.72);
@@ -314,4 +338,59 @@
 }
 .mapa-sos-escuro .leaflet-control-attribution a {
   color: #cbd5e1;
+}
+
+/* ── a arte dos pinos ─────────────────────────────────────────────────────
+   Com a arte presente, as peças em CSS somem: o PNG já tem cabeça, ponta,
+   aro e sombra próprios, e empilhar os dois daria duas fontes de luz no
+   mesmo objeto — que é exatamente o que faz uma composição parecer colada.
+   Sem o arquivo, `.pino-sem-arte` devolve o desenho antigo. */
+
+/* O contêiner precisa de tamanho PRÓPRIO.
+   Esconder a cabeça e a ponta em CSS fez o `.pino-marca` colapsar para zero,
+   e aí o `width: 100%` da arte não tinha contra o que medir — o pino saiu do
+   tamanho natural do PNG, gigante sobre o mapa. Agora ele ocupa exatamente a
+   caixa que o Leaflet reserva (o `iconSize`), e a arte cabe dentro dela. */
+.pino-marca:not(.pino-sem-arte),
+.pino-mec:not(.pino-sem-arte) {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.pino-arte {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* A ponta encosta na base da imagem, e é ela a âncora: `contain` com
+     `bottom` mantém esse encontro em qualquer proporção de tela. */
+  object-fit: contain;
+  object-position: bottom center;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 3px 5px rgb(3 8 16 / 0.55));
+}
+
+.pino-marca:not(.pino-sem-arte) .pino-marca-cabeca,
+.pino-marca:not(.pino-sem-arte) .pino-marca-ponta,
+.pino-mec:not(.pino-sem-arte) .pino-mec-sigla,
+.pino-mec:not(.pino-sem-arte) > svg {
+  display: none;
+}
+
+.pino-mec:not(.pino-sem-arte),
+.pino-marca:not(.pino-sem-arte) {
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+/* O selo de emergência continua: ele é informação que a arte não carrega
+   (o pino de alerta diz "atenção", o selo diz "é EMERGÊNCIA"). */
+.pino-marca:not(.pino-sem-arte) .pino-marca-alerta {
+  z-index: 2;
+}
+.pino-arte.pino-arte-premium {
+  filter: drop-shadow(1px 4px 3px rgb(3 8 16 / 0.3));
 }

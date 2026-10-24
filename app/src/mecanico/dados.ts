@@ -9,7 +9,7 @@ import { CHAVES_SOS } from '@/sos/tempoReal'
 import type { FichaMecanico, HomeMecanico, ItemSOS, SituacaoMecanico } from '@/sos/tipos'
 
 /**
- * Dados e ganchos do app do mecânico.
+ * Dados e ganchos do app do especialista.
  *
  * A home (`sos_home_mecanico`) é a fonte única do "como estou agora": ficha,
  * chamado atual, fila e números do dia. A casca, o painel e o histórico usam a
@@ -33,9 +33,9 @@ export function useInfoCentral() {
 }
 
 /**
- * Troca a situação do mecânico. Ao ficar disponível, pede a posição na hora:
+ * Troca a situação do especialista. Ao ficar disponível, pede a posição na hora:
  * sem ela o despacho não sabe quem está mais perto. GPS negado não impede —
- * o mecânico continua recebendo chamados, só não entra no cálculo de distância.
+ * o especialista continua recebendo chamados, só não entra no cálculo de distância.
  *
  * Importante: quem chama deve rodar `destravarAudio()` no próprio toque, antes
  * do `mutate` — o navegador só libera som dentro do gesto.
@@ -182,7 +182,7 @@ export function useAlturaTeclado(): number {
 }
 
 export function primeiroNome(nome: string | null | undefined): string {
-  return (nome ?? '').trim().split(/\s+/)[0] || 'mecânico'
+  return (nome ?? '').trim().split(/\s+/)[0] || 'especialista'
 }
 
 export function saudacao(agora = new Date()): string {
@@ -265,7 +265,7 @@ export interface OsDoVeiculo {
 
 /**
  * Últimas OS do veículo no Checklist. Lidas direto da tabela: só aparecem se
- * o perfil do mecânico tem acesso às ordens de serviço (RLS). Sem acesso ou
+ * o perfil do especialista tem acesso às ordens de serviço (RLS). Sem acesso ou
  * sem histórico, devolve lista vazia e a tela simplesmente não mostra o bloco.
  */
 export function useHistoricoVeiculo(veiculoId: string | null | undefined, osAtualId?: string | null) {

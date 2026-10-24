@@ -27,6 +27,8 @@ import { useCliente } from '../sessao'
 import { AreaApp, BotaoApp, CabecalhoTela, CampoApp, Esqueleto, Faixa, Folha, Tela, VazioApp } from '../comum/ui'
 import { CHAVE_LEMBRETES, dataLonga, kmTexto, nomeVeiculo, useMeusVeiculos, type EstadoAgendar } from './dados'
 import { ErroCarga, Escolha, PlacaVeiculo } from './pecas'
+import { Arte } from '../comum/Arte'
+import { ARTE3D, ARTE_MOBILE } from '../comum/kit3d'
 
 const TIPOS: Record<TipoAgendamento, { rotulo: string; icone: typeof Wrench }> = {
   revisao: { rotulo: 'Revisão', icone: CalendarCheck },
@@ -83,12 +85,12 @@ export function Revisoes() {
 
   return (
     <>
-      <CabecalhoTela titulo="Revisões" subtitulo="Manutenção preventiva e agendamentos" voltar />
+      <CabecalhoTela titulo="Revisões" subtitulo="Manutenção e agendamentos" arte={ARTE3D.revisoes} voltar />
       <Tela className="entrada-suave">
         <section className="flex flex-col gap-3 rounded-[1.25rem] border border-line bg-surface p-4">
           <div className="flex items-start gap-3">
             <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-accent-soft text-accent-ink">
-              <CalendarPlus className="size-6" />
+              <Arte src={ARTE_MOBILE.revisoes} alt="" recuo={<CalendarPlus className="size-6" />} classeImagem="size-12 rounded-xl object-contain" />
             </span>
             <div className="min-w-0">
               <p className="font-display text-[17px] leading-tight font-bold text-ink">Cuide antes de quebrar</p>
@@ -140,7 +142,7 @@ export function Revisoes() {
           ) : agendamentos.isError ? (
             <ErroCarga erro={agendamentos.error} aoTentar={() => void agendamentos.refetch()} />
           ) : lista.length === 0 ? (
-            <VazioApp icone={CalendarClock} titulo="Nenhum agendamento" descricao="Peça uma revisão, manutenção ou orçamento em poucos toques." />
+            <VazioApp arte="revisoes" icone={CalendarClock} titulo="Nenhum agendamento" descricao="Peça uma revisão, manutenção ou orçamento em poucos toques." />
           ) : (
             <>
               {abertos.map((a) => (
@@ -358,7 +360,7 @@ function FolhaAgendar({ inicial, aoFechar }: { inicial: EstadoAgendar | null; ao
           colunas={2}
           valor={tipo}
           aoMudar={setTipo}
-          opcoes={(Object.keys(TIPOS) as TipoAgendamento[]).map((t) => ({ valor: t, rotulo: TIPOS[t].rotulo, icone: TIPOS[t].icone }))}
+          opcoes={(Object.keys(TIPOS) as TipoAgendamento[]).map((t) => ({ valor: t, rotulo: TIPOS[t].rotulo, icone: TIPOS[t].icone, peca: t === 'revisao' ? ARTE_MOBILE.revisoes : t === 'manutencao' ? '/sos/mobile-3d/ferramentas.webp' : t === 'orcamento' ? ARTE_MOBILE.termos : ARTE_MOBILE.periodoQualquer }))}
         />
 
         {lista.length > 0 && (
@@ -392,9 +394,9 @@ function FolhaAgendar({ inicial, aoFechar }: { inicial: EstadoAgendar | null; ao
           valor={periodo}
           aoMudar={setPeriodo}
           opcoes={[
-            { valor: 'manha', rotulo: 'Manhã', icone: Sunrise },
-            { valor: 'tarde', rotulo: 'Tarde', icone: Sun },
-            { valor: 'qualquer', rotulo: 'Tanto faz', icone: Clock },
+            { valor: 'manha', rotulo: 'Manhã', icone: Sunrise, peca: ARTE_MOBILE.temaClaro },
+            { valor: 'tarde', rotulo: 'Tarde', icone: Sun, peca: ARTE_MOBILE.temaAuto },
+            { valor: 'qualquer', rotulo: 'Tanto faz', icone: Clock, peca: ARTE_MOBILE.periodoQualquer },
           ]}
         />
 

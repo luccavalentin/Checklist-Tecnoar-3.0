@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Loader2, Siren } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Arte } from '../../comum/Arte'
+import { ARTE_MOBILE } from '../../comum/kit3d'
 
 /**
  * Botão de confirmar o SOS que precisa ser SEGURADO por um instante.
@@ -50,7 +52,7 @@ export function BotaoSegurar({
   }
 
   return (
-    <div className="flex flex-col items-center gap-1.5">
+    <div className="mx-auto flex w-full max-w-[30rem] flex-col items-center gap-2">
       <button
         type="button"
         disabled={bloqueado}
@@ -76,15 +78,16 @@ export function BotaoSegurar({
           if (e.detail === 0 && !bloqueado) aoConfirmar()
         }}
         className={cn(
-          'cli-segurar relative flex min-h-[4.25rem] w-full items-center justify-center overflow-hidden rounded-[1.15rem] bg-[#ff6600] px-5 font-display text-[18px] font-bold text-white transition-transform disabled:opacity-60',
+          'cli-segurar cli-confirmar-3d sos-button-3d sos-button-3d-primario relative flex min-h-[4.25rem] w-full items-center justify-center overflow-hidden rounded-[1.25rem] px-3 py-1.5 font-display text-[16px] font-bold text-white transition-transform disabled:opacity-60',
           segurando && 'scale-[0.985]',
-          'shadow-[0_1px_2px_rgb(11_28_51/0.12),0_12px_26px_-14px_rgb(255_102_0/0.8)]',
         )}
       >
-        <span aria-hidden className="cli-segurar-barra absolute inset-0 bg-[#9e2219]" />
-        <span className="relative flex items-center gap-2.5">
-          {carregando ? <Loader2 className="size-5 animate-spin" /> : <Siren className="size-5" />}
-          {carregando ? rotuloCarregando : segurando ? 'Continue segurando…' : rotulo}
+        <span aria-hidden className="absolute inset-x-4 bottom-1.5 h-1 overflow-hidden rounded-full bg-[#732500]/35">
+          <span className="cli-segurar-barra block h-full w-full rounded-full bg-[#bdf4ff]" />
+        </span>
+        <span className="relative flex min-w-0 items-center justify-center gap-2.5 pb-1">
+          {carregando ? <Loader2 className="size-8 shrink-0 animate-spin" /> : <Arte src={ARTE_MOBILE.sirene} alt="" classeImagem="size-10 shrink-0 object-contain" recuo={<Siren className="size-7 shrink-0" />} />}
+          <span className="min-w-0 text-center leading-tight">{carregando ? rotuloCarregando : segurando ? 'Continue segurando…' : rotulo}</span>
         </span>
       </button>
       {!carregando && <p className="text-center text-[12px] text-ink-3">Segure por 1 segundo — evita pedido por engano.</p>}

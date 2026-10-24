@@ -5,8 +5,12 @@ import { useToast } from '@/componentes/ui/Toast'
 import { sosCancelar } from '@/sos/api'
 import { CHAVES_SOS } from '@/sos/tempoReal'
 import { AreaApp, BotaoApp, Faixa, Folha } from '../../comum/ui'
+import { Arte } from '../../comum/Arte'
+import { ARTE3D, ARTE_MOBILE } from '../../comum/kit3d'
+import { Check } from 'lucide-react'
 
 const MOTIVOS = ['Consegui resolver sozinho', 'Outro socorro vai me atender', 'Pedi por engano', 'Está demorando muito', 'Outro motivo']
+const PECAS = [ARTE3D.concluido, ARTE_MOBILE.atendimento, ARTE_MOBILE.cancelarSocorro, ARTE3D.tempo, ARTE_MOBILE.periodoQualquer]
 
 /**
  * Cancelar o SOS. Motivo obrigatório (é regra do banco e ajuda a central a
@@ -24,7 +28,7 @@ export function FolhaCancelar({ chamadoId, aberta, aoFechar }: { chamadoId: stri
   const cancelar = useMutation({
     mutationFn: () => sosCancelar(chamadoId, final),
     onSuccess: () => {
-      toast.ok('Socorro cancelado', 'A Tecnoar e o mecânico foram avisados.')
+      toast.ok('Socorro cancelado', 'A Tecnoar e o especialista foram avisados.')
       void qc.invalidateQueries({ queryKey: CHAVES_SOS.detalhe(chamadoId) })
       void qc.invalidateQueries({ queryKey: CHAVES_SOS.homeCliente })
       void qc.invalidateQueries({ queryKey: CHAVES_SOS.meusChamados })
@@ -37,12 +41,12 @@ export function FolhaCancelar({ chamadoId, aberta, aoFechar }: { chamadoId: stri
       aberta={aberta}
       aoFechar={aoFechar}
       titulo="Cancelar o socorro?"
-      descricao="Se o mecânico já estiver a caminho, ele volta. Conte o motivo:"
+      descricao="Se o especialista já estiver a caminho, ele volta. Conte o motivo:"
       rodape={
         <>
           {cancelar.isError && <Faixa tom="critico">{(cancelar.error as Error).message}</Faixa>}
           <BotaoApp variante="perigo" tamanho="lg" largo disabled={!final} carregando={cancelar.isPending} onClick={() => cancelar.mutate()}>
-            Cancelar o socorro
+            <Arte src={ARTE_MOBILE.cancelarSocorro} alt="" classeImagem="size-8 object-contain" recuo={null} /><span>Cancelar o socorro</span>
           </BotaoApp>
           <BotaoApp variante="fantasma" tamanho="md" largo onClick={aoFechar}>
             Voltar, não cancelar
@@ -50,19 +54,19 @@ export function FolhaCancelar({ chamadoId, aberta, aoFechar }: { chamadoId: stri
         </>
       }
     >
-      <div className="flex flex-col gap-2 pb-2">
-        {MOTIVOS.map((m) => (
+      <div className="cancelar-opcoes flex flex-col gap-2 pb-2">
+        {MOTIVOS.map((m, i) => (
           <button
             key={m}
             type="button"
             aria-pressed={motivo === m}
             onClick={() => setMotivo(m)}
             className={cn(
-              'flex min-h-12 items-center rounded-xl border px-4 text-left text-[15px] font-medium transition-colors',
+              'sos-choice-card flex min-h-14 items-center gap-3 rounded-xl border px-3 py-2 text-left text-[14px] font-medium transition-colors',
               motivo === m ? 'border-accent bg-accent-soft text-accent-ink' : 'border-line-strong text-ink',
             )}
           >
-            {m}
+            <Arte src={PECAS[i]} alt="" classeImagem="size-8 shrink-0 object-contain" recuo={null} /><span className="min-w-0 flex-1">{m}</span>{motivo === m && <Check className="size-4 shrink-0 text-accent-ink" />}
           </button>
         ))}
         {motivo && (

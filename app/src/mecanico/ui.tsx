@@ -1,6 +1,5 @@
 import {
   forwardRef,
-  useEffect,
   type ButtonHTMLAttributes,
   type InputHTMLAttributes,
   type ReactNode,
@@ -10,14 +9,17 @@ import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Loader2, X, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useDialogo } from '../comum/useDialogo'
+import { IconeM3D } from './ArteMecanico'
+import './mecanico-mobile.css'
 
 /**
- * Peças de interface do app do mecânico.
+ * Peças de interface do app do especialista.
  *
  * Ferramenta de campo, não sistema: superfícies lisas, contraste alto, uma
  * ação principal por tela, botões do tamanho do polegar (56 px ou mais nas
  * ações que movem o atendimento) e números grandes em fonte mono. As cores
- * vêm dos tokens da seção "mecânico" do estilo.css (classe `mec`), com azul
+ * vêm dos tokens da seção "especialista" do estilo.css (classe `mec`), com azul
  * Tecnoar na ação principal.
  */
 
@@ -155,6 +157,8 @@ export const BotaoM = forwardRef<HTMLButtonElement, BotaoMProps>(function BotaoM
       className={cn(
         'inline-flex items-center justify-center text-center font-display leading-tight font-semibold tracking-tight transition-[transform,background-color,border-color,box-shadow] select-none active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100',
         VARIANTE[variante],
+        'sos-button-3d',
+        `sos-button-3d-${variante}`,
         TAMANHO[tamanho],
         largo && 'w-full',
         className,
@@ -164,7 +168,7 @@ export const BotaoM = forwardRef<HTMLButtonElement, BotaoMProps>(function BotaoM
       {carregando ? (
         <Loader2 className={cn('shrink-0 animate-spin', grande ? 'size-6' : 'size-5')} />
       ) : (
-        Icone && <Icone className={cn('shrink-0', grande ? 'size-6' : 'size-5')} strokeWidth={grande ? 2.6 : 2.2} />
+        Icone && <IconeM3D icone={Icone} className={grande ? 'size-8' : 'size-7'} />
       )}
       <span className="min-w-0">{children}</span>
     </button>
@@ -256,7 +260,7 @@ export function LinhaTarefa({
           estado === 'feito' ? 'bg-ok-soft text-ok-ink' : estado === 'aviso' ? 'bg-warn-soft text-warn-ink' : estado === 'pendente' ? 'bg-accent-soft text-accent-ink' : 'bg-surface-2 text-ink-2',
         )}
       >
-        <Icone className="size-[22px]" strokeWidth={2.2} />
+        <IconeM3D icone={Icone} className="size-10" />
         {estado === 'feito' && (
           <span aria-hidden className="absolute -right-1 -bottom-1 flex size-5 items-center justify-center rounded-full bg-[#00afef] text-[#0D1C33] ring-2 ring-surface">
             <svg viewBox="0 0 12 12" className="size-3" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
@@ -368,26 +372,14 @@ export function FolhaM({
   children?: ReactNode
   rodape?: ReactNode
 }) {
-  useEffect(() => {
-    if (!aberta) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && aoFechar()
-    document.addEventListener('keydown', onKey)
-    const antes = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = antes
-    }
-  }, [aberta, aoFechar])
+  const painel = useDialogo(aberta, aoFechar)
 
   if (!aberta) return null
   return createPortal(
-    <div className="mec fixed inset-0 z-[85] flex items-end justify-center sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label={typeof titulo === 'string' ? titulo : undefined}>
+    <div className="mec fixed inset-0 z-[85] sos-dialogo-central flex items-center justify-center p-3 sm:p-6" role="dialog" aria-modal="true" aria-label={typeof titulo === 'string' ? titulo : undefined}>
       <div className="absolute inset-0 bg-[#020812]/70" onClick={aoFechar} aria-hidden />
-      <div className="sos-sheet sos-sobe relative flex max-h-[92dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[2rem] text-ink sm:rounded-[2rem]">
-        <div className="flex justify-center pt-2.5 sm:hidden" aria-hidden>
-          <span className="h-1.5 w-10 rounded-full bg-line-strong" />
-        </div>
+      <div ref={painel} tabIndex={-1} className="sos-sheet sos-dialogo-painel relative flex max-h-[90dvh] w-full max-w-lg flex-col overflow-hidden rounded-[1.5rem] text-ink outline-none">
+        <div className="sos-dialogo-marca flex items-center justify-between border-b border-line px-5 py-3"><img className="sos-dialogo-logo h-7 w-auto" src="/brand/tecnoar-positivo.svg" alt="Tecnoar" /><img className="sos-dialogo-logo-negativo hidden h-7 w-auto" src="/brand/tecnoar-negativo.svg" alt="Tecnoar" /><span className="text-[10px] font-semibold tracking-wide text-ink-3">EQUIPE TECNOAR</span></div>
         {(titulo || descricao) && (
           <div className="flex items-start justify-between gap-3 px-5 pt-3 pb-2 sm:pt-5">
             <div className="min-w-0">

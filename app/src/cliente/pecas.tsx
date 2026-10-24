@@ -2,6 +2,8 @@ import type { ComponentType, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { AlertTriangle, ChevronRight, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Arte } from '../comum/Arte'
+import { PECA_OCORRENCIA } from '../comum/kit3d'
 import { OCORRENCIAS, formatarPlacaExibicao } from '@/sos/rotulos'
 import type { OcorrenciaSOS } from '@/sos/tipos'
 
@@ -11,37 +13,64 @@ import type { OcorrenciaSOS } from '@/sos/tipos'
  */
 
 /**
- * Placa no padrão Mercosul — a pessoa reconhece o próprio veículo pela placa
- * antes de ler o modelo.
+ * A placa.
+ *
+ * Era um desenho da placa Mercosul inteira, com a tarja azul e a palavra
+ * BRASIL. Parecia simpático e fazia um estrago: decoração se passando por
+ * dado. Num cartão já cheio de informação, aquela tarja azul roubava o olho
+ * de tudo — e o que importa ali é a SEQUÊNCIA, não a bandeira. Pior: dois
+ * centímetros de azul-bandeira dentro de uma marca navy-e-laranja brigavam
+ * com a identidade em toda tela onde a placa aparecia, que é quase todas.
+ *
+ * Agora a placa é o que ela é: um identificador. Fica na mesma pastilha de
+ * aço do resto do app, com o número em tipo monoespaçado de largura fixa —
+ * que é o que deixa 0 e O, 1 e I distinguíveis à primeira olhada. A forma e
+ * o espaçamento das letras já dizem "placa" sem precisar desenhar o país.
  */
 export function PlacaVeiculo({ placa, tamanho = 'md', className }: { placa: string | null | undefined; tamanho?: 'sm' | 'md' | 'lg'; className?: string }) {
-  const texto = tamanho === 'lg' ? 'text-[19px] px-3 py-0.5' : tamanho === 'sm' ? 'text-[12px] px-1.5 py-px' : 'text-[15px] px-2 py-px'
-  const faixa = tamanho === 'lg' ? 'h-3 text-[7px]' : tamanho === 'sm' ? 'h-2 text-[5px]' : 'h-2.5 text-[6px]'
+  const t =
+    tamanho === 'lg'
+      ? 'text-[18px] px-2.5 py-1 tracking-[0.14em]'
+      : tamanho === 'sm'
+        ? 'text-[11.5px] px-1.5 py-0.5 tracking-[0.1em]'
+        : 'text-[14px] px-2 py-0.5 tracking-[0.12em]'
   return (
     <span
-      className={cn('inline-flex shrink-0 flex-col overflow-hidden rounded-[6px] border-[1.5px] border-[#0b1c33] bg-white leading-none text-[#0b1c33]', className)}
+      className={cn('sos-placa num inline-flex shrink-0 items-center font-bold leading-none', t, className)}
       aria-label={`Placa ${formatarPlacaExibicao(placa)}`}
     >
-      <span aria-hidden className={cn('flex items-center justify-center bg-[#1446a0] font-sans font-bold tracking-[0.25em] text-white', faixa)}>
-        BRASIL
-      </span>
-      <span aria-hidden className={cn('num placa-num text-center font-bold', texto)}>
-        {formatarPlacaExibicao(placa)}
-      </span>
+      <span className="sos-placa-texto">{formatarPlacaExibicao(placa)}</span>
     </span>
   )
 }
 
-/** Quadradinho com o ícone do tipo de problema. */
+/**
+ * O que quebrou no caminhão.
+ *
+ * Tenta a peça 3D (`/sos/ocorrencias/freios.png` e irmãs) e cai no ícone de
+ * linha enquanto ela não existe. Quando a arte está lá, a pastilha de fundo
+ * sai junto: o render já tem volume e sombra próprios, e empilhar os dois
+ * daria duas fontes de luz no mesmo objeto — que é exatamente o que faz uma
+ * composição parecer colada.
+ */
 export function IconeOcorrencia({ tipo, tamanho = 'md', className }: { tipo: OcorrenciaSOS; tamanho?: 'sm' | 'md' | 'lg'; className?: string }) {
   const info = OCORRENCIAS[tipo] ?? OCORRENCIAS.outro
   const Icone = info.icone
   const t = tamanho === 'lg' ? 'size-14 rounded-2xl [&>svg]:size-7' : tamanho === 'sm' ? 'size-9 rounded-xl [&>svg]:size-[18px]' : 'size-11 rounded-2xl [&>svg]:size-[22px]'
   const grave = info.prioridade === 'emergencia'
-  return (
+  const pastilha = (
     <span className={cn('flex shrink-0 items-center justify-center shadow-[0_10px_24px_-20px_rgb(8_24_48/0.5)]', grave ? 'bg-crit-soft text-crit' : 'bg-surface-2 text-ink-2', t, className)}>
       <Icone />
     </span>
+  )
+  const medida = tamanho === 'lg' ? 'size-14' : tamanho === 'sm' ? 'size-9' : 'size-11'
+  return (
+    <Arte
+      src={PECA_OCORRENCIA[tipo] ?? `/sos/ocorrencias/${tipo}.png`}
+      alt=""
+      recuo={pastilha}
+      classeImagem={cn('shrink-0', medida, className)}
+    />
   )
 }
 
@@ -75,7 +104,7 @@ export function Escolha<T extends string>({
   rotulo,
   colunas,
 }: {
-  opcoes: Array<{ valor: T; rotulo: string; icone?: ComponentType<{ className?: string }> }>
+  opcoes: Array<{ valor: T; rotulo: string; icone?: ComponentType<{ className?: string }>; peca?: string }>
   valor: T | null
   aoMudar: (v: T) => void
   rotulo?: string
@@ -101,10 +130,11 @@ export function Escolha<T extends string>({
               onClick={() => aoMudar(o.valor)}
               className={cn(
                 'flex min-h-12 items-center justify-center gap-2 rounded-[1rem] border px-2 text-[14px] font-semibold transition-[transform,border-color,background-color,box-shadow] active:scale-[0.98]',
+                o.peca && 'min-h-[4.5rem] flex-col gap-1 py-2',
                 ativo ? 'border-accent bg-accent-soft text-accent-ink shadow-[0_10px_24px_-20px_rgb(255_102_0/0.55)]' : 'border-line-strong bg-surface text-ink-2',
               )}
             >
-              {Icone && <Icone className="size-4 shrink-0" />}
+              {o.peca ? <Arte src={o.peca} alt="" recuo={Icone ? <Icone className="size-4 shrink-0" /> : null} classeImagem="size-9 shrink-0 object-contain" /> : Icone && <Icone className="size-4 shrink-0" />}
               <span className="truncate">{o.rotulo}</span>
             </button>
           )
@@ -172,8 +202,10 @@ export function LinhaLista({
   onClick,
   href,
   className,
+  peca,
 }: {
   icone?: ComponentType<{ className?: string }>
+  peca?: string
   tomIcone?: 'neutro' | 'marca' | 'sos' | 'ok' | 'info' | 'atencao'
   titulo: ReactNode
   detalhe?: ReactNode
@@ -197,7 +229,7 @@ export function LinhaLista({
             tomIcone === 'atencao' && 'bg-warn-soft text-warn-ink',
           )}
         >
-          <Icone className="size-5" />
+          {peca ? <Arte src={peca} alt="" recuo={<Icone className="size-5" />} classeImagem="conta-lista-peca" /> : <Icone className="size-5" />}
         </span>
       )}
       <span className="min-w-0 flex-1">

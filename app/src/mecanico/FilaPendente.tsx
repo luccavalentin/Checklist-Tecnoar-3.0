@@ -6,7 +6,7 @@ import { descartarAcao, processarFila, rotuloAcao, tentarDeNovo, useFila } from 
 
 /**
  * O que está guardado no aparelho esperando sinal — dito com todas as
- * letras, para o mecânico não refazer (nem achar que perdeu) o que já fez.
+ * letras, para o especialista não refazer (nem achar que perdeu) o que já fez.
  * Ação recusada pelo servidor aparece à parte, em vermelho, com o motivo.
  *
  * Sem `chamadoId`, mostra a fila inteira (painel).

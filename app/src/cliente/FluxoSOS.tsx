@@ -24,12 +24,14 @@ import { sosAbrirChamado, sosEnviarAnexo } from '@/sos/api'
 import { vibrarAlerta } from '@/sos/alerta'
 import { formatarCoordenadas, posicaoAtual } from '@/sos/geo'
 import { MapaSOS } from '@/sos/Mapa'
-import { OCORRENCIAS, ORDEM_OCORRENCIAS, linkTelefone } from '@/sos/rotulos'
+import { OCORRENCIAS, linkTelefone } from '@/sos/rotulos'
 import { CHAVES_SOS } from '@/sos/tempoReal'
 import type { ChamadoSOS, NovoChamado, OcorrenciaSOS } from '@/sos/tipos'
 import { useCliente } from '../sessao'
 import { AreaApp, BotaoApp, CampoApp, Faixa, Folha } from '../comum/ui'
 import { useOnline } from '../comum/Pwa'
+import { Arte } from '../comum/Arte'
+import { ARTE3D, ARTE_MOBILE, VEICULO_MOBILE } from '../comum/kit3d'
 import {
   nomeVeiculo,
   temaMapa,
@@ -44,6 +46,7 @@ import { guardarPendente, useEnvioPendenteSOS } from './filaSOS'
 import { IconeOcorrencia, PlacaVeiculo } from './pecas'
 import { PassoLocal, type LocalSOS } from './fluxo/PassoLocal'
 import { AnexosPendentes, type AnexoPendente } from './fluxo/AnexosPendentes'
+import { PassoProblema } from './fluxo/PassoProblema'
 import { BotaoSegurar } from './fluxo/BotaoSegurar'
 
 type Passo = 'problema' | 'local' | 'confirmar' | 'enviado' | 'guardado'
@@ -258,7 +261,7 @@ export function FluxoSOS() {
               setTrocandoVeiculo(false)
             }}
           >
-            <Truck className="size-5 text-ink-3" />
+            <Arte src={VEICULO_MOBILE.truck} alt="" classeImagem="size-11 shrink-0 object-contain" recuo={<Truck className="size-5 text-ink-3" />} />
             <span className="min-w-0 flex-1 text-[15px] font-semibold text-ink">Outro veículo (digitar a placa)</span>
           </OpcaoVeiculo>
         </li>
@@ -269,9 +272,11 @@ export function FluxoSOS() {
   /* passo 1 — veículo e problema */
   if (passo === 'problema') {
     return (
-      <PaginaFluxo passo={1} titulo="O que aconteceu?" subtitulo="Toque na opção mais parecida. O mecânico confirma no local." aoVoltar={fechar} aoFechar={fechar} telCentral={telCentral}>
+      <PaginaFluxo passo={1} titulo="O que aconteceu?" subtitulo="Fale, escreva, ou toque no que mais parece." aoVoltar={fechar} aoFechar={fechar} telCentral={telCentral}>
         {ativo && <AvisoJaTemSocorro protocolo={ativo.protocolo} aoAcompanhar={() => navegar(`/chamado/${ativo.id}`, { replace: true })} />}
-
+        <PassoProblema
+          seletorVeiculo={
+            <>
         {lista.length > 1 ? (
           <section aria-label="Qual veículo" className="flex flex-col gap-2">
             <h2 className="text-[13.5px] font-semibold text-ink-2">Qual veículo?</h2>
@@ -316,35 +321,24 @@ export function FluxoSOS() {
             </button>
           </div>
         ) : null}
-
-        <div className="grid grid-cols-2 gap-2.5">
-          {ORDEM_OCORRENCIAS.map((o) => {
-            const dados = OCORRENCIAS[o]
-            const Icone = dados.icone
-            const escolhido = ocorrencia === o
-            const grave = dados.prioridade === 'emergencia'
-            return (
-              <button
-                key={o}
-                type="button"
-                onClick={() => {
-                  setOcorrencia(o)
-                  setPasso(local ? 'confirmar' : 'local')
-                }}
-                aria-pressed={escolhido}
-                className={cn(
-                  'sos-choice-card flex min-h-[6.25rem] flex-col items-start justify-between gap-2 rounded-[1.25rem] p-3.5 text-left transition-[transform,border-color] active:scale-[0.98]',
-                  escolhido ? 'border-accent' : 'border-line',
-                )}
-              >
-                <span className={cn('sos-subtle-chip flex size-10 items-center justify-center rounded-xl', grave ? 'text-crit' : 'text-ink-2')}>
-                  <Icone className="size-5" />
-                </span>
-                <span className="font-display text-[15px] leading-tight font-bold text-ink">{dados.rotulo}</span>
-              </button>
-            )
-          })}
-        </div>
+            </>
+          }
+          ocorrencia={ocorrencia}
+          aoEscolher={setOcorrencia}
+          descricao={descricao}
+          aoDescrever={setDescricao}
+          anexos={anexos}
+          aoMudarAnexos={setAnexos}
+          /* Sem tipo escolhido o chamado segue como `desconhecido`, cujo
+             rótulo já é a verdade: "O especialista descobre para você". Travar
+             o avanço aqui só produziria palpite ruim de leigo — e palpite
+             ruim num campo que define prioridade de despacho é pior do que
+             campo em branco. */
+          aoContinuar={() => {
+            if (!ocorrencia) setOcorrencia('desconhecido')
+            setPasso(local ? 'confirmar' : 'local')
+          }}
+        />
         {folhaVeiculo}
       </PaginaFluxo>
     )
@@ -376,7 +370,7 @@ export function FluxoSOS() {
       <PaginaFluxo
         passo={3}
         titulo="Confirme o pedido"
-        subtitulo="Confira antes de enviar. O mecânico recebe tudo isso."
+        subtitulo="Confira antes de enviar. O especialista recebe tudo isso."
         aoVoltar={() => setPasso('local')}
         aoFechar={fechar}
         telCentral={telCentral}
@@ -416,10 +410,10 @@ export function FluxoSOS() {
         )}
 
         <section aria-label="Resumo do pedido" className="sos-premium-list flex flex-col divide-y divide-line">
-          <Linha icone={Truck} rotulo="Veículo" acao={lista.length > 0 ? { rotulo: 'Trocar', aoClicar: () => setTrocandoVeiculo(true) } : undefined}>
+          <Linha icone={Truck} peca={VEICULO_MOBILE[veiculo?.tipo ?? 'truck'] ?? ARTE3D.veiculos} rotulo="Veículo" acao={lista.length > 0 ? { rotulo: 'Trocar', aoClicar: () => setTrocandoVeiculo(true) } : undefined}>
             {digitarPlaca ? (
               <CampoApp
-                rotulo="Placa (opcional, ajuda o mecânico)"
+                rotulo="Placa (opcional, ajuda o especialista)"
                 autoCapitalize="characters"
                 value={placa}
                 onChange={(e) => setPlaca(mascaraPlaca(e.target.value))}
@@ -436,7 +430,7 @@ export function FluxoSOS() {
             )}
           </Linha>
 
-          <Linha icone={Siren} rotulo="Problema" acao={{ rotulo: 'Trocar', aoClicar: () => setPasso('problema') }}>
+          <Linha icone={Siren} peca={ARTE_MOBILE.sirene} rotulo="Problema" acao={{ rotulo: 'Trocar', aoClicar: () => setPasso('problema') }}>
             {ocorrencia && infoOcorrencia ? (
               <div className="flex items-center gap-2.5">
                 <IconeOcorrencia tipo={ocorrencia} tamanho="sm" />
@@ -449,6 +443,7 @@ export function FluxoSOS() {
 
           <Linha
             icone={MapPin}
+            peca={ARTE3D.local}
             rotulo="Onde você está"
             acao={{ rotulo: 'Ajustar', aoClicar: () => setPasso('local') }}
             abaixo={
@@ -456,7 +451,7 @@ export function FluxoSOS() {
                 <div className="flex flex-col gap-2">
                   <div className="relative h-36 overflow-hidden rounded-2xl border border-line">
                     <MapaSOS
-                      marcadores={[{ id: 'cliente', tipo: 'cliente', ponto: local.ponto }]}
+                      marcadores={[{ id: 'cliente', tipo: 'cliente', ponto: local.ponto, premium: true }]}
                       centro={local.ponto}
                       zoom={15}
                       interativo={false}
@@ -481,11 +476,13 @@ export function FluxoSOS() {
 
           <div className="p-4">
             <CampoApp
-              rotulo="Telefone para o mecânico falar com você"
+              rotulo="Telefone para o especialista falar com você"
               type="tel"
               inputMode="tel"
               autoComplete="tel"
+              placeholder="(11) 99999-9999"
               icone={Phone}
+              peca={ARTE3D.ligar}
               value={telefone}
               onChange={(e) => setTelefone(mascaraTelefone(e.target.value))}
             />
@@ -510,7 +507,7 @@ export function FluxoSOS() {
 
         {telCentral && (
           <a href={telCentral} className="flex min-h-12 items-center justify-center gap-2 text-[14px] font-semibold text-ink-2">
-            <PhoneCall className="size-4" /> Prefere falar? Ligar para a Tecnoar
+            <Arte src={ARTE3D.ligar} alt="" classeImagem="size-7 shrink-0 object-contain" recuo={<PhoneCall className="size-4" />} /> Prefere falar? Ligar para a Tecnoar
           </a>
         )}
       </PaginaFluxo>
@@ -561,12 +558,12 @@ function Detalhes({ aberto: inicial, temConteudo, children }: { aberto: boolean;
   return (
     <section className="sos-premium-list">
       <button type="button" aria-expanded={aberto} onClick={() => setAberto((a) => !a)} className="flex min-h-16 w-full items-center gap-3 px-4 py-3 text-left">
-        <span className="sos-subtle-chip flex size-10 shrink-0 items-center justify-center rounded-xl text-accent-ink">
-          <Camera className="size-5" />
+        <span className="flex size-10 shrink-0 items-center justify-center text-accent-ink">
+          <Arte src={ARTE_MOBILE.camera} alt="" classeImagem="size-10 object-contain" recuo={<Camera className="size-5" />} />
         </span>
         <span className="min-w-0 flex-1">
           <span className="block text-[15px] font-semibold text-ink">Foto, áudio ou detalhes</span>
-          <span className="block text-[12.5px] text-ink-3">{temConteudo ? 'Adicionado ao pedido' : 'Opcional · ajuda o mecânico a levar a peça certa'}</span>
+          <span className="block text-[12.5px] text-ink-3">{temConteudo ? 'Adicionado ao pedido' : 'Opcional · ajuda o especialista a levar a peça certa'}</span>
         </span>
         <ChevronDown className={cn('size-5 shrink-0 text-ink-3 transition-transform', aberto && 'rotate-180')} />
       </button>
@@ -582,12 +579,13 @@ function CabecalhoMapa({ aoVoltar, telCentral }: { aoVoltar: () => void; telCent
       <button type="button" onClick={aoVoltar} aria-label="Voltar" className={cn(redondo, 'text-ink')}>
         <ChevronLeft className="size-6" />
       </button>
-      <span className="flex items-center gap-2 rounded-full bg-[#ff6600] px-4 py-2 font-display text-[13.5px] font-bold text-white shadow-[0_6px_16px_-6px_rgb(255_102_0/0.7)]">
-        <Siren className="size-4" /> Pedido de socorro
+      <span className="sos-button-3d sos-button-3d-primario flex min-h-12 items-center gap-1.5 rounded-2xl px-2 py-0.5 font-display text-[13px] font-bold text-white">
+        <Arte src={ARTE_MOBILE.sirene} alt="" classeImagem="size-9 shrink-0 object-contain" recuo={<Siren className="size-5" />} />
+        <span>Pedido de socorro</span>
       </span>
       {telCentral ? (
         <a href={telCentral} aria-label="Ligar para a Tecnoar" className={cn(redondo, 'text-ok')}>
-          <PhoneCall className="size-5" />
+          <Arte src={ARTE3D.ligar} alt="" classeImagem="size-8 object-contain" recuo={<PhoneCall className="size-5" />} />
         </a>
       ) : (
         <span className="size-12" />
@@ -632,7 +630,7 @@ function PaginaFluxo({
             <div className="flex items-center">
               {telCentral && (
                 <a href={telCentral} aria-label="Ligar para a Tecnoar" className="sos-icon-button flex size-11 items-center justify-center rounded-full text-ok">
-                  <PhoneCall className="size-5" />
+                  <Arte src={ARTE3D.ligar} alt="" classeImagem="size-8 object-contain" recuo={<PhoneCall className="size-5" />} />
                 </a>
               )}
               <button type="button" onClick={aoFechar} aria-label="Fechar pedido de socorro" className="sos-icon-button flex size-11 items-center justify-center rounded-full text-ink-2">
@@ -672,12 +670,14 @@ function PaginaFluxo({
 
 function Linha({
   icone: Icone,
+  peca,
   rotulo,
   acao,
   children,
   abaixo,
 }: {
   icone: typeof Truck
+  peca?: string
   rotulo: string
   acao?: { rotulo: string; aoClicar: () => void }
   children: ReactNode
@@ -687,8 +687,8 @@ function Linha({
   return (
     <div className="flex flex-col gap-3 p-4">
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-surface-2 text-ink-2">
-          <Icone className="size-[18px]" />
+        <span className="mt-0.5 flex size-10 shrink-0 items-center justify-center text-ink-2">
+          {peca ? <Arte src={peca} alt="" classeImagem="size-10 object-contain" recuo={<Icone className="size-[18px]" />} /> : <Icone className="size-[18px]" />}
         </span>
         <div className="min-w-0 flex-1">
           <p className="mb-1 text-[12.5px] font-medium text-ink-3">{rotulo}</p>
@@ -705,7 +705,7 @@ function Linha({
   )
 }
 
-/** Acidente: antes do socorro mecânico, a vida. */
+/** Acidente: antes do socorro, a vida. */
 function AvisoAcidente() {
   const botao = 'flex min-h-14 flex-1 flex-col items-center justify-center rounded-xl border border-crit/20 bg-surface px-1 text-center text-crit-ink active:scale-[0.97]'
   return (
@@ -745,24 +745,21 @@ function TelaEnviado({ resultado, aoSeguir }: { resultado: Resultado; aoSeguir: 
   const jaExistia = !!chamado.ja_existia
   const subindo = enviados + falhas < total
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 overflow-y-auto bg-canvas px-6 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-center">
-      <div className="relative flex size-32 items-center justify-center">
-        <span aria-hidden className={cn('cli-onda absolute inset-0 rounded-full', jaExistia ? 'bg-warn/25' : 'bg-ok/25')} />
-        <span className={cn('relative flex size-24 items-center justify-center rounded-full text-white', jaExistia ? 'bg-warn' : 'bg-ok')}>
-          {jaExistia ? <Siren className="size-11" /> : <Check className="size-12" strokeWidth={3} />}
-        </span>
+    <div className="sos-enviado-3d fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 overflow-y-auto bg-canvas px-5 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-[calc(1.5rem+env(safe-area-inset-bottom))] text-center">
+      <div className="relative flex size-32 shrink-0 items-center justify-center">
+        <Arte src={jaExistia ? ARTE_MOBILE.sirene : ARTE3D.concluido} alt="" classeImagem="size-32 object-contain" recuo={jaExistia ? <Siren className="size-16 text-warn" /> : <Check className="size-16 text-ok" strokeWidth={3} />} />
       </div>
       <div className="flex max-w-sm flex-col items-center gap-3">
         <h1 className="font-display text-[28px] leading-tight font-bold text-ink">{jaExistia ? 'Você já tem um socorro em andamento' : 'SOS enviado'}</h1>
         <div className="flex flex-col items-center gap-1">
           <span className="text-[12.5px] font-medium text-ink-3">Protocolo</span>
-          <span className="num rounded-full border border-line bg-surface px-4 py-1.5 text-[19px] font-semibold tracking-wider text-ink">{chamado.protocolo}</span>
+          <span className="sos-protocolo-3d num px-6 py-3 text-[18px] font-semibold tracking-wide">{chamado.protocolo}</span>
         </div>
         <p className="flex items-center gap-2 text-[15px] leading-relaxed font-semibold text-ink">
-          {!jaExistia && <Loader2 className="size-4 animate-spin text-accent" />}
-          {jaExistia ? 'Não abrimos outro pedido para não confundir a equipe.' : 'Procurando o mecânico mais próximo…'}
+          {!jaExistia && <Arte src={ARTE3D.cobertura} alt="" classeImagem="size-10 shrink-0 object-contain" recuo={<Loader2 className="size-4 animate-spin text-accent" />} />}
+          {jaExistia ? 'Não abrimos outro pedido para não confundir a equipe.' : 'Procurando o especialista mais próximo…'}
         </p>
-        <p className="text-[14px] leading-relaxed text-ink-2">Fique em local seguro, com o pisca-alerta ligado.</p>
+        <p className="flex items-center gap-2 text-[14px] leading-relaxed text-ink-2"><Arte src={ARTE_MOBILE.sirene} alt="" classeImagem="size-8 shrink-0 object-contain" recuo={null} />Fique em local seguro, com o pisca-alerta ligado.</p>
       </div>
 
       {total > 0 && (
@@ -784,7 +781,8 @@ function TelaEnviado({ resultado, aoSeguir }: { resultado: Resultado; aoSeguir: 
       )}
 
       <BotaoApp tamanho="lg" onClick={aoSeguir} className="w-full max-w-sm">
-        Acompanhar agora <ChevronRight className="size-5" />
+        <Arte src={ARTE_MOBILE.mapaBrasil} alt="" classeImagem="size-9 shrink-0 object-contain" recuo={<MapPin className="size-5" />} />
+        <span>Acompanhar agora</span> <ChevronRight className="size-5 shrink-0" />
       </BotaoApp>
     </div>
   )
@@ -818,7 +816,7 @@ function TelaGuardado({ local, telCentral, aoInicio }: { local: LocalSOS; telCen
         </p>
         <p className="num mt-1.5 text-[20px] font-semibold tracking-wide text-ink">{formatarCoordenadas(local.ponto)}</p>
         {local.endereco && <p className="mt-1 text-[13px] leading-snug text-ink-2">{local.endereco}</p>}
-        <p className="mt-2 text-[12.5px] leading-snug text-ink-3">Se ligar para a Tecnoar, leia estes números: com eles o mecânico encontra você.</p>
+        <p className="mt-2 text-[12.5px] leading-snug text-ink-3">Se ligar para a Tecnoar, leia estes números: com eles o especialista encontra você.</p>
       </div>
 
       <div className="flex w-full max-w-sm flex-col gap-2">

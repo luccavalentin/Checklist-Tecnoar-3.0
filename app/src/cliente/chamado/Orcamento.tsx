@@ -15,13 +15,13 @@ import { TelaAssinatura } from './Assinatura'
 /**
  * Orçamento do atendimento, do lado do cliente.
  *
- * O mecânico lança peças e serviços (do catálogo, com o preço de lá) e envia;
+ * O especialista lança peças e serviços (do catálogo, com o preço de lá) e envia;
  * a taxa de deslocamento entra sozinha na chegada. Aqui o cliente vê item por
- * item, o total e o recado do mecânico, e responde: aprova ASSINANDO na tela
+ * item, o total e o recado do especialista, e responde: aprova ASSINANDO na tela
  * (a assinatura vai para o laudo) ou recusa, com motivo se quiser.
  *
  * Quem manda é o banco: `sos_responder_orcamento` confere se ainda há
- * orçamento pendente e se a assinatura é deste chamado. Se o mecânico mudou
+ * orçamento pendente e se a assinatura é deste chamado. Se o especialista mudou
  * os itens depois de enviar (`orcamento_desatualizado`), a aprovação espera o
  * reenvio — ninguém assina um total que já não é o da tela.
  */
@@ -34,7 +34,7 @@ function totalItens(itens: ItemSOS[]): number {
   return itens.reduce((s, i) => s + Number(i.valor_total ?? 0), 0)
 }
 
-/** Motivo da recusa que o cliente escreveu (fica no evento, não no recado do mecânico). */
+/** Motivo da recusa que o cliente escreveu (fica no evento, não no recado do especialista). */
 function motivoRecusa(d: DetalheChamado): string | null {
   const e = [...d.eventos].reverse().find((x) => x.tipo === 'orcamento' && /recusado/i.test(x.titulo))
   return e?.descricao?.trim() || null
@@ -86,7 +86,7 @@ export function CartaoOrcamento({ detalhe: d, aoAbrir }: { detalhe: DetalheChama
           </div>
           {c.orcamento_desatualizado && (
             <Faixa tom="atencao" icone={AlertTriangle}>
-              O mecânico mudou os itens depois de enviar. Aguarde o orçamento atualizado.
+              O especialista mudou os itens depois de enviar. Aguarde o orçamento atualizado.
             </Faixa>
           )}
           <BotaoApp tamanho="lg" largo icone={FileText} onClick={aoAbrir}>
@@ -120,7 +120,7 @@ export function CartaoOrcamento({ detalhe: d, aoAbrir }: { detalhe: DetalheChama
         </span>
         {motivo && <span className="mt-1 block truncate text-[12.5px] text-ink-3">Motivo: {motivo}</span>}
         {c.orcamento_desatualizado && (
-          <span className="mt-1.5 block text-[12px] leading-snug font-semibold text-warn-ink">Os itens mudaram depois da resposta. O mecânico pode enviar um orçamento novo.</span>
+          <span className="mt-1.5 block text-[12px] leading-snug font-semibold text-warn-ink">Os itens mudaram depois da resposta. O especialista pode enviar um orçamento novo.</span>
         )}
       </span>
       <ChevronRight className="mt-1 size-5 shrink-0 text-ink-3" />
@@ -177,7 +177,7 @@ export function FolhaOrcamento({ detalhe: d, aberta, aoFechar }: { detalhe: Deta
     onSuccess: (novo) => {
       assinaturaEnviada.current = null
       atualizar(novo)
-      toast.ok('Orçamento aprovado', 'O mecânico já foi avisado e pode seguir com o serviço.')
+      toast.ok('Orçamento aprovado', 'O especialista já foi avisado e pode seguir com o serviço.')
       aoFechar()
     },
     onSettled: () => (travado.current = false),
@@ -188,7 +188,7 @@ export function FolhaOrcamento({ detalhe: d, aberta, aoFechar }: { detalhe: Deta
     mutationFn: () => sosResponderOrcamento(c.id, false, { observacao: final || null }),
     onSuccess: (novo) => {
       atualizar(novo)
-      toast.ok('Orçamento recusado', 'O mecânico e a Tecnoar foram avisados.')
+      toast.ok('Orçamento recusado', 'O especialista e a Tecnoar foram avisados.')
       aoFechar()
     },
     onSettled: () => (travado.current = false),
@@ -215,7 +215,7 @@ export function FolhaOrcamento({ detalhe: d, aberta, aoFechar }: { detalhe: Deta
     : c.orcamento_desatualizado
       ? 'A aprovação volta assim que o orçamento atualizado chegar.'
       : !online
-        ? 'Sem internet. A resposta precisa de conexão para chegar ao mecânico.'
+        ? 'Sem internet. A resposta precisa de conexão para chegar ao especialista.'
         : null
 
   const ocupado = aprovar.isPending || recusar.isPending
@@ -228,9 +228,9 @@ export function FolhaOrcamento({ detalhe: d, aberta, aoFechar }: { detalhe: Deta
         titulo={etapa === 'recusar' ? 'Recusar o orçamento?' : 'Orçamento do atendimento'}
         descricao={
           etapa === 'recusar'
-            ? 'O mecânico e a Tecnoar recebem sua resposta na hora. Se quiser, conte o motivo.'
+            ? 'O especialista e a Tecnoar recebem sua resposta na hora. Se quiser, conte o motivo.'
             : podeResponder
-              ? 'Confira os itens e responda. O mecânico aguarda sua resposta para seguir.'
+              ? 'Confira os itens e responda. O especialista aguarda sua resposta para seguir.'
               : subtituloResposta(c)
         }
         rodape={
@@ -302,7 +302,7 @@ export function FolhaOrcamento({ detalhe: d, aberta, aoFechar }: { detalhe: Deta
           <div className="sos-chip flex items-center justify-between gap-3 rounded-2xl px-4 py-3">
             <span className="min-w-0">
               <span className="block truncate text-[12px] font-semibold text-ink-3">{c.protocolo}</span>
-              <span className="block truncate text-[13px] text-ink-2">{d.mecanico?.nome ? `Mecânico: ${d.mecanico.nome}` : 'Atendimento Tecnoar'}</span>
+              <span className="block truncate text-[13px] text-ink-2">{d.mecanico?.nome ? `Especialista: ${d.mecanico.nome}` : 'Atendimento Tecnoar'}</span>
             </span>
             <span className="num shrink-0 font-display text-[22px] font-black text-ink">{moeda(total)}</span>
           </div>
@@ -358,16 +358,20 @@ function ConteudoOrcamento({ detalhe: d, total, soma }: { detalhe: DetalheChamad
       {c.orcamento_desatualizado && (
         <Faixa tom="atencao" icone={AlertTriangle}>
           {c.orcamento_status === 'pendente'
-            ? `Os itens mudaram depois do envio${diferenca ? `: agora somam ${moeda(soma)}` : ''}. O mecânico precisa reenviar o orçamento.`
-            : `Os itens mudaram depois da sua resposta${diferenca ? ` e agora somam ${moeda(soma)}` : ''}. O mecânico pode enviar um orçamento novo.`}
+            ? `Os itens mudaram depois do envio${diferenca ? `: agora somam ${moeda(soma)}` : ''}. O especialista precisa reenviar o orçamento.`
+            : /* Desde 20261007 isto não é só um aviso: a aprovação anterior
+                 deixou de autorizar o serviço, e o banco recusa continuar sem
+                 uma nova. Dizer "o especialista pode enviar" soava opcional. */
+              `O que você aprovou mudou${diferenca ? ` e agora soma ${moeda(soma)}` : ''}. ` +
+              'Sua aprovação anterior vale só para o que você viu: o serviço continua quando você aprovar o orçamento atualizado.'}
         </Faixa>
       )}
 
       {nota && (
         <div className="flex items-start gap-3">
-          <Avatar nome={autor ?? 'Mecânico'} url={autor === d.mecanico?.nome ? d.mecanico?.avatar_url : null} tamanho="sm" />
+          <Avatar nome={autor ?? 'Especialista'} url={autor === d.mecanico?.nome ? d.mecanico?.avatar_url : null} tamanho="sm" />
           <div className="sos-chip min-w-0 flex-1 rounded-2xl rounded-tl-md px-3.5 py-2.5">
-            <p className="text-[11.5px] font-semibold text-ink-3">{autor ? `${autor.split(' ')[0]} · recado do mecânico` : 'Recado do mecânico'}</p>
+            <p className="text-[11.5px] font-semibold text-ink-3">{autor ? `${autor.split(' ')[0]} · recado do especialista` : 'Recado do especialista'}</p>
             <p className="mt-0.5 text-[14px] leading-relaxed whitespace-pre-line text-ink">{nota}</p>
           </div>
         </div>
@@ -398,7 +402,7 @@ function ConteudoOrcamento({ detalhe: d, total, soma }: { detalhe: DetalheChamad
               <LinhaItem key={i.id} item={i} />
             ))}
           </ul>
-          <p className="mt-1.5 px-1 text-[12px] leading-snug text-ink-3">Calculada pela distância percorrida até o seu veículo, lançada automaticamente na chegada do mecânico.</p>
+          <p className="mt-1.5 px-1 text-[12px] leading-snug text-ink-3">Calculada pela distância percorrida até o seu veículo, lançada automaticamente na chegada do especialista.</p>
         </section>
       )}
 

@@ -7,7 +7,7 @@ import { EsqueletoM, SecaoM } from './ui'
 
 /**
  * Histórico do veículo / últimas OS na Tecnoar. Só aparece quando há o que
- * mostrar (e quando o perfil do mecânico enxerga as OS no Checklist).
+ * mostrar (e quando o perfil do especialista enxerga as OS no Checklist).
  */
 export function HistoricoVeiculo({ veiculoId, osAtualId }: { veiculoId: string | null | undefined; osAtualId?: string | null }) {
   const hist = useHistoricoVeiculo(veiculoId, osAtualId)

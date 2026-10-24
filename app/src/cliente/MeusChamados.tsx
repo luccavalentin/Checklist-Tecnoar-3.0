@@ -37,9 +37,10 @@ export function ListaSocorros() {
   if (lista.length === 0)
     return (
       <VazioApp
+            arte="historico"
         icone={Siren}
         titulo="Nenhum socorro pedido"
-        descricao="Quando precisar, o botão SOS chama a Tecnoar e você acompanha o mecânico chegando pelo mapa."
+        descricao="Quando precisar, o botão SOS chama a Tecnoar e você acompanha o especialista chegando pelo mapa."
         acao={
           <BotaoApp variante="sos" icone={Siren} onClick={() => navegar('/sos')}>
             Pedir socorro

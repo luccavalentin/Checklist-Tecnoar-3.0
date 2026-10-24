@@ -1,5 +1,5 @@
 /**
- * Ondas sobre o mapa enquanto a Tecnoar procura o mecânico. Dá a sensação
+ * Ondas sobre o mapa enquanto a Tecnoar procura o especialista. Dá a sensação
  * certa: "estão procurando por você agora", não "travou". Com movimento
  * reduzido no aparelho, as ondas ficam paradas.
  */

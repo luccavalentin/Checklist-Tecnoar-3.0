@@ -44,9 +44,15 @@ export function mascaraCEP(v: string): string {
 }
 
 export function mascaraTelefone(v: string): string {
-  const d = somenteDigitos(v).slice(0, 11)
-  if (d.length <= 10) return d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d{1,4})$/, '$1-$2')
-  return d.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2')
+  const digitos = somenteDigitos(v)
+  // Aceita também números brasileiros colados com o código +55.
+  const nacional = (digitos.length === 12 || digitos.length === 13) && digitos.startsWith('55') ? digitos.slice(2) : digitos
+  const d = nacional.slice(0, 11)
+  if (!d) return ''
+  if (d.length <= 2) return `(${d}`
+  const numero = d.slice(2)
+  const corte = numero.length > 8 ? 5 : 4
+  return `(${d.slice(0, 2)}) ${numero.slice(0, corte)}${numero.length > corte ? `-${numero.slice(corte)}` : ''}`
 }
 
 export function mascaraPlaca(v: string): string {

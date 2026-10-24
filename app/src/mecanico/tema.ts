@@ -1,9 +1,9 @@
 import { useLayoutEffect } from 'react'
 
 /**
- * Tema do app do mecânico.
+ * Tema do app do especialista.
  *
- * Usa o mesmo tema escolhido no app. Cliente e mecânico precisam alternar
+ * Usa o mesmo tema escolhido no app. Cliente e especialista precisam alternar
  * claro/escuro de forma previsível, sem uma tela forçar outra aparência.
  */
 
@@ -35,7 +35,7 @@ export function aplicarTemaMecanico(t: TemaMecanico) {
 }
 
 /**
- * Garante que as telas do mecânico acompanhem o tema salvo antes do primeiro
+ * Garante que as telas do especialista acompanhem o tema salvo antes do primeiro
  * desenho visível.
  */
 export function useTemaMecanico() {

@@ -33,7 +33,7 @@ export function resumoOrcamento(d: DetalheChamado): { texto: string; estado: 'fe
  *
  * `aviso`: o banco recusou o "iniciar serviço" porque falta a aprovação.
  * `travado`: a chegada ainda está guardada no aparelho (sem sinal); o banco
- * só aceita orçamento com o mecânico no local.
+ * só aceita orçamento com o especialista no local.
  */
 export const CartaoOrcamento = forwardRef<HTMLElement, { d: DetalheChamado; aviso?: string | null; travado?: boolean }>(function CartaoOrcamento(
   { d, aviso, travado },

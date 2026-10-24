@@ -4,6 +4,8 @@ import { ChevronLeft, ChevronRight, Ellipsis, Brain, type LucideIcon } from 'luc
 import { cn } from '@/lib/utils'
 import { Folha } from '../../comum/ui'
 import { useHomeCliente } from '../dados'
+import { Arte } from '../../comum/Arte'
+import { ARTE3D, ARTE_MOBILE } from '../../comum/kit3d'
 
 /**
  * Peças da Tecno IA usadas pelos dois modos — a conversa com a IA e o guia
@@ -15,6 +17,7 @@ import { useHomeCliente } from '../dados'
 
 export interface OpcaoMenuIA {
   rotulo: string
+  peca?: string
   descricao?: string
   icone: LucideIcon
   aoEscolher?: () => void
@@ -47,7 +50,7 @@ export function MolduraIA({
   }
 
   return (
-    <div className="cli-palco">
+    <div className="cli-palco tecno-ia-mobile">
       <div className="cli-coluna">
       <header className="tecno-ia-header sticky top-0 z-30 pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))]">
         <div className="mx-auto flex min-h-[4.2rem] max-w-2xl items-center gap-2 px-2 pr-[max(0.5rem,env(safe-area-inset-right))] pl-[max(0.5rem,env(safe-area-inset-left))]">
@@ -84,7 +87,7 @@ export function MolduraIA({
             const conteudo = (
               <>
               <span className="flex size-10 shrink-0 items-center justify-center rounded-[1rem] bg-accent-soft text-accent">
-                  <Icone className="size-5" />
+                  <Arte src={o.peca ?? (o.href ? ARTE3D.ligar : /Conversar/.test(o.rotulo) ? ARTE3D.ia : /guia|Nova conversa/.test(o.rotulo) ? ARTE3D.historico : ARTE3D.revisoes)} alt="" recuo={<Icone className="size-5" />} classeImagem="size-10 object-contain" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-[15px] font-semibold text-ink">{o.rotulo}</span>
@@ -134,10 +137,9 @@ export function BotaoSOSTopo() {
       type="button"
       onClick={() => navegar(ativo ? `/chamado/${ativo.id}` : '/sos')}
       aria-label={ativo ? 'Acompanhar o socorro em andamento' : 'Pedir socorro (SOS)'}
-      className="sos-siren-action flex h-11 shrink-0 items-center gap-1.5 rounded-full px-3.5 font-display text-[15px] font-semibold text-white active:scale-95"
+      className="tecno-ia-sos-distintivo flex size-14 shrink-0 items-center justify-center rounded-full active:scale-95"
     >
-      <span className={cn('size-2 rounded-full bg-white', ativo && 'sos-piscar')} aria-hidden />
-      {ativo ? 'Ao vivo' : 'SOS'}
+      <Arte src={ARTE_MOBILE.seloSOS} alt="" recuo={<span className="rounded-full bg-[#ff6600] px-3 py-2 font-bold text-white">{ativo ? 'Ao vivo' : 'SOS'}</span>} classeImagem="size-14 object-contain" />
     </button>
   )
 }
@@ -154,7 +156,7 @@ export function AvatarIA({ grande, className }: { grande?: boolean; className?: 
         className,
       )}
     >
-      <Brain className={grande ? 'size-7' : 'size-4'} />
+      <Arte src={ARTE_MOBILE.robo} alt="" recuo={<Brain className={grande ? 'size-7' : 'size-4'} />} classeImagem="tecno-ia-robo" />
     </span>
   )
 }
@@ -190,7 +192,7 @@ export function Digitando() {
       <AvatarIA />
       <div className="tecno-ia-bubble-ai flex h-11 items-center gap-1.5 rounded-[1.25rem] rounded-bl-md px-4">
         {[0, 1, 2].map((i) => (
-          <span key={i} className="size-2 animate-bounce rounded-full bg-ink-3" style={{ animationDelay: `${i * 120}ms` }} />
+          <span key={i} className="size-2 animate-pulse rounded-full bg-ink-3" style={{ animationDelay: `${i * 120}ms` }} />
         ))}
       </div>
     </div>

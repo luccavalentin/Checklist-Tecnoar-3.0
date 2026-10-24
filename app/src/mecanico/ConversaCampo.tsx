@@ -6,11 +6,13 @@ import { MENSAGENS_RAPIDAS_MECANICO, STATUS_ENCERRADOS, horaCurta } from '@/sos/
 import type { DetalheChamado } from '@/sos/tipos'
 import { useMecanico } from '../sessao'
 import { descartarAcao, enviarAcao, tentarDeNovo, useFilaChamado, type AcaoFila } from './filaOffline'
+import { Arte } from '../comum/Arte'
+import { ARTE_MOBILE } from '../comum/kit3d'
 
-const PAPEL: Record<string, string> = { cliente: 'Cliente', mecanico: 'Mecânico', central: 'Central', sistema: 'Sistema' }
+const PAPEL: Record<string, string> = { cliente: 'Cliente', mecanico: 'Especialista', central: 'Central', sistema: 'Sistema' }
 
 /**
- * Conversa do mecânico com o cliente. Igual à do cliente, com uma diferença
+ * Conversa do especialista com o cliente. Igual à do cliente, com uma diferença
  * que importa na estrada: sem sinal a mensagem não se perde — aparece na
  * conversa como "aguardando sinal" e sai sozinha quando a internet voltar.
  * Os atalhos são grandes: quem escreve de luva precisa de um toque.
@@ -88,7 +90,7 @@ export function ConversaCampo({ d }: { d: DetalheChamado }) {
         <p className="rounded-lg bg-surface-2 px-3 py-2 text-center text-[12.5px] text-ink-3">Chamado encerrado: a conversa foi fechada.</p>
       ) : (
         <>
-          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]" aria-label="Mensagens rápidas">
+          <div className="mec-chat-rapidas -mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]" aria-label="Mensagens rápidas">
             {MENSAGENS_RAPIDAS_MECANICO.map((r) => (
               <button
                 key={r}
@@ -126,9 +128,9 @@ export function ConversaCampo({ d }: { d: DetalheChamado }) {
               type="submit"
               aria-label="Enviar"
               disabled={!texto.trim()}
-              className="flex size-12 shrink-0 items-center justify-center rounded-full bg-accent text-on-accent shadow-accent transition-transform active:scale-95 disabled:opacity-40"
+              className="mec-chat-enviar flex size-12 shrink-0 items-center justify-center rounded-full transition-transform active:scale-95 disabled:opacity-40"
             >
-              <Send className="size-5" />
+              <Arte src={ARTE_MOBILE.enviar} alt="" classeImagem="size-10 object-contain" recuo={<Send className="size-5" />} />
             </button>
           </form>
           {erro && <p className="text-[12.5px] font-medium text-crit-ink">{erro}</p>}

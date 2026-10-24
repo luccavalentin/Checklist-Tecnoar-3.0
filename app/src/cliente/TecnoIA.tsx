@@ -92,7 +92,7 @@ export function TecnoIA() {
   // A IA foi desligada na central enquanto a escolha era "IA": guia.
   const modo: Modo | null = escolha === 'ia' && ia.isSuccess && !iaLigada ? 'guia' : escolha
   const tel = linkTelefone(info.data?.telefone)
-  const ligar: OpcaoMenuIA = { rotulo: 'Ligar para a Tecnoar', descricao: 'Fale com um mecânico da central', icone: PhoneCall, href: tel, desativada: !tel }
+  const ligar: OpcaoMenuIA = { rotulo: 'Ligar para a Tecnoar', descricao: 'Fale com um especialista da central', icone: PhoneCall, href: tel, desativada: !tel }
 
   const opcoes: OpcaoMenuIA[] =
     modo === 'ia'

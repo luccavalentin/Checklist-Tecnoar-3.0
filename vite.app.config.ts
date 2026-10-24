@@ -69,7 +69,7 @@ export default defineConfig({
       injectRegister: false,
       filename: 'sw.js',
       scope: '/',
-      includeAssets: ['icone-64.png', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.ico', 'favicon-32.png', 'icone-64.png', 'apple-touch-icon.png'],
       manifest: {
         id: '/',
         name: 'SOS Tecnoar',
@@ -116,7 +116,7 @@ export default defineConfig({
         // Push e clique em notificação (ver `notificacoesDoSOS` acima).
         importScripts: ['/sw-notificacoes.js'],
         cleanupOutdatedCaches: true,
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,webp,woff2}'],
         // Gerador de PDF (~1,8 MB): baixa no primeiro laudo/relatório, não na instalação.
         // Aberturas do iPhone e capturas da loja não entram no pacote de
         // instalação: o sistema lê cada uma só quando precisa.

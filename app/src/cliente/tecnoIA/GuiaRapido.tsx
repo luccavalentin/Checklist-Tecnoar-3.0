@@ -23,6 +23,8 @@ import { BotaoApp, Tela } from '../../comum/ui'
 import { primeiroNome, useInfoPublica, type EstadoAgendar, type EstadoFluxoSOS } from '../dados'
 import { GRAVIDADES, NOS, SINTOMAS, type Gravidade, type NoPergunta, type NoResultado, type OpcaoResposta, type Sintoma } from './arvore'
 import { AvatarIA, BalaoIA, BalaoVoce, Digitando } from './pecasIA'
+import { Arte } from '../../comum/Arte'
+import { ARTE3D, PECA_SINTOMA } from '../../comum/kit3d'
 
 interface Passo {
   no: NoPergunta
@@ -40,7 +42,7 @@ const ESPERA_MS = 520
  * O motorista escolhe o sintoma e responde de duas a quatro perguntas com um
  * toque. No fim: gravidade clara (seguir / cautela / parar), o que fazer
  * agora e o que NÃO fazer — e, se for o caso, o SOS já sai com o problema
- * escolhido e as respostas anexadas para o mecânico.
+ * escolhido e as respostas anexadas para o especialista.
  */
 export function GuiaRapido({ aviso, aoConversarIA }: { aviso?: ReactNode; aoConversarIA?: () => void }) {
   const { conta } = useCliente()
@@ -148,7 +150,7 @@ export function GuiaRapido({ aviso, aoConversarIA }: { aviso?: ReactNode; aoConv
         <AvatarIA grande />
         <div className="min-w-0 flex-1">
           <p className="font-display text-[17px] leading-tight font-bold text-ink">Guia rápido em 1 minuto</p>
-          <p className="mt-0.5 text-[13px] leading-snug text-ink-2">Feito com a experiência dos mecânicos da Tecnoar. Funciona até sem internet.</p>
+          <p className="mt-0.5 text-[13px] leading-snug text-ink-2">Feito com a experiência dos especialistas da Tecnoar. Funciona até sem internet.</p>
         </div>
         {sintoma && (
           <button
@@ -166,7 +168,7 @@ export function GuiaRapido({ aviso, aoConversarIA }: { aviso?: ReactNode; aoConv
           onClick={aoConversarIA}
           className="flex min-h-14 items-center gap-3 rounded-[1.25rem] border border-line bg-surface px-4 py-3 text-left active:scale-[0.99]"
         >
-          <Brain className="size-5 shrink-0 text-accent-ink" />
+          <Arte src={ARTE3D.ia} alt="" recuo={<Brain className="size-5 shrink-0 text-accent-ink" />} classeImagem="size-10 shrink-0 object-contain" />
           <span className="min-w-0 flex-1">
             <span className="block text-[14.5px] font-bold text-ink">Prefere descrever com suas palavras?</span>
             <span className="block text-[12.5px] text-ink-3">Converse com a Tecno IA e mande foto do problema.</span>
@@ -175,7 +177,7 @@ export function GuiaRapido({ aviso, aoConversarIA }: { aviso?: ReactNode; aoConv
       )}
       <p className="flex items-start gap-2 rounded-xl bg-surface-2 px-3.5 py-2.5 text-[12.5px] leading-snug text-ink-2">
         <Info className="mt-0.5 size-4 shrink-0 text-ink-3" />
-        É uma triagem automática e não substitui a avaliação de um mecânico. Se você estiver em perigo, pare em local seguro e toque em SOS.
+        É uma triagem automática e não substitui a avaliação de um especialista. Se você estiver em perigo, pare em local seguro e toque em SOS.
       </p>
 
       <div className="flex flex-col gap-3 pt-1" aria-live="polite">
@@ -196,9 +198,7 @@ export function GuiaRapido({ aviso, aoConversarIA }: { aviso?: ReactNode; aoConv
                   onClick={() => escolherSintoma(s)}
                   className="flex min-h-[7.25rem] flex-col items-start gap-2 rounded-[1.25rem] border border-line bg-surface p-3 text-left transition-transform active:scale-[0.97]"
                 >
-                  <span className="flex size-10 items-center justify-center rounded-xl bg-accent-soft text-accent-ink">
-                    <Icone className="size-5" />
-                  </span>
+                  <Arte src={PECA_SINTOMA[s.id]} alt="" recuo={<span className="flex size-14 items-center justify-center rounded-xl bg-accent-soft text-accent-ink"><Icone className="size-7" /></span>} classeImagem="guia-sintoma-3d size-16 object-contain" />
                   <span className="text-[14px] leading-tight font-bold text-ink">{s.rotulo}</span>
                   <span className="text-[11.5px] leading-snug text-ink-3">{s.descricao}</span>
                 </button>
@@ -379,15 +379,15 @@ function CartaoResultado({
           )}
           {telefone && (
             <a href={telefone} className="flex min-h-11 items-center justify-center gap-2 text-[14px] font-semibold text-ink-2">
-              <PhoneCall className="size-4" /> Falar com um mecânico da Tecnoar
+              <Arte src={ARTE3D.ligar} alt="" recuo={<PhoneCall className="size-4" />} classeImagem="size-7 object-contain" /> Falar com um especialista da Tecnoar
             </a>
           )}
           <button type="button" onClick={aoRecomecar} className="flex min-h-11 items-center justify-center gap-2 text-[13.5px] font-semibold text-ink-3">
-            <RotateCcw className="size-4" /> Fazer outro diagnóstico
+            <Arte src={ARTE3D.historico} alt="" recuo={<RotateCcw className="size-4" />} classeImagem="size-7 object-contain" /> Fazer outro diagnóstico
           </button>
         </div>
         <p className="border-t border-line pt-3 text-[11.5px] leading-snug text-ink-3">
-          Orientação automática com base nas suas respostas. Não substitui a avaliação de um mecânico. Na dúvida, pare em local seguro.
+          Orientação automática com base nas suas respostas. Não substitui a avaliação de um especialista. Na dúvida, pare em local seguro.
         </p>
       </div>
     </article>

@@ -72,7 +72,7 @@ export interface EstadoFila {
 const PREFIXO = 'sos.fila.v1'
 /** Sem resposta neste tempo, o pedido conta como "sem sinal" e volta para a fila. */
 const PRAZO_MS = 20_000
-/** Com o dedo no botão, espera menos: sinal fraco vira "guardado" e o mecânico segue. */
+/** Com o dedo no botão, espera menos: sinal fraco vira "guardado" e o especialista segue. */
 const PRAZO_TOQUE_MS = 12_000
 const INTERVALO_MS = 20_000
 
@@ -286,7 +286,15 @@ function aoConcluir(a: AcaoFila, resposta: unknown) {
                   midia_caminho: null,
                   midia_tipo: null,
                   rapida: a.rapida,
+                  // Saiu da fila agora: existe no banco, mas ninguém do outro
+                  // lado confirmou nada ainda. Um tique.
+                  entregue_em: null,
                   lida_em: null,
+                  apagada_em: null,
+                  responde_a: null,
+                  duracao_seg: null,
+                  local_lat: null,
+                  local_lng: null,
                   created_at: new Date().toISOString(),
                 },
               ],
@@ -304,7 +312,7 @@ function aoConcluir(a: AcaoFila, resposta: unknown) {
 
 /**
  * A central finalizou antes de a finalização guardada sair: o texto do
- * mecânico não se perde — entra onde o banco ainda está vazio.
+ * especialista não se perde — entra onde o banco ainda está vazio.
  */
 async function aproveitarTexto(a: AcaoFila) {
   if (a.tipo !== 'avancar' || a.status !== 'servico_finalizado' || !a.dados) return
@@ -562,7 +570,7 @@ export function rotuloAcao(a: AcaoFila): string {
 
 /**
  * O chamado como vai ficar quando a fila sair: a etapa guardada já vale na
- * tela (sem sinal, o mecânico continua o atendimento). Para na primeira etapa
+ * tela (sem sinal, o especialista continua o atendimento). Para na primeira etapa
  * parada por erro — dali em diante, vale o que o banco diz.
  */
 export function aplicarFila(d: DetalheChamado, acoes: AcaoFila[]): DetalheChamado {

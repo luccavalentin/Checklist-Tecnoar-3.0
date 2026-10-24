@@ -1,0 +1,287 @@
+/* Mobile Tecnoar · referências do cliente, 23/10/2026.
+   Fotos e peças são decoração; dados e controles continuam HTML nativo. */
+:root {
+  --metal-mobile: linear-gradient(135deg, #9baec1 0%, #275170 23%, #007ab0 53%, #304158 82%, #ff7a16 100%);
+  --painel-mobile: linear-gradient(125deg, #19334b, #06192c 48%, #09192a 80%, #243043);
+}
+.dark .cli-premium { background: #03101e; }
+.cli-premium :is(button, a, input, textarea) { touch-action: manipulation; }
+.cli-premium :is(input, textarea), .sos-login-shell input { caret-color: #ff8a3d; }
+.cli-premium ::selection, .sos-login-shell ::selection { color: #03101e; background: #72dcff; }
+
+/* A estrada ocupa o topo do telefone e desaparece sob os controles. */
+.ini-app.ini-premium { justify-content: flex-start; }
+.dark .ini-app.ini-premium {
+  --i-fundo: #03101e;
+  --i-cartao: #0b2135;
+  --i-chip: #102b43;
+  --i-texto-3: #afc5dc;
+  background: #03101e;
+}
+.ini-app.ini-premium::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 50%;
+  width: min(100%, 560px);
+  height: 500px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: linear-gradient(180deg, #03101e20 35%, #03101e80 65%, #03101e 100%), url('/sos/mobile-3d/estrada.webp') center top / 100% auto no-repeat;
+}
+:root:not(.dark) .ini-app.ini-premium::before {
+  opacity: 1;
+  mask-image: none;
+  background: linear-gradient(180deg, #03101e10 20%, #03101e99 48%, #03101ed9 68%, #f5f7fb 100%), url('/sos/mobile-3d/estrada.webp') center top / 100% auto no-repeat;
+}
+:root:not(.dark) .ini-app.ini-premium .ini-chamada { color: #fff; text-shadow: 0 3px 14px #000; }
+:root:not(.dark) .ini-app.ini-premium .ini-chamada span { color: #ff9a4d; }
+.ini-app.ini-premium .ini-topo { min-height: 76px; padding-inline: max(18px, env(safe-area-inset-left)); }
+.ini-app.ini-premium .ini-botao {
+  width: 44px;
+  height: 44px;
+  border: 1px solid #658cae88;
+  background: linear-gradient(140deg, #234665e8, #061626e8);
+  box-shadow: inset 0 1px 1px #c9ecff38, 0 6px 14px -10px #000;
+}
+.ini-app.ini-premium .ini-topo-peca { width: 32px; height: 32px; object-fit: contain; }
+.ini-app.ini-premium .ini-avatar { color: #fff; }
+.ini-app.ini-premium .ini-palco { flex: 0 0 auto; padding-inline: 18px; }
+.ini-cena-estrada { width: 100%; height: clamp(100px, 13svh, 130px); pointer-events: none; }
+.ini-app.ini-premium .ini-chamada { font-size: clamp(28px, 7.7vw, 36px); line-height: 1.04; font-weight: 800; letter-spacing: -.035em; }
+.dark .ini-app.ini-premium .ini-chamada { text-shadow: 0 3px 16px #000; }
+.ini-app.ini-premium .ini-beacon { width: clamp(172px, 21svh, 200px); margin: 8px 0 6px; }
+.ini-app.ini-premium .ini-beacon.b3d-pronto {
+  animation: b3d-coracao 1.65s cubic-bezier(.22, .61, .36, 1) infinite;
+  transform-origin: center;
+}
+.ini-app.ini-premium .ini-beacon.b3d-pronto .b3d-brilho {
+  animation: b3d-coracao-luz 1.65s ease-out infinite;
+}
+.ini-app.ini-premium .ini-beacon[data-motion-paused='true'],
+.ini-app.ini-premium .ini-beacon[data-motion-paused='true'] * { animation-play-state: paused; }
+@keyframes b3d-coracao {
+  0%, 38%, 100% { scale: 1; }
+  10% { scale: 1.075; }
+  19% { scale: 1; }
+  27% { scale: 1.045; }
+}
+@keyframes b3d-coracao-luz {
+  0%, 38%, 100% { opacity: .28; }
+  10% { opacity: .6; }
+  19% { opacity: .3; }
+  27% { opacity: .48; }
+}
+/* O mesmo objeto e a mesma batida no atalho central da navegação. */
+#raiz .cli-premium .sos-menu-3d {
+  width: 64px;
+  height: 66px;
+  margin-top: -17px;
+  flex-shrink: 0;
+}
+#raiz .cli-premium .sos-menu-3d.b3d-pronto { animation: b3d-coracao 1.65s cubic-bezier(.22, .61, .36, 1) infinite; }
+#raiz .cli-premium .sos-menu-3d .b3d-letras { gap: 2px; }
+#raiz .cli-premium .sos-menu-3d .b3d-sos { font-size: 13px; }
+#raiz .cli-premium .sos-menu-3d.b3d-vivo .b3d-sos { font-size: 8px; }
+#raiz .cli-premium .sos-menu-3d .b3d-brilho { width: 108%; filter: blur(14px); animation: b3d-coracao-luz 1.65s ease-out infinite; }
+#raiz .cli-premium .sos-menu-3d .b3d-onda { display: none; }
+#raiz .cli-premium .sos-menu-3d[data-motion-paused='true'],
+#raiz .cli-premium .sos-menu-3d[data-motion-paused='true'] * { animation-play-state: paused; }
+#raiz .sos-agendar-render { min-height: 48px; padding: 0; background: transparent; border: 0; box-shadow: none; }
+.acao-agendar-imagem { width: 100%; max-width: 320px; height: auto; object-fit: contain; }
+.vei-ficha-acoes .sos-agendar-render { flex: 0 1 150px; width: 150px; max-width: 58%; min-width: 0; }
+.vei-ficha-acoes .sos-agendar-render .acao-agendar-imagem { width: 150px; max-width: 100%; }
+/* Abas com a mesma linguagem de metal, verniz laranja e canais ciano. */
+#raiz .historico-filtros-3d { background: transparent; padding: 0; gap: 9px; box-shadow: none; border: 0; border-radius: 0; }
+#raiz .historico-filtros-3d [role='tab'] {
+  position: relative;
+  isolation: isolate;
+  min-height: 52px;
+  padding: 6px;
+  border: 2px solid #247ca0;
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(145deg, #c9d4df, #344250 20%, #071d31 43%, #162d42 75%, #83dfff);
+  box-shadow: inset 0 1px 1px #fff9, 0 5px 10px -7px #001b36;
+  font-size: 13px;
+  text-shadow: 0 1px 2px #3b1b00;
+}
+#raiz .historico-filtros-3d [role='tab']::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 4px;
+  border: 1px solid #ffd98b;
+  border-radius: 12px;
+  background: linear-gradient(165deg, #ffb52d, #ff7908 44%, #db4400 92%);
+  box-shadow: inset 0 2px 2px #fff3b999, inset 0 -2px 3px #8b2d0088;
+}
+#raiz .historico-filtros-3d [role='tab'][aria-selected='true'] { border-color: #00c9ff; box-shadow: inset 0 1px 2px #fff, 0 5px 12px -7px #ff6600; }
+#raiz .historico-filtros-3d [role='tab'][aria-selected='true']::before { background: linear-gradient(165deg, #ffbe3c, #ff860e 44%, #ed5600); }
+#raiz .historico-filtros-3d [role='tab']:active { transform: scale(.97); }
+#raiz .historico-filtros-3d [role='tab']:focus-visible { outline: 3px solid #007fb3; outline-offset: 3px; }
+.ini-app.ini-premium .ini-sos-descricao { font-size: 19px; line-height: 1.2; font-weight: 700; }
+.ini-app.ini-premium .ini-prontidao { margin-top: 4px; font-size: 13px; }
+.ini-app.ini-premium .ini-contatos { display: grid; grid-template-columns: 1.2fr 1fr; gap: 9px; width: 100%; margin-top: 12px; }
+.ini-app.ini-premium .ini-contatos .ini-ligar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  margin: 0;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid #8c9eae;
+  border-radius: 15px;
+  color: var(--i-texto);
+  background: var(--i-cartao);
+}
+.dark .ini-app.ini-premium .ini-contatos .ini-ligar { color: #fff; background: var(--painel-mobile); border-color: #6284a0; box-shadow: inset 0 1px 2px #c9eaff24, 0 6px 16px -12px #ff6600; }
+.ini-app.ini-premium .ini-contatos .ini-ligar:last-child { border-color: #00afef; }
+.ini-app.ini-premium .ini-contato-peca { width: 29px; height: 29px; object-fit: contain; }
+.ini-app.ini-premium .ini-rodape { gap: 9px; padding: 12px 18px calc(98px + env(safe-area-inset-bottom)); }
+.ini-app.ini-premium :is(.ini-veiculo, .ini-pastilha) { border: 1px solid #3f617e; box-shadow: none; }
+.dark .ini-app.ini-premium :is(.ini-veiculo, .ini-pastilha) { background: var(--painel-mobile); box-shadow: inset 0 1px 1px #b8eaff26, 0 6px 18px -16px #00afef; }
+.ini-app.ini-premium .ini-veiculo { min-height: 62px; padding: 8px 12px; border-radius: 16px; }
+.ini-app.ini-premium .ini-veiculo-icone { width: 48px; height: 44px; background: transparent; }
+.ini-app.ini-premium .ini-veiculo-icone img { width: 46px; height: 42px; object-fit: contain; }
+.ini-app.ini-premium .ini-pastilha { min-height: 100px; padding: 9px; }
+.ini-app.ini-premium .ini-pastilha-peca { width: 36px; height: 36px; filter: none; opacity: 1; object-fit: contain; }
+.ini-app.ini-premium .ini-pastilha-nome { margin-top: 5px; font-size: 14px; }
+.ini-app.ini-premium .ini-pastilha-texto { font-size: 11px; line-height: 1.3; }
+#raiz .cli-premium .cli-nav { border-radius: 24px; }
+.dark #raiz .cli-premium .cli-nav { background: var(--painel-mobile); border: 1px solid #4580a1; box-shadow: inset 0 1px 2px #d3f0ff33, 0 12px 28px -14px #000; }
+#raiz .cli-premium .cli-nav .nav-peca { width: 31px; height: 31px; object-fit: contain; }
+.cli-premium .cli-nav a { gap: 3px; }
+.cli-premium .cli-nav a[aria-current='page'] .nav-peca { filter: none; opacity: 1; }
+.dark .cli-premium .cli-nav a[aria-current='page'] { color: #ff9a4d !important; }
+
+/* Acesso: campos com 16px evitam o zoom involuntário do Safari. */
+.sos-login-shell, .dark .sos-login-shell {
+  background: linear-gradient(180deg, #03101e0a, #03101e30 24%, #03101ee8 70%, #03101e), url('/sos/mobile-3d/oficina.webp') center top / cover no-repeat;
+}
+.sos-login-shell::before { opacity: .16; }
+.sos-login-shell .sos-login-frame { max-width: 480px; margin-inline: auto; padding-inline: max(16px, env(safe-area-inset-left)); }
+.sos-login-shell .sos-login-brand { min-height: 190px; padding-block: 26px 20px; }
+.sos-login-shell .sos-login-brand .sos-login-logo { height: clamp(100px, 17svh, 150px) !important; }
+.sos-login-shell .sos-login-lema { font-size: 14px; }
+.sos-login-shell .sos-login-topo { margin-bottom: 16px; }
+.sos-login-shell .sos-canais-acesso { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; width: 100%; }
+.sos-login-shell .sos-canais-acesso > a { width: 100%; height: auto; min-height: 62px; padding: 6px 8px; gap: 8px; border: 1px solid #3478a5; border-radius: 19px; background: var(--painel-mobile); box-shadow: inset 0 1px 2px #d3f0ff33, 0 8px 18px -14px #000; }
+.sos-login-shell .sos-canais-acesso > a:first-child { border-color: #d4833b; }
+.sos-login-shell .sos-emergencia-orb { width: 43px; height: 43px; flex-shrink: 0; background: transparent; box-shadow: none; animation: none; }
+.sos-login-shell .sos-emergencia-orb::before, .sos-login-shell .sos-emergencia-orb::after { display: none; }
+.sos-acesso-peca { width: 43px; height: 43px; object-fit: contain; }
+.sos-whatsapp-rotulo { display: flex; flex-direction: column; align-items: flex-start; color: #fff; line-height: 1.3; }
+.sos-whatsapp-rotulo > span { font-size: 11px; color: #b6cce5; }
+.sos-whatsapp-rotulo > strong { font-size: 17px; }
+.sos-login-shell .sos-login-cartao { padding: 22px 20px 10px; border: 1px solid #1687b2; border-radius: 25px; background: linear-gradient(125deg, #102a40f5, #031426f5 68%, #14314bf5); box-shadow: inset 0 1px 1px #d9f1ff38, 0 14px 32px -18px #000; color: #fff; }
+.sos-login-shell .sos-login-cartao h1 { font-size: 28px; font-weight: 750; color: #fff; }
+.sos-login-shell .sos-login-cartao .sos-login-sub { display: block; color: #b6cce5; font-size: 14px; line-height: 1.5; }
+.sos-login-shell .sos-login-cartao :is(label, .text-ink-2) { color: #c1d5eb; }
+.sos-login-shell .sos-login-cartao input { min-height: 52px; font-size: 16px; color: #fff; background: #031426; border-color: #217caa; }
+.sos-login-shell .sos-login-cartao input::placeholder { color: #a4bdd8; }
+.sos-login-shell .sos-login-cartao input:focus { outline-color: #70d5fa; }
+.sos-login-shell .sos-login-cartao button[type='submit'] { min-height: 54px; border: 1px solid #ffbd66; border-radius: 17px; color: #071626; font-size: 18px; background: linear-gradient(180deg, #ff951a, #ff6600 65%, #ed5100); box-shadow: inset 0 2px 2px #ffe6ac88, 0 8px 20px -12px #ff6600; }
+.sos-login-shell .sos-login-cartao a[href='/cadastro'] { color: #ff9a4d; }
+.sos-login-shell .sos-login-rodape { padding-top: 16px; margin-top: 0; }
+.sos-login-shell .sos-login-rodape a { min-height: 48px; border-color: #398db6; background: #081e31e8; }
+
+/* Conta: os dados verdadeiros ficam acima das preferências do aparelho. */
+.mobile-page-header > div { min-height: 104px; gap: 10px; }
+.mobile-page-header h1 { font-size: 27px; line-height: 1.12; white-space: normal; overflow: visible; letter-spacing: -.025em; }
+.mobile-page-header p { margin-top: 7px; font-size: 13px; }
+.mobile-header-peca { width: 66px; height: 66px; flex-shrink: 0; object-fit: contain; }
+.dark .cli-area-interna > .cli-coluna { background: #03101e; }
+.dark .cli-area-interna .mobile-page-header { background: linear-gradient(100deg, #06192cf5, #06192cb8), url('/sos/mobile-3d/oficina.webp') center 35% / cover; border-bottom: 1px solid #306183; }
+.dark .cli-area-interna :is(.sos-native-card, .sos-premium-list, main > section.border) { background: var(--painel-mobile); border-color: #355e7b; }
+.dark .cli-area-interna .sos-soft-action { background: #0b243b; }
+.dark .cli-area-interna .sos-motion-button.sos-premium-action { border: 1px solid #ffb65c; color: #071626; background: linear-gradient(#ff941a, #ff6600); box-shadow: inset 0 1px 2px #ffe8b078, 0 8px 18px -14px #ff6600; }
+.dark .cli-area-interna .vei { --v-cartao: #0b2135; --v-borda: #355e7b; --v-texto-3: #afc5dc; }
+.dark .cli-area-interna .vei-topo { background: linear-gradient(90deg, #03101ef5, #03101eb8), url('/sos/mobile-3d/oficina.webp') center 25% / cover; border-bottom: 1px solid #306183; }
+.dark .cli-area-interna .vei-ficha { background: var(--painel-mobile); border: 1px solid #486b89; border-radius: 20px; }
+.cli-area-interna .vei-ficha-arte {
+  position: relative;
+  top: auto;
+  right: auto;
+  width: 100%;
+  height: 132px;
+  max-width: none;
+  object-fit: contain;
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+.cli-area-interna .vei-ficha:has(.vei-ficha-arte[data-pronta]) :is(.vei-ficha-nome, .vei-ficha-detalhe) { max-width: none; }
+.cli-area-interna .vei-adicionar { min-height: 46px; }
+.conta-cabecalho { position: relative; }
+.conta-cabecalho > header { display: none; }
+.conta-abertura { position: relative; min-height: 146px; padding: calc(28px + env(safe-area-inset-top)) 24px 18px; overflow: hidden; }
+.conta-abertura h1 { position: relative; z-index: 1; font-size: 34px; line-height: 1.1; font-weight: 750; letter-spacing: -.03em; }
+.conta-abertura p { position: relative; z-index: 1; margin-top: 8px; max-width: 60%; color: var(--c-ink-3); font-size: 14px; line-height: 1.4; }
+.conta-abertura img { position: absolute; width: 196px; height: 168px; right: -12px; top: 0; object-fit: contain; pointer-events: none; }
+.dark .conta-abertura { background: linear-gradient(90deg, #03101e, #03101e75), url('/sos/mobile-3d/estrada.webp') center 20% / cover; }
+.dark .conta-abertura h1 { color: #fff; }
+.dark .conta-abertura p { color: #b6cce5; }
+.conta-mobile { gap: 14px; padding-top: 0; }
+.dark .conta-mobile > section { background: var(--painel-mobile); border-color: #355e7b; }
+.dark .conta-mobile .conta-identidade { border-color: #6591af; }
+.conta-mobile .conta-identidade { min-height: 88px; }
+.conta-mobile .conta-identidade { position: relative; gap: 12px; padding-right: 84px; }
+.conta-avatar-aro { display: grid; place-items: center; width: 64px; height: 64px; padding: 4px; flex-shrink: 0; border-radius: 50%; background: conic-gradient(from 35deg, #00c8ff, #0877a9 36%, #ff7c12 44%, #ffa142 52%, #bacbd9 60%, #1772a2 72%, #00c8ff); box-shadow: 0 6px 15px -9px #00afef; }
+.conta-avatar-aro > span { width: 100%; height: 100%; border: 2px solid #091c32; background: radial-gradient(circle at 30% 22%, #123d70, #001b4d 66%, #071426); color: #fff; font-size: 20px; }
+.conta-veiculo-canto { position: absolute; right: 10px; bottom: 12px; width: 68px; height: 64px; object-fit: contain; pointer-events: none; }
+.conta-mobile .conta-dados { border-radius: 20px; }
+.conta-dado-peca { width: 40px; height: 40px; border-radius: 12px; object-fit: contain; flex-shrink: 0; }
+.conta-lista-peca { width: 46px; height: 46px; border-radius: 12px; object-fit: contain; max-width: none; }
+.conta-mobile a:has(.conta-lista-peca) { min-height: 77px; }
+.conta-mobile a:has(.conta-lista-peca) > span:first-child { width: 46px; height: 46px; background: transparent; box-shadow: none; }
+.conta-mobile [role='radiogroup'] button { flex-direction: column; gap: 4px; min-height: 76px; padding-block: 8px; }
+.conta-mobile [role='radiogroup'] button > span { overflow: visible; text-overflow: clip; }
+
+/* Tecno IA: mesma oficina, robô e câmera fornecidos, sem alterar o chat. */
+.dark .tecno-ia-mobile { background: linear-gradient(#03101ee8, #03101ed9), url('/sos/mobile-3d/oficina.webp') center / cover fixed; }
+.dark .tecno-ia-mobile .cli-coluna { background: transparent; }
+.tecno-ia-robo { width: 100%; height: 100%; object-fit: contain; }
+.tecno-ia-mobile .tecno-ia-avatar { background: transparent; border: 0; box-shadow: none; }
+.tecno-ia-mobile .tecno-ia-boas-vindas { align-items: center; padding: 16px 12px; border: 1px solid #3f7b9b; border-radius: 22px; background: var(--painel-mobile); color: #fff; }
+.tecno-ia-mobile .tecno-ia-boas-vindas > .tecno-ia-avatar { width: 90px; height: 110px; }
+.tecno-ia-mobile .tecno-ia-boas-vindas .tecno-ia-bubble-ai { flex: 1; max-width: none; padding: 0; border: 0; background: transparent; box-shadow: none; color: #fff; font-size: 14px; line-height: 1.6; }
+.tecno-ia-mobile .tecno-ia-boas-vindas strong { color: #ff9a4d; }
+.tecno-ia-camera { width: 43px; height: 43px; object-fit: contain; }
+.tecno-ia-mobile button[aria-label='Enviar mensagem'] { background: transparent; box-shadow: none; border: 0; }
+.tecno-ia-mobile button[aria-label='Enviar mensagem']:disabled { opacity: .5; }
+.tecno-ia-mobile button[aria-label='Enviar mensagem']:focus-visible { outline: 3px solid #00afef; outline-offset: 2px; }
+
+@media (max-height: 740px) {
+  .ini-app.ini-premium .ini-topo { min-height: 72px; }
+  .ini-cena-estrada { height: 88px; }
+  .ini-app.ini-premium .ini-chamada { font-size: 27px; }
+  .ini-app.ini-premium .ini-beacon { width: 158px; margin-block: 8px 5px; }
+  .ini-app.ini-premium .ini-rodape { padding-top: 10px; }
+  .sos-login-shell .sos-login-brand { min-height: 140px; padding-block: 16px; }
+  .sos-login-shell .sos-login-lema { display: block; }
+}
+@media (max-width: 359px) {
+  .ini-app.ini-premium .ini-topo, .ini-app.ini-premium .ini-palco, .ini-app.ini-premium .ini-rodape { padding-inline: 12px; }
+  .ini-app.ini-premium .ini-contatos { gap: 6px; }
+  .ini-app.ini-premium .ini-contatos .ini-ligar { font-size: 11px; padding-inline: 5px; gap: 4px; }
+  .ini-app.ini-premium .ini-pastilha { padding: 8px; }
+  .sos-login-shell .sos-login-cartao { padding-inline: 14px; }
+  .sos-login-shell .sos-canais-acesso > a { gap: 4px; padding-inline: 5px; }
+  .sos-acesso-peca { width: 32px; height: 32px; }
+  .sos-whatsapp-rotulo > strong { font-size: 15px; }
+  .tecno-ia-mobile .tecno-ia-boas-vindas > .tecno-ia-avatar { width: 62px; height: 88px; }
+}
+@media (min-width: 620px) {
+  .ini-app.ini-premium .ini-topo { width: 100%; }
+  .ini-app.ini-premium .ini-palco { flex: 0 0 auto; width: 100%; }
+  .ini-app.ini-premium .ini-rodape { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
+  .sos-login-shell .sos-login-frame { min-height: 100svh; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #raiz .cli-premium .sos-menu-3d, #raiz .cli-premium .sos-menu-3d * { animation: none !important; }
+  .ini-app.ini-premium *, .sos-login-shell *, .tecno-ia-mobile * { animation: none !important; transition: none !important; }
+}

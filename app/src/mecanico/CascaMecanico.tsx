@@ -18,14 +18,17 @@ import { aplicarNoChamado, useFila, useProcessadorFila } from './filaOffline'
 import { Placa } from './pecas'
 import { FolhaSituacao } from './Situacao'
 import { useTemaMecanico } from './tema'
+import { IconeM3D } from './ArteMecanico'
+import { ARTE_MOBILE } from '../comum/kit3d'
+import { Arte } from '../comum/Arte'
 // A barra de abas (mi-abas) vive aqui: o estilo dela vale em todas as telas.
 import './inicioMecanico.css'
 
 /**
- * Casca do app do mecânico: abas, alerta de SOS e envio de posição.
+ * Casca do app do especialista: abas, alerta de SOS e envio de posição.
  *
  * Três coisas moram aqui e não nas telas, porque precisam continuar vivas
- * enquanto o mecânico troca de aba:
+ * enquanto o especialista troca de aba:
  * - o tempo real que dispara o alerta de novo SOS (em qualquer tela);
  * - o GPS de quem está disponível (a central precisa vê-lo no mapa);
  * - o atalho de volta para o atendimento em andamento.
@@ -49,7 +52,7 @@ export function CascaMecanico() {
   // Ações de campo guardadas sem sinal saem daqui também (em qualquer aba).
   useProcessadorFila(usuarioId)
   const somLiberado = useSomLiberado()
-  // O chamado em andamento fica carregado enquanto o mecânico anda pelas abas:
+  // O chamado em andamento fica carregado enquanto o especialista anda pelas abas:
   // se o sinal cair, ele ainda abre o atendimento e segue (a fila manda depois).
   useQuery({
     queryKey: CHAVES_SOS.detalhe(chamadoAtual?.id ?? ''),
@@ -149,7 +152,7 @@ function Aba({ item: i }: { item: ItemAba }) {
       {({ isActive }) => (
         <>
           <span className="relative flex size-8 items-center justify-center">
-            <Icone className="size-6" strokeWidth={isActive ? 2.3 : 1.8} />
+            <IconeM3D icone={Icone} className={cn('mec-aba-peca size-8', isActive && 'mec-aba-peca-ativa')} />
             {!!i.contador && (
               <span className="num absolute -top-1.5 -right-3 flex min-w-[19px] items-center justify-center rounded-full bg-[#ff6600] px-1 text-[10.5px] leading-[19px] font-bold text-white ring-2 ring-surface">
                 {i.contador > 99 ? '99+' : i.contador}
@@ -179,7 +182,7 @@ function BotaoAtendimento({ chamadoId, fila }: { chamadoId: string | null; fila:
       className="flex h-full w-full flex-col items-center justify-end gap-0.5 pb-1.5 active:scale-95"
     >
       <span className="mi-atendimento-fab">
-        <BellRing className="size-[1.6rem]" strokeWidth={2} />
+        <Arte src={ARTE_MOBILE.seloSOS} alt="" recuo={<BellRing className="size-[1.6rem]" strokeWidth={2} />} classeImagem="mec-atendimento-peca size-14 object-contain" />
         {(chamadoId || fila) && <span aria-hidden className="mi-atendimento-ponto" />}
       </span>
       <span className="mi-atendimento-rotulo">Atendimento</span>
@@ -195,7 +198,7 @@ function PilulaAtendimento({ chamado }: { chamado: NonNullable<HomeMecanico['cha
   return (
     <Link
       to={`/chamado/${chamado.id}`}
-      className="entrada-suave sos-premium-action fixed inset-x-5 bottom-[calc(env(safe-area-inset-bottom)+var(--sos-nav-height)+var(--sos-nav-bottom)+0.85rem)] z-40 mx-auto flex max-w-[32rem] items-center gap-3 rounded-[1.35rem] py-2.5 pr-3 pl-3.5 text-white shadow-[0_18px_36px_-22px_rgb(255_102_0/0.9)] active:brightness-95"
+      className="entrada-suave sos-button-3d sos-button-3d-primario sos-premium-action fixed inset-x-5 bottom-[calc(env(safe-area-inset-bottom)+var(--sos-nav-height)+var(--sos-nav-bottom)+0.85rem)] z-40 mx-auto flex max-w-[32rem] items-center gap-3 rounded-[1.35rem] py-2.5 pr-3 pl-3.5 text-white shadow-[0_18px_36px_-22px_rgb(255_102_0/0.9)] active:brightness-95"
     >
       <span className="relative flex size-3 shrink-0" aria-hidden>
         <span className="mec-pulso absolute inset-0 rounded-full bg-white" />

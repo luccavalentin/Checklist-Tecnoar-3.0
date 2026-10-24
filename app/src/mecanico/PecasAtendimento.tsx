@@ -14,6 +14,8 @@ import { primeiroNome } from './dados'
 import { enviarAcao, type ResultadoFila } from './filaOffline'
 import { IconeOcorrencia, Placa } from './pecas'
 import { CartaoM, FolhaM, RotuloM } from './ui'
+import { Arte } from '../comum/Arte'
+import { ARTE_MOBILE } from '../comum/kit3d'
 
 /**
  * Peças da tela de atendimento, usadas no deslocamento e no serviço.
@@ -96,7 +98,7 @@ export function AtalhosContato({ d, aoConversa }: { d: DetalheChamado; aoConvers
   const { usuarioId, perfil } = useMecanico()
   const tel = telefoneCliente(d)
   const naoLidas = mensagensNaoLidas(d, usuarioId)
-  const texto = `Olá! Aqui é ${primeiroNome(perfil.nome)}, mecânico da Tecnoar, sobre o seu SOS ${d.chamado.protocolo}.`
+  const texto = `Olá! Aqui é ${primeiroNome(perfil.nome)}, especialista da Tecnoar, sobre o seu SOS ${d.chamado.protocolo}.`
   return (
     <div className="grid grid-cols-3 gap-2">
       <Atalho icone={Phone} rotulo="Ligar" href={linkTelefone(tel)} />
@@ -120,12 +122,12 @@ function Atalho({
   contador?: number
 }) {
   const cls = cn(
-    'relative flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-2xl border border-line bg-surface-2 px-1 text-[12.5px] font-bold text-ink transition-transform active:scale-[0.97] min-[420px]:min-h-12 min-[420px]:flex-row min-[420px]:gap-2 min-[420px]:text-[13.5px]',
+    'sos-button-3d sos-button-3d-neutro relative flex min-h-[76px] min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[12.5px] font-semibold transition-transform active:scale-[0.97]',
     !href && !onClick && 'pointer-events-none opacity-40',
   )
   const conteudo = (
     <>
-      <Icone className={cn('size-5 shrink-0', rotulo === 'WhatsApp' ? 'text-[#25d366]' : 'text-accent-ink')} />
+      <Arte src={rotulo === 'WhatsApp' ? ARTE_MOBILE.whatsapp : rotulo === 'Ligar' ? ARTE_MOBILE.ligarCentral : ARTE_MOBILE.atendimento} alt="" classeImagem="size-8 shrink-0 object-contain" recuo={<Icone className={cn('size-5 shrink-0', rotulo === 'WhatsApp' ? 'text-[#25d366]' : 'text-accent-ink')} />} />
       <span className="truncate">{rotulo}</span>
       {!!contador && (
         <span className="num absolute -top-1.5 -right-1.5 flex min-w-5 items-center justify-center rounded-full bg-[#ff6600] px-1 text-[11px] leading-5 font-bold text-white ring-2 ring-surface">
@@ -141,7 +143,7 @@ function Atalho({
       </a>
     )
   return (
-    <button type="button" onClick={onClick} className={cls} aria-label={contador ? `Chat, ${contador} mensagens novas` : 'Chat com o cliente'}>
+    <button type="button" onClick={onClick} disabled={!onClick} className={cls} aria-label={rotulo === 'Chat' ? contador ? `Chat, ${contador} mensagens novas` : 'Chat com o cliente' : `${rotulo} do cliente`}>
       {conteudo}
     </button>
   )
@@ -282,7 +284,7 @@ export function ProblemaRelatado({ d, fotos = true }: { d: DetalheChamado; fotos
   )
 }
 
-/** Detalhes que o mecânico consulta parado: relato, veículo, local. */
+/** Detalhes que o especialista consulta parado: relato, veículo, local. */
 export function DetalhesChamado({ d }: { d: DetalheChamado }) {
   return (
     <div className="flex flex-col gap-3">

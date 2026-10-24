@@ -1,0 +1,123 @@
+/*
+ * O botão de socorro.
+ *
+ * A peça renderizada entra como imagem e o texto fica por cima, em HTML: assim
+ * "SOS TECNOAR" sai nítido em qualquer tela, é lido por leitor de tela e não
+ * depende da imagem ter carregado. Se a arte falhar, o aro de reserva abaixo
+ * mantém um alvo laranja redondo e o pedido continua possível.
+ */
+.b3d {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 898 / 931;
+  /* O texto acompanha o tamanho do botão, não o da janela. */
+  container-type: inline-size;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 34%, #ffa94a, #ff6600 58%, #c93f00);
+  box-shadow: 0 18px 44px -18px #ff660099;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 150ms var(--premium-ease, cubic-bezier(.23, 1, .32, 1));
+}
+.b3d:active { transform: scale(.955); }
+.b3d:focus-visible { outline: 3px solid #00afef; outline-offset: 6px; }
+
+/* A peça cobre o aro de reserva assim que carrega. */
+.b3d-peca {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Respiro quente atrás do botão: diz que o equipamento está ligado. */
+.b3d-brilho {
+  position: absolute;
+  z-index: -1;
+  width: 118%;
+  height: 64%;
+  border-radius: 50%;
+  background: #ff6600;
+  filter: blur(42px);
+  opacity: .32;
+  animation: b3d-respirar 3.4s ease-in-out infinite;
+}
+
+/* Duas ondas lentas, nas duas cores da marca. Prontidão, não alarme. */
+.b3d-onda {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #ff8a3d8c;
+  border-radius: 50%;
+  animation: b3d-onda 3.4s cubic-bezier(.23, 1, .32, 1) infinite;
+}
+.b3d-onda-2 { border-color: #00afef66; animation-delay: 1.7s; }
+
+/* A face chapada da peça ocupa, medido no render, cerca de 66% da largura e
+   fica centrada em 50% × 40%. A marca e o texto moram dentro dela, com folga
+   para a borda não encostar no anel de luz. */
+.b3d-letras {
+  position: absolute;
+  top: 40%;
+  display: flex;
+  /* A face mede ~66% da peça; 52% deixa a marca longe do anel de luz. */
+  width: 52%;
+  flex-direction: column;
+  align-items: center;
+  gap: 4cqw;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.b3d-logo {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 2px 7px #681e0099);
+}
+.b3d-sos {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 19cqw, 42px);
+  font-weight: 800;
+  line-height: .96;
+  letter-spacing: .05em;
+  /* O espaço depois da última letra desloca o bloco; isto devolve ao centro. */
+  padding-left: .05em;
+  color: #002061;
+  text-shadow: 0 1px 1px #ffcf8a66;
+}
+.b3d-icone { color: #fff; filter: drop-shadow(0 2px 8px #681e00bf); }
+
+/* Socorro em andamento: a peça para de chamar e passa a informar. */
+.b3d-vivo .b3d-onda { animation-duration: 5.2s; border-color: #ffffff5c; }
+.b3d-vivo .b3d-sos { font-size: clamp(13px, 10cqw, 21px); letter-spacing: .07em; padding-left: .07em; }
+
+/*
+ * Sem sinal: o instrumento tem energia, o canal é que morreu. A peça esfria
+ * em vez de sumir — trocar o objeto quando o estado muda obrigaria a pessoa a
+ * reaprender a tela justo na pior hora dela.
+ */
+.b3d-frio { background: radial-gradient(circle at 42% 34%, #7f93ad, #4a5e78 58%, #2b3b52); box-shadow: 0 16px 36px -20px #00152fa6; }
+.b3d-frio .b3d-peca { filter: saturate(.18) brightness(.78); }
+.b3d-frio .b3d-brilho { background: #7f93ad; opacity: .22; animation: none; }
+.b3d-frio .b3d-onda { border-color: #9fb2cc5c; animation-duration: 5.6s; }
+
+@keyframes b3d-respirar {
+  0%, 100% { opacity: .3; transform: scale(1); }
+  50% { opacity: .56; transform: scale(1.1); }
+}
+@keyframes b3d-onda {
+  0% { opacity: .62; transform: scale(.76); }
+  100% { opacity: 0; transform: scale(1.46); }
+}
+@media (hover: hover) and (pointer: fine) {
+  .b3d:hover { transform: translateY(-2px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .b3d-brilho, .b3d-onda { animation: none; }
+  .b3d-onda { opacity: .18; transform: scale(1.12); }
+}

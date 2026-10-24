@@ -15,7 +15,7 @@ import { AreaM, BotaoM, CampoM, CartaoM, RodapeAcao, RotuloM, SeloM, TelaM, Topo
 import { CHAVES_OS } from './dados'
 
 /**
- * NOVA OS — aberta pelo mecânico no app, direto no sistema Tecnoar.
+ * NOVA OS — aberta pelo especialista no app, direto no sistema Tecnoar.
  *
  *   1. Cliente e veículo   o mesmo campo do novo chamado: busca por placa,
  *                          nome, celular ou CPF/CNPJ no cadastro de clientes
@@ -86,7 +86,7 @@ export function NovaOSMecanico() {
         `OS nº ${os.numero} aberta no sistema Tecnoar`,
         os.cliente_novo ? 'Cliente cadastrado. Agora lance as peças que vai usar.' : 'Agora lance as peças que vai usar.',
       )
-      // Abre direto a folha de peças: é o que o mecânico faz em seguida.
+      // Abre direto a folha de peças: é o que o especialista faz em seguida.
       navegar(`/os/${os.id}?adicionar=produto`, { replace: true })
     },
     onError: (e) => setErro((e as Error).message),

@@ -1,0 +1,64 @@
+/* Mesma família visual do cliente, com prioridade para o trabalho em campo. */
+.mec { --mec-metal: linear-gradient(125deg, #19334b, #06192c 48%, #09192a 80%, #243043); }
+.mec :is(button, a, input, textarea) { touch-action: manipulation; }
+.mec :is(input, textarea) { caret-color: #ff8a3d; }
+.mec ::selection { color: #03101e; background: #72dcff; }
+.mec :is(button, a):focus-visible { outline: 3px solid #00afef; outline-offset: 3px; }
+.dark .mec.mec-fundo { background: #03101e; }
+.dark .mec :is(.sos-native-card, .sos-premium-list) { background: var(--mec-metal); border-color: #355e7b; }
+.mec .mec-native-header { border-bottom: 1px solid #365e7a; background: linear-gradient(100deg, #06192cf5, #06192cb8), url('/sos/mobile-3d/oficina.webp') center 35% / cover; color: #fff; }
+.mec .mec-native-header h1 { color: #fff; font-size: 25px; letter-spacing: -.025em; }
+.mec .mec-native-header :is(.text-ink-3, .text-ink-2, .text-ink) { color: #c2d5eb; }
+.mec .mec-native-header > div { min-height: 82px; }
+.mec .mec-native-header button { color: #fff; }
+.dark .mec .sos-soft-action { background: #0c263d; }
+.mec .sos-premium-action { color: #002061; border: 1px solid #ffb75e; background: linear-gradient(#ff971e, #ff6600); box-shadow: inset 0 1px 2px #ffe8b078, 0 8px 18px -14px #ff6600; }
+.mec .sos-premium-action:disabled { box-shadow: none; }
+.mec .mi-abas { border: 1px solid #547c99; box-shadow: inset 0 1px 2px #d3f0ff33, 0 12px 28px -14px #0006; backdrop-filter: none; }
+.dark .mec .mi-abas { background: var(--mec-metal); }
+.mec .mec-aba-peca { opacity: .75; filter: saturate(.65); }
+.mec .mec-aba-peca-ativa { opacity: 1; filter: none; }
+.mec .mi-aba-ativa { color: #ad4300; }
+.dark .mec .mi-aba-ativa { color: #ff9a4d; }
+.mec .mi-atendimento-fab { width: 62px; height: 62px; padding: 0; background: transparent; border: 0; box-shadow: none; }
+.mec .mi-atendimento-fab::before, .mec .mi-atendimento-fab::after { display: none; }
+.mec .mec-atendimento-peca { width: 62px; height: 62px; }
+.mec .mi-atendimento-rotulo { color: inherit; font-size: 10px; }
+
+.mec .mi.mi-studio { background: #f5f7fb; }
+.dark .mec .mi.mi-studio { --mi-fundo: #03101e; --mi-cartao: #0b2135; --mi-borda: #355e7b; --mi-texto-3: #afc5dc; background: #03101e; }
+.mec .mi.mi-studio .mi-topo { max-width: 480px; color: #fff; border-bottom: 1px solid #365e7a; background: linear-gradient(90deg, #03101edb, #03101e80), url('/sos/mobile-3d/oficina.webp') center 22% / cover; }
+.mec .mi.mi-studio .mi-saudacao { margin-top: 18px; }
+.mec .mi.mi-studio .mi-data { color: #c2d5eb; }
+.mec .mi.mi-studio .mi-ola { font-size: 29px; color: #fff; }
+.mec .mi.mi-studio .mi-sub { color: #d3e1f0; max-width: 24ch; }
+.mec .mi.mi-studio .mi-redondo { border: 1px solid #658cae88; background: linear-gradient(140deg, #234665e8, #061626e8); box-shadow: inset 0 1px 1px #c9ecff38, 0 6px 14px -10px #000; }
+.mec .mi.mi-studio .mi-avatar { color: #fff; }
+.mec .mi.mi-studio .mi-studio-cena { display: flex; justify-content: flex-end; height: 90px; margin: -4px 18px 0; }
+.mec .mi.mi-studio .mi-studio-cena img { width: 138px; height: 100px; filter: none; }
+.mec .mi.mi-studio .mi-studio-pista { display: none; }
+.mec .mi.mi-studio .mi-conteudo { gap: 14px; padding-top: 14px; }
+.dark .mec .mi.mi-studio .mi-cartao { border: 1px solid #355e7b; background: var(--mec-metal); }
+.mec .mi.mi-studio .mi-numero { border: 0; background: transparent; box-shadow: none; }
+.mec .mi.mi-studio .mi-status { border-radius: 16px; }
+.mec .mi.mi-studio .mi-status-on { background: #e2f4ee; color: #10513f; }
+.dark .mec .mi.mi-studio .mi-status-on { background: #103c35; color: #dcfff0; border-color: #2c7362; }
+.mec .mi.mi-studio .mi-novo { min-height: 78px; color: #002061; border: 1px solid #ffb75e; border-radius: 17px; background: linear-gradient(#ff971e, #ff6600); box-shadow: inset 0 1px 2px #ffe8b078, 0 8px 18px -14px #ff6600; }
+.mec .mi.mi-studio .mi-novo-ocupado { color: var(--mi-texto); background: var(--mi-cartao); border-color: var(--mi-borda); box-shadow: none; }
+.mec .mi.mi-studio .mi-acesso { min-height: 106px; padding: 10px; }
+.mec .mi.mi-studio .mi-acesso-icone { width: 38px; height: 38px; background: transparent; box-shadow: none; }
+.mec .mi.mi-studio .mi-acesso-rotulo { font-size: 12px; line-height: 1.35; }
+.mec .mi.mi-studio .mi-ultimo-icone { background: transparent; }
+.mec .mi.mi-studio .mi-aviso-icone { background: transparent; }
+.mec button[aria-label='Enviar pergunta'] { border: 0; background: transparent; box-shadow: none; }
+.mec button[aria-label='Enviar pergunta']:disabled { opacity: .45; }
+@media (max-width: 359px) {
+  .mec .mi.mi-studio .mi-linha-status { grid-template-columns: 1fr; }
+  .mec .mi.mi-studio .mi-studio-cena { height: 72px; }
+  .mec .mi.mi-studio .mi-studio-cena img { height: 82px; width: 120px; }
+  .mec .mi-atendimento-fab, .mec .mec-atendimento-peca { width: 54px; height: 54px; }
+  .mec .mi.mi-studio .mi-acesso { padding: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mec *, .mec *::before, .mec *::after { animation: none !important; transition: none !important; }
+}

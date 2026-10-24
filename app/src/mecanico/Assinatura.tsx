@@ -8,7 +8,7 @@ import { useOnline } from './dados'
 import { BotaoM, CampoM, FolhaM } from './ui'
 
 /**
- * Aceite do serviço no aparelho do mecânico: o cliente (ou o motorista)
+ * Aceite do serviço no aparelho do especialista: o cliente (ou o motorista)
  * assina com o dedo e a assinatura vira um anexo do chamado (tipo
  * "assinatura", etapa "conclusão"), guardado junto das fotos do chamado.
  */

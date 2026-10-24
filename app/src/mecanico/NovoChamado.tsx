@@ -47,11 +47,11 @@ import { useTemaMecanico } from './tema'
 import { AreaM, BotaoM, CartaoM, OpcaoM, RodapeAcao, RotuloM, SecaoM, SeloM, TelaM, TopoM } from './ui'
 
 /**
- * NOVO CHAMADO — aberto pelo próprio mecânico (além de aceitar os da fila).
+ * NOVO CHAMADO — aberto pelo próprio especialista (além de aceitar os da fila).
  *
- * O cliente parou na oficina móvel, ligou direto para o mecânico ou foi
+ * O cliente parou na oficina móvel, ligou direto para o especialista ou foi
  * achado na estrada: em quatro toques o chamado nasce na central da Tecnoar
- * (mesma tabela, mesmo mapa, origem "mecânico") e o mecânico cai direto no
+ * (mesma tabela, mesmo mapa, origem "especialista") e o especialista cai direto no
  * atendimento.
  *
  *   1. Quem é o cliente?  um campo só (placa, nome ou telefone); tocar no
@@ -62,7 +62,7 @@ import { AreaM, BotaoM, CartaoM, OpcaoM, RodapeAcao, RotuloM, SecaoM, SeloM, Tel
  *   4. Conferir           resumo, OS (lançar na aberta / abrir nova / depois)
  *                         e ABRIR CHAMADO.
  *
- * O GPS começa a refinar já na primeira tela: quando o mecânico chega ao
+ * O GPS começa a refinar já na primeira tela: quando o especialista chega ao
  * passo do local, a leitura costuma estar em poucos metros. O rascunho fica
  * na sessão (`sos.*`, apagado ao sair da conta).
  */
@@ -90,7 +90,7 @@ interface LocalEscolhido {
 }
 
 
-/** Texto pronto ao tocar no tipo — o mecânico só completa. */
+/** Texto pronto ao tocar no tipo — o especialista só completa. */
 const SUGESTAO: Record<OcorrenciaSOS, string> = {
   freios: 'Problema no sistema de freios.',
   nao_liga: 'Veículo não dá partida.',
@@ -107,7 +107,7 @@ const SUGESTAO: Record<OcorrenciaSOS, string> = {
 /* ── rascunho da sessão ─────────────────────────────────────────────────── */
 
 const CHAVE_RASCUNHO = 'sos.novo-chamado.v1'
-/** Local marcado há mais tempo que isso não vale mais (o mecânico andou). */
+/** Local marcado há mais tempo que isso não vale mais (o especialista andou). */
 const VALIDADE_LOCAL_MS = 10 * 60_000
 
 interface Rascunho {
@@ -293,7 +293,7 @@ function Fluxo() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [incompleto])
 
-  // Chegou ao passo do local com leitura velha (o mecânico andou): GPS de novo.
+  // Chegou ao passo do local com leitura velha (o especialista andou): GPS de novo.
   useEffect(() => {
     if (passo !== 'local') return
     const l = gps.leitura
@@ -504,7 +504,7 @@ function PassoProblema({
   function escolher(t: OcorrenciaSOS) {
     const anterior = tipo ? SUGESTAO[tipo] : ''
     aoTipo(t)
-    // Troca a sugestão enquanto o mecânico não escreveu nada dele.
+    // Troca a sugestão enquanto o especialista não escreveu nada dele.
     const atual = descricao.trim()
     if (!atual || atual === anterior) aoDescricao(SUGESTAO[t])
     if (!SUGESTAO[t] && !atual) window.setTimeout(() => area.current?.focus(), 50)
@@ -572,7 +572,7 @@ function PassoProblema({
 
 /* ── 3. onde ────────────────────────────────────────────────────────────── */
 
-/** O mecânico arrastou o mapa com o dedo (movimento do próprio app não conta). */
+/** O especialista arrastou o mapa com o dedo (movimento do próprio app não conta). */
 function OuvirArraste({ aoArrastar }: { aoArrastar: () => void }) {
   useMapEvents({ dragstart: aoArrastar })
   return null

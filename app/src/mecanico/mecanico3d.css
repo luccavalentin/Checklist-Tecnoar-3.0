@@ -1,0 +1,93 @@
+/* Tecnoar: assets de estúdio sobre superfícies operacionais legíveis. */
+.mi.mi-studio {
+  --mi-fundo: #eef3f8;
+  --mi-texto: #0d1c33;
+  --mi-texto-2: #354b66;
+  --mi-texto-3: #52657d;
+  --mi-cartao: #fff;
+  --mi-azul: #002061;
+  --mi-sombra: 0 12px 24px -18px rgb(0 32 97 / 30%);
+  background: var(--mi-fundo);
+}
+.dark .mi.mi-studio {
+  --mi-fundo: #091426;
+  --mi-texto: #f4f8ff;
+  --mi-texto-2: #c2d3e9;
+  --mi-texto-3: #a2b8d2;
+  --mi-cartao: #13233b;
+  --mi-azul: #7edbff;
+}
+.mi-studio .mi-topo {
+  max-width: 480px;
+  overflow: hidden;
+  padding-bottom: 0;
+}
+.mi-studio .mi-barra { align-items: center; padding: 8px 20px 0; }
+.mi-studio .mi-redondo { width: 42px; height: 42px; backdrop-filter: none; }
+.mi-studio .mi-saudacao { max-width: none; margin-top: 26px; padding-inline: 20px; }
+.mi-studio .mi-data { font-size: 12px; }
+.mi-studio .mi-ola { margin-top: 8px; font-size: clamp(28px, 7.5cqw, 36px); letter-spacing: -.035em; }
+.mi-studio .mi-sub { margin-top: 8px; font-size: 14px; }
+.mi-studio-cena { position: relative; height: 188px; margin: -4px 12px -4px; isolation: isolate; pointer-events: none; }
+.mi-studio-cena img { position: relative; z-index: 1; display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 14px 12px rgb(0 32 97 / 18%)); animation: mi-studio-chegada 440ms cubic-bezier(.16,1,.3,1) both; }
+.mi-studio-pista { position: absolute; inset: auto 8% 20px; height: 22px; border-radius: 50%; background: rgb(0 32 97 / 10%); filter: blur(10px); }
+.dark .mi-studio-pista { background: rgb(0 175 239 / 16%); }
+.mi-studio .mi-conteudo { max-width: 480px; gap: 18px; padding-inline: max(20px, env(safe-area-inset-left)); }
+.mi-studio .mi-cartao { border: 0; border-radius: 16px; backdrop-filter: none; }
+.mi-studio .mi-linha-status { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 10px; }
+.mi-studio .mi-status { min-height: 100px; padding: 12px; gap: 8px; }
+.mi-studio .mi-area { padding: 12px; }
+.mi-studio .mi-status-titulo { font-size: 13px; }
+.mi-studio .mi-chave { flex-shrink: 0; }
+.mi-studio .mi-status-on .mi-chave { box-shadow: none; }
+.mi-studio .mi-status-ponto { width: 12px; height: 12px; }
+.mi-studio .mi-status-ponto::after { inset: 2px; box-shadow: none; }
+.mi-studio .mi-status-on { background: #e2f4ee; color: #10513f; }
+.dark .mi-studio .mi-status-on { background: #103c35; color: #dcfff0; }
+.mi-studio .mi-status-on .mi-status-sub, .mi-studio .mi-status-on .mi-status-rotulo { color: inherit; opacity: .85; }
+.mi-studio .mi-numeros { gap: 0; padding-block: 16px; border-block: 1px solid var(--mi-borda); }
+.mi-studio .mi-numero { border-radius: 0; box-shadow: none; background: transparent; }
+.mi-studio .mi-numero + .mi-numero { border-left: 1px solid var(--mi-borda); }
+.mi-studio .mi-numero-valor { letter-spacing: -.025em; }
+.mi-studio .mi-numero-rotulo { color: var(--mi-texto-2); }
+.mi-studio .mi-novo { border-radius: 16px; min-height: 80px; padding: 14px; background: linear-gradient(135deg,#ff8636,#ff6600); color: #0d1c33; box-shadow: 0 14px 22px -16px rgb(156 58 0 / 55%), inset 0 1px 0 rgb(255 255 255 / 40%); }
+.mi-studio .mi-novo-sub { color: #331b0a; font-size: 12px; }
+.mi-studio .mi-novo-titulo { text-transform: none; letter-spacing: -.015em; font-size: 18px; }
+.mi-studio .mi-novo-seta { box-shadow: none; background: rgb(255 255 255 / 25%); }
+.mi-studio .mi-novo-ocupado { background: var(--mi-cartao); color: var(--mi-texto); box-shadow: var(--mi-sombra); }
+.mi-studio .mi-novo-ocupado .mi-novo-sub { color: var(--mi-texto-2); }
+.mi-studio .mi-acesso { min-height: 94px; padding: 12px; }
+.mi-studio .mi-acesso-rotulo { font-size: 12px; }
+.mi-studio .mi-aviso-botao { min-height: 44px; }
+.mi-studio :is(button,a) { -webkit-tap-highlight-color: transparent; }
+.mi-studio :is(button,a):focus-visible, .ma-studio :is(button,input):focus-visible { outline: 3px solid #008ac0; outline-offset: 4px; }
+.mi-studio ::selection, .ma-studio ::selection { color: #fff; background: #002061; }
+.mi-studio :is(button,a), .ma-studio button { transition: transform 180ms cubic-bezier(.16,1,.3,1), background-color 180ms ease-out; }
+.ma-studio { background: #eef3f8; }
+.dark .ma-studio { background: #091426; }
+.ma-studio-cabecalho { background: #0d1c33; color: #fff; }
+.ma-studio-cabecalho > div:last-child { background: #243950; height: 3px; }
+.ma-studio-cabecalho > div:last-child > div { background: #ff6600; }
+.ma-studio-cabecalho h2 { letter-spacing: -.015em; text-transform: none; font-weight: 750; }
+.ma-studio-cabecalho > div:first-child > svg { color: #ff8636; }
+.ma-studio-cena { display: flex; height: 118px; justify-content: center; margin-bottom: -8px; pointer-events: none; }
+.ma-studio-cena img { display: block; width: 150px; height: 140px; object-fit: contain; filter: drop-shadow(0 12px 10px rgb(0 32 97 / 16%)); animation: mi-studio-chegada 280ms cubic-bezier(.16,1,.3,1) both; }
+.ma-studio-aceitar { background: linear-gradient(145deg,#ff8a3d,#ff6600); color: #0d1c33; box-shadow: 0 12px 22px -15px rgb(156 58 0 / 55%), inset 0 1px 0 rgb(255 255 255 / 40%); letter-spacing: -.01em; }
+.ma-studio-recusar { background: var(--c-surface-2, #e4ebf3); box-shadow: inset 0 0 0 1px rgb(82 101 125 / 24%); }
+.dark .ma-studio-recusar { background: #20324b; }
+.ma-studio button:active:not(:disabled) { transform: scale(.98); }
+@keyframes mi-studio-chegada { from { opacity: .65; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@media (min-width: 360px) and (max-width: 400px) { .mi-studio .mi-status-titulo { font-size: 12px; } }
+@media (max-width: 359px) {
+  .mi-studio .mi-barra { padding-inline: 16px; gap: 8px; }
+  .mi-studio .mi-redondo { width: 38px; height: 38px; }
+  .mi-studio .mi-linha-status { grid-template-columns: 1fr; }
+  .mi-studio .mi-status { min-height: 80px; }
+  .mi-studio-cena { height: 156px; }
+}
+@media (max-height: 700px) { .ma-studio-cena { height: 76px; } .ma-studio-cena img { width: 100px; height: 96px; } }
+@media (prefers-reduced-motion: reduce) {
+  .mi-studio-cena img, .ma-studio-cena img { animation: none; }
+  .mi-studio :is(button,a), .ma-studio button { transition: none; }
+  .mi-studio :is(button,a):active, .ma-studio button:active:not(:disabled) { transform: none; }
+}

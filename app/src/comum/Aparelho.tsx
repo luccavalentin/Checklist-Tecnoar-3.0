@@ -8,8 +8,11 @@ import { useToast } from '@/componentes/ui/Toast'
 import { useInstalacao } from '@/layout/ConviteInstalacao'
 import { ativarNotificacoes, BADGE, mostrarNotificacao, permissaoAtual, suportado } from '@/notificacoes/sistema'
 import { useSessao } from '../sessao'
+import { ehUrgente, semMarcacao } from './avisos'
 import { BotaoApp, Folha } from './ui'
 import { CHAVE_NOTIFICACOES, rotaInterna } from './Notificacoes'
+import { Arte } from './Arte'
+import { ARTE_MOBILE } from './kit3d'
 
 /**
  * O SOS Tecnoar como aplicativo do aparelho: instalado, com notificação que
@@ -128,13 +131,13 @@ async function notificacaoDeTeste(): Promise<boolean> {
 interface Aviso {
   id: string
   titulo: string
+  /** Vem da coluna nova; ausente nas linhas antigas. Ver comum/avisos.ts. */
+  urgente?: boolean | null
   mensagem: string | null
   link: string | null
   criada_em: string
 }
 
-/** Títulos de aviso urgente do SOS (mesma regra do service worker). */
-const URGENTE = /^(🚨|🔴|⏱|⚠️|📡|📍|⏰)/u
 
 export function AvisosDoApp() {
   const { usuarioId } = useSessao()
@@ -160,21 +163,21 @@ export function AvisosDoApp() {
       if (document.visibilityState === 'hidden') {
         // Em segundo plano: notificação do sistema. Se o push também chegar,
         // o mesmo `tag` substitui em silêncio em vez de tocar duas vezes.
-        void mostrarNotificacao({ id: a.id, titulo: a.titulo, mensagem: a.mensagem, link: a.link, created_at: a.criada_em })
+        void mostrarNotificacao({ id: a.id, titulo: semMarcacao(a.titulo), mensagem: a.mensagem, link: a.link, created_at: a.criada_em })
         return
       }
       // Já está na tela de que o aviso fala: ela mesma se atualiza.
       const rota = rotaInterna(a.link)
       if (rota && rota === caminho.current) return
-      if (URGENTE.test(a.titulo)) navigator.vibrate?.([200, 80, 200])
+      if (ehUrgente(a)) navigator.vibrate?.([200, 80, 200])
       setAviso(a)
     }
 
     const canal = supabase
       .channel(`sos-avisos-${usuarioId}-${Math.random().toString(36).slice(2, 7)}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notificacoes', filter: `usuario_id=eq.${usuarioId}` }, (p) => {
-        const n = p.new as { id: string; titulo: string; mensagem: string | null; link: string | null; created_at: string }
-        entregar({ id: n.id, titulo: n.titulo, mensagem: n.mensagem, link: n.link, criada_em: n.created_at })
+        const n = p.new as { id: string; titulo: string; mensagem: string | null; link: string | null; created_at: string; urgente?: boolean | null }
+        entregar({ id: n.id, titulo: n.titulo, urgente: n.urgente, mensagem: n.mensagem, link: n.link, criada_em: n.created_at })
       })
       .subscribe()
 
@@ -201,12 +204,12 @@ export function AvisosDoApp() {
 
   useEffect(() => {
     if (!aviso) return
-    const relogio = window.setTimeout(() => setAviso(null), URGENTE.test(aviso.titulo) ? 12_000 : 6_000)
+    const relogio = window.setTimeout(() => setAviso(null), ehUrgente(aviso) ? 12_000 : 6_000)
     return () => window.clearTimeout(relogio)
   }, [aviso])
 
   if (!aviso) return null
-  const urgente = URGENTE.test(aviso.titulo)
+  const urgente = ehUrgente(aviso)
 
   function abrir() {
     if (!aviso) return
@@ -236,12 +239,12 @@ export function AvisosDoApp() {
         )}
       >
         <button type="button" onClick={abrir} className="flex min-w-0 flex-1 items-start gap-3 text-left">
-          <img src="/icone-192.png" alt="" className="mt-0.5 size-10 shrink-0 rounded-[0.7rem]" />
+          <img src="/icone-192.png" alt="" className="mt-0.5 size-10 shrink-0" />
           <span className="min-w-0 flex-1">
             <span className={cn('flex items-center gap-1.5 text-[11.5px] font-semibold', urgente ? 'text-white/60' : 'text-ink-3')}>
               SOS Tecnoar <span aria-hidden>·</span> agora
             </span>
-            <span className="block truncate text-[14.5px] font-bold">{aviso.titulo}</span>
+            <span className="block truncate text-[14.5px] font-bold">{semMarcacao(aviso.titulo)}</span>
             {aviso.mensagem && (
               <span className={cn('line-clamp-2 block text-[13.5px] leading-snug', urgente ? 'text-white/80' : 'text-ink-2')}>{aviso.mensagem}</span>
             )}
@@ -329,7 +332,7 @@ export function ConviteNotificacoesApp({ bloqueado }: { bloqueado: boolean }) {
     >
       <div className="flex flex-col items-center gap-4 pt-1 pb-2 text-center">
         <span className="relative">
-          <img src="/icone-192.png" alt="" className="size-20 rounded-[1.4rem] shadow-e2" />
+          <img src="/icone-192.png" alt="" className="size-20 rounded-full shadow-e2" />
           <span className="absolute -top-1.5 -right-1.5 flex size-7 items-center justify-center rounded-full bg-[#ff6600] text-white ring-4 ring-surface">
             <BellRing className="size-4" />
           </span>
@@ -380,7 +383,7 @@ function Linha({
           tom === 'neutro' && 'bg-surface-2 text-ink-2',
         )}
       >
-        <Icone className="size-5" />
+        {titulo.toLocaleLowerCase('pt-BR').includes('notificaç') ? <Arte src={ARTE_MOBILE.notificacoes} alt="" recuo={<Icone className="size-5" />} classeImagem="size-10 rounded-xl object-contain" /> : <Icone className="size-5" />}
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-[15px] font-semibold text-ink">{titulo}</span>
@@ -405,7 +408,7 @@ function Pilula({ children }: { children: ReactNode }) {
 }
 
 /** Instalar, ativar e testar as notificações — tudo num lugar só. */
-export function CartaoAparelho({ className }: { className?: string }) {
+export function CartaoAparelho({ className, mostrarInstalacao = true }: { className?: string; mostrarInstalacao?: boolean }) {
   const instalado = useInstalado()
   const instalacao = useInstalacao()
   const [permissao, setPermissao] = usePermissaoNotificacao()
@@ -420,7 +423,7 @@ export function CartaoAparelho({ className }: { className?: string }) {
 
   return (
     <div className={cn('flex flex-col divide-y divide-line rounded-[1.25rem] border border-line bg-surface px-4', className)}>
-      {instalado ? (
+      {mostrarInstalacao && (instalado ? (
         <Linha icone={Smartphone} tom="ok" titulo="App instalado" detalhe="Abre pela tela de início, em tela cheia." />
       ) : instalacao.disponivel ? (
         <Linha
@@ -433,7 +436,7 @@ export function CartaoAparelho({ className }: { className?: string }) {
         />
       ) : (
         <Linha icone={Smartphone} tom="neutro" titulo="Instalar o app" detalhe="No menu do navegador, toque em Instalar app ou Adicionar à tela inicial." />
-      )}
+      ))}
 
       {permissao === 'granted' ? (
         <>

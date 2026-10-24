@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Outlet, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
-import { ChevronRight, History, House, Siren, Truck, UserRound, X } from 'lucide-react'
+import { ChevronRight, History, House, Truck, UserRound, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { tocarAlerta, vibrarAlerta } from '@/sos/alerta'
 import { STATUS_SOS, WHATSAPP_SOS_PADRAO, linkWhatsApp } from '@/sos/rotulos'
@@ -9,8 +9,12 @@ import { sosDetalhe } from '@/sos/api'
 import { CHAVES_SOS, useTempoRealCliente } from '@/sos/tempoReal'
 import type { ChamadoSOS, StatusSOS } from '@/sos/tipos'
 import { aplicarTema, lerTema, useCliente } from '../sessao'
+import { ARTE3D, ARTE_MOBILE } from '../comum/kit3d'
+import { Arte } from '../comum/Arte'
 import { BarraNavegacao } from '../comum/ui'
+import { BotaoSOS } from './inicio/BotaoSOS'
 import { useNaoLidasApp } from '../comum/Notificacoes'
+import { useOnline } from '../comum/Pwa'
 import { useHomeCliente, useInfoPublica, type CtxCascaCliente } from './dados'
 import { useEnvioPendenteSOS } from './filaSOS'
 import { TelaAvaliacao } from './chamado/Avaliacao'
@@ -100,7 +104,7 @@ export function CascaCliente() {
   const contexto: CtxCascaCliente = { naoLidas }
 
   return (
-    <div className="cli-palco">
+    <div className={cn('cli-palco cli-premium', pathname === '/' ? 'cli-na-inicio' : 'cli-area-interna')}>
       <div className="cli-coluna">
         <Outlet context={contexto} />
       </div>
@@ -123,12 +127,12 @@ export function CascaCliente() {
       <BarraNavegacao
         className="cli-fixo cli-nav"
         itens={[
-          { rota: '/', rotulo: 'Início', icone: House },
-          { rota: '/veiculos', rotulo: 'Veículos', icone: Truck },
-          { rota: '/historico', rotulo: 'Histórico', icone: History },
-          { rota: '/perfil', rotulo: 'Conta', icone: UserRound, contador: naoLidas },
+          { rota: '/', rotulo: 'Início', icone: House, peca: ARTE3D.casa },
+          { rota: '/veiculos', rotulo: 'Veículos', icone: Truck, peca: ARTE3D.veiculos },
+          { rota: '/historico', rotulo: 'Histórico', icone: History, peca: ARTE3D.historico },
+          { rota: '/perfil', rotulo: 'Conta', icone: UserRound, peca: ARTE3D.conta, contador: naoLidas },
         ]}
-        centro={<BotaoCentralSOS chamadoAtivoId={ativo?.id ?? null} />}
+        centro={pathname === '/' ? undefined : <BotaoCentralSOS chamadoAtivoId={ativo?.id ?? null} />}
       />
     </div>
   )
@@ -144,18 +148,14 @@ function BotaoCentralSOS({ chamadoAtivoId }: { chamadoAtivoId: string | null }) 
   const navegar = useNavigate()
   const ativo = !!chamadoAtivoId
   return (
-    <button
-      type="button"
-      onClick={() => navegar(ativo ? `/chamado/${chamadoAtivoId}` : '/sos')}
-      aria-label={ativo ? 'Acompanhar o socorro em andamento' : 'Pedir socorro (SOS)'}
-      className="flex h-full w-full flex-col items-center justify-center gap-1 active:scale-95"
-    >
-      <span className={cn('sos-center-fab relative -mt-[1.05rem] flex items-center justify-center rounded-full bg-[#ff6600] text-white ring-4 ring-surface', 'shadow-[0_10px_22px_-10px_rgb(255_102_0/0.8)] max-[360px]:-mt-3')}>
-        <Siren className="size-[1.55rem]" strokeWidth={2.2} />
-        {ativo && <span aria-hidden className="absolute -top-0.5 -right-0.5 size-3.5 rounded-full bg-white ring-[3px] ring-[#ff6600] sos-piscar" />}
-      </span>
+    <div className="flex h-full w-full flex-col items-center justify-center gap-1">
+      <BotaoSOS
+        modo={ativo ? 'vivo' : 'pronto'}
+        aoTocar={() => navegar(ativo ? `/chamado/${chamadoAtivoId}` : '/sos')}
+        className="sos-menu-3d"
+      />
       <span className={cn('text-[11px] font-bold', ativo ? 'text-crit' : 'text-[#536781] dark:text-white')}>{ativo ? 'Ao vivo' : 'SOS'}</span>
-    </button>
+    </div>
   )
 }
 
@@ -163,10 +163,21 @@ function BotaoCentralSOS({ chamadoAtivoId }: { chamadoAtivoId: string | null }) 
  * WhatsApp da Tecnoar sempre à mão, flutuando acima da barra. O número vem da
  * central (Configurações do SOS); sem número cadastrado, o botão não aparece.
  */
+/**
+ * WhatsApp sempre à mão — MENOS sem internet.
+ *
+ * O WhatsApp precisa de dados para abrir. Deixá-lo na tela quando a conexão
+ * caiu oferece uma saída que não existe, e ele ainda flutuava POR CIMA do
+ * degrau "Ligar para a Tecnoar", que é justamente o canal que continua
+ * funcionando. Era a pior troca possível: o atalho que não serve tapando o
+ * único que serve.
+ */
 function BotaoWhatsApp() {
   const info = useInfoPublica()
+  const online = useOnline()
+  const { pathname } = useLocation()
   const link = linkWhatsApp(info.data?.whatsapp ?? WHATSAPP_SOS_PADRAO, 'Olá, Tecnoar! Vim pelo app SOS.')
-  if (!link) return null
+  if (!link || !online || pathname === '/') return null
   return (
     <div className="cli-fixo pointer-events-none fixed z-[45] flex justify-end px-4" style={{ bottom: 'calc(var(--sos-nav-height) + var(--sos-nav-bottom) + 0.72rem + env(safe-area-inset-bottom))' }}>
       <a
@@ -174,11 +185,13 @@ function BotaoWhatsApp() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Falar com a Tecnoar no WhatsApp"
-        className="pointer-events-auto flex size-14 items-center justify-center rounded-full border border-[#00afef]/45 bg-[#0D1C33] text-[#00afef] shadow-[0_10px_24px_-10px_rgb(0_32_97/0.9)] ring-4 ring-surface transition-transform active:scale-95"
+        className="pointer-events-auto flex size-14 items-center justify-center rounded-xl text-[#00afef] drop-shadow-[0_5px_8px_rgb(0_0_0/0.3)] transition-transform active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-cyan"
       >
-        <svg viewBox="0 0 32 32" aria-hidden className="size-8" fill="currentColor">
+        <Arte src={ARTE_MOBILE.whatsapp} alt="" classeImagem="size-14 object-contain" recuo={
+          <svg viewBox="0 0 32 32" aria-hidden className="size-8" fill="currentColor">
           <path d="M16.04 3C8.86 3 3.03 8.83 3.03 16c0 2.29.6 4.53 1.74 6.5L3 29l6.68-1.75A12.95 12.95 0 0 0 16.04 29C23.2 29 29 23.17 29 16S23.2 3 16.04 3Zm0 23.63c-1.95 0-3.87-.52-5.54-1.52l-.4-.24-3.96 1.04 1.06-3.86-.26-.4A10.6 10.6 0 0 1 5.4 16c0-5.87 4.77-10.63 10.64-10.63 5.86 0 10.6 4.76 10.6 10.63 0 5.86-4.74 10.63-10.6 10.63Zm5.83-7.96c-.32-.16-1.89-.93-2.18-1.04-.29-.1-.5-.16-.72.16-.21.32-.82 1.04-1 1.25-.19.21-.37.24-.69.08-.32-.16-1.35-.5-2.57-1.59-.95-.85-1.59-1.9-1.78-2.22-.18-.32-.02-.49.14-.65.14-.14.32-.37.48-.56.16-.18.21-.32.32-.53.1-.21.05-.4-.03-.56-.08-.16-.72-1.73-.98-2.37-.26-.62-.52-.54-.72-.55h-.61c-.21 0-.56.08-.85.4-.29.32-1.11 1.09-1.11 2.66s1.14 3.08 1.3 3.3c.16.2 2.24 3.43 5.43 4.8.76.33 1.35.53 1.81.67.76.24 1.45.21 2 .13.61-.09 1.89-.77 2.15-1.52.27-.74.27-1.38.19-1.52-.08-.13-.29-.21-.61-.37Z" />
         </svg>
+        } />
       </a>
     </div>
   )

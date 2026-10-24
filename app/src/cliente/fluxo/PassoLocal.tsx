@@ -6,6 +6,8 @@ import { acompanharPosicao, buscarLugar, ehApple, enderecoDoPonto, formatarCoord
 import { BotaoMapa, CapturaMapa, MapaSOS, centralizarMapa, type MapaLeaflet, type MarcadorMapa } from '@/sos/Mapa'
 import { BotaoApp, Faixa } from '../../comum/ui'
 import { useOnline } from '../../comum/Pwa'
+import { Arte } from '../../comum/Arte'
+import { ARTE3D, ARTE_MOBILE } from '../../comum/kit3d'
 import { temaMapa } from '../dados'
 
 export interface LocalSOS {
@@ -196,7 +198,7 @@ export function PassoLocal({
 
         <div className="absolute right-3 bottom-9 z-10 flex flex-col gap-2">
           <BotaoMapa rotulo="Voltar para minha localização" onClick={voltarAoGps}>
-            <LocateFixed />
+            <Arte src={ARTE_MOBILE.centralizar} alt="" classeImagem="size-8 object-contain" recuo={<LocateFixed />} />
           </BotaoMapa>
         </div>
       </div>
@@ -212,10 +214,8 @@ export function PassoLocal({
           </div>
 
           {ponto && (
-            <div className="flex items-start gap-3 rounded-2xl border border-line bg-surface-2 p-3.5">
-              <span className={cn('flex size-10 shrink-0 items-center justify-center rounded-xl', ajustando ? 'bg-accent-soft text-accent-ink' : 'bg-cyan-soft text-cyan')}>
-                {ajustando ? <Move className="size-5" /> : <MapPin className="size-5" />}
-              </span>
+            <div className="local-cartao-3d flex items-start gap-3 rounded-2xl border border-line bg-surface-2 p-3.5">
+              <Arte src={ajustando ? ARTE_MOBILE.mapaBrasil : ARTE3D.local} alt="" classeImagem="h-12 w-10 shrink-0 object-contain" recuo={<MapPin className="size-8 shrink-0 text-cyan" />} />
               <div className="min-w-0 flex-1">
                 <p className="text-[15px] leading-snug font-semibold text-ink">
                   {endereco ?? (buscandoEndereco ? 'Buscando o endereço…' : 'Endereço não identificado')}
@@ -255,11 +255,13 @@ export function PassoLocal({
 
           <div className="flex flex-col gap-2 pt-1">
             <BotaoApp variante="escuro" tamanho="xl" largo disabled={!ponto} onClick={confirmar}>
-              {ajustando ? 'Usar este ponto' : 'Sim, estou aqui'}
+              <Arte src={ARTE3D.local} alt="" classeImagem="h-11 w-9 shrink-0 object-contain" recuo={<MapPin className="size-6 shrink-0" />} />
+              <span>{ajustando ? 'Usar este ponto' : 'Sim, estou aqui'}</span>
             </BotaoApp>
             {!ajustando && ponto && (
-              <BotaoApp variante="neutro" tamanho="lg" largo icone={Move} onClick={comecarAjuste}>
-                Corrigir no mapa
+              <BotaoApp variante="neutro" tamanho="lg" largo onClick={comecarAjuste}>
+                <Arte src={ARTE_MOBILE.mapaBrasil} alt="" classeImagem="size-11 shrink-0 object-contain" recuo={<Move className="size-6 shrink-0" />} />
+                <span>Corrigir no mapa</span>
               </BotaoApp>
             )}
             {ajustando && gps && (

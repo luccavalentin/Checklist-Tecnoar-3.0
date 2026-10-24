@@ -2,7 +2,8 @@ import { useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { Camera, Loader2 } from 'lucide-react'
 import { sosEnviarAnexo } from '@/sos/api'
-import { EnviarMidia, GaleriaAnexos, reduzirImagem } from '@/sos/componentes'
+import { GaleriaAnexos, reduzirImagem } from '@/sos/componentes'
+import { Midia3D } from '../comum/Midia3D'
 import { CHAVES_SOS } from '@/sos/tempoReal'
 import type { DetalheChamado, EtapaAnexo } from '@/sos/tipos'
 import { useMecanico } from '../sessao'
@@ -34,7 +35,7 @@ export function FotosAtendimento({ d }: { d: DetalheChamado }) {
       <details className="rounded-[1.25rem] border border-line bg-surface">
         <summary className="flex min-h-14 cursor-pointer list-none items-center px-4 text-[14.5px] font-semibold text-ink-2">Gravar áudio ou vídeo</summary>
         <div className="px-4 pb-4">
-          <EnviarMidia chamadoId={c.id} etapa={etapa} />
+          <Midia3D chamadoId={c.id} etapa={etapa} />
         </div>
       </details>
 

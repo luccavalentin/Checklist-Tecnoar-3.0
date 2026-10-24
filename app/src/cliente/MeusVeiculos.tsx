@@ -1,8 +1,12 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { BellRing, CalendarPlus, Check, Gauge, History, Plus, Star, Truck } from 'lucide-react'
+import { CalendarPlus, Gauge, History, Plus, Star, Truck } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Arte } from '../comum/Arte'
+import { ARTE_MOBILE, VEICULO_MOBILE } from '../comum/kit3d'
+import { ARTE3D } from '../comum/kit3d'
+import { AcaoAgendar3D } from '../comum/AcaoAgendar3D'
 import { mascaraPlaca } from '@/lib/formatos'
 import { useToast } from '@/componentes/ui/Toast'
 import { sosAtualizarConta, sosAtualizarKm, sosCadastrarVeiculo } from '@/sos/api'
@@ -12,7 +16,7 @@ import type { LembreteSOS } from '@/sos/tipos'
 import { useCliente } from '../sessao'
 import { BotaoApp, CampoApp, Esqueleto, Faixa, Folha, LogoSOS } from '../comum/ui'
 import { dataNumerica, kmTexto, nomeVeiculo, useLembretes, useMeusVeiculos, venceu, type EstadoAgendar, type VeiculoCliente } from './dados'
-import { ErroCarga, PlacaVeiculo, Rotulo } from './pecas'
+import { ErroCarga, PlacaVeiculo } from './pecas'
 import './veiculos.css'
 
 const TIPOS = ['cavalo', 'truck', 'toco', 'carreta', 'onibus', 'utilitario']
@@ -56,7 +60,6 @@ export function MeusVeiculos() {
   return (
     <div className="vei">
       <header className="vei-topo pt-[calc(env(safe-area-inset-top)+var(--faixa-rede,0px))]">
-        <div aria-hidden className="vei-foto" />
         <div className="vei-barra">
           <span className="hidden dark:block">
             <LogoSOS negativo altura={44} />
@@ -68,14 +71,14 @@ export function MeusVeiculos() {
             <Plus className="size-5 text-[#ff6a00]" strokeWidth={2.4} /> Adicionar
           </button>
         </div>
-        <h1 className="vei-titulo">
-          Meus <span className="text-[#ff6a00]">veículos</span>
-        </h1>
-        <p className="vei-sub">
-          {lista.length
-            ? `${lista.length} veículo${lista.length > 1 ? 's' : ''} cadastrado${lista.length > 1 ? 's' : ''} na sua conta, com a manutenção preventiva de cada um.`
-            : 'Gerencie os veículos cadastrados na sua conta.'}
-        </p>
+        {/* Uma cor só. Título bicolor divide a leitura em duas e não
+            acrescenta informação: "veículos" não é mais importante que
+            "Meus". O destaque desta tela é o botão de adicionar. */}
+        <h1 className="vei-titulo">Meus veículos</h1>
+        {/* Sem lista, uma frase que CONVIDA. Com lista, nada: a pessoa está
+            olhando os próprios veículos e não precisa que a tela conte
+            quantos são nem explique para que serve a página. */}
+        {!lista.length && <p className="vei-sub">Cadastre seu veículo e o socorro já sai com a placa certa.</p>}
       </header>
       <main className="vei-conteudo entrada-suave">
         {veiculos.isLoading ? (
@@ -89,7 +92,7 @@ export function MeusVeiculos() {
         ) : lista.length === 0 ? (
           <section className="vei-vazio">
             <span className="vei-vazio-icone">
-              <Truck className="size-10" strokeWidth={1.6} />
+              <Arte src={ARTE_MOBILE.caminhao} alt="" recuo={<Truck className="size-10" strokeWidth={1.6} />} classeImagem="size-20 object-contain" />
               <span aria-hidden className="vei-vazio-mais">
                 <Plus className="size-4" strokeWidth={3} />
               </span>
@@ -126,6 +129,26 @@ export function MeusVeiculos() {
   )
 }
 
+/**
+ * O veículo, como PLACA DE IDENTIFICAÇÃO.
+ *
+ * O cartão era cinco retângulos arredondados aninhados: a borda do cartão, a
+ * caixa da quilometragem, a caixa da manutenção, e dois botões cheios. Cinco
+ * molduras para quatro dados. Isso não é hierarquia — é empacotar cada
+ * informação numa caixinha porque não se decidiu qual importa mais, e o
+ * resultado lê como formulário, não como veículo.
+ *
+ * Agora é UMA superfície, com campos estampados e fios de aço separando —
+ * que é exatamente a placa rebitada que todo caminhão carrega. A forma vem
+ * do objeto, não de um padrão de dashboard.
+ *
+ * E some a contradição mais grosseira da tela antiga: ela dizia "Em dia,
+ * avisamos quando chegar a hora" e logo embaixo plantava um botão enorme de
+ * "Agendar revisão". A tela mandava descansar e gritava para agir ao mesmo
+ * tempo. Agora o peso do botão SEGUE o estado: sem nada vencendo, agendar é
+ * um link discreto; com revisão vencida, vira o botão cheio que ele merece
+ * ser — e aí não compete com nada, porque é a única coisa a fazer ali.
+ */
 function CartaoVeiculo({
   veiculo: v,
   principal,
@@ -148,85 +171,78 @@ function CartaoVeiculo({
   const agendar = (descricao?: string) =>
     navegar('/revisoes?agendar=1', { state: { veiculoId: v.id, tipo: 'revisao', descricao } satisfies EstadoAgendar })
 
+  const vencidos = lembretes.filter((l) => venceu(l.vence_em))
+  const proximo = vencidos[0] ?? lembretes[0] ?? null
+  const urgente = vencidos.length > 0
+
   return (
-    <li className={cn('overflow-hidden rounded-[1.25rem] border bg-surface', principal ? 'border-accent/40' : 'border-line')}>
-      <div className="flex flex-col gap-4 p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            {principal ? (
-              <p className="inline-flex items-center gap-1 text-[12px] font-bold text-accent-ink">
-                <Star className="size-3.5 fill-current" /> Principal · já vem no SOS
-              </p>
-            ) : (
-              <Rotulo>Veículo</Rotulo>
+    <li className={cn('vei-ficha', principal && 'vei-ficha-principal', urgente && 'vei-ficha-urgente')}>
+      {/* O caminhão. É ELE o assunto desta tela — uma lista de registros com
+          um ícone de linha é cara de sistema; o veículo em volume é cara de
+          app. Sem a arte gerada ainda, não entra nada: um ícone genérico
+          grande ali só pareceria espaço reservado esperando a imagem. */}
+      <Arte
+        src={VEICULO_MOBILE[v.tipo ?? 'cavalo'] ?? ARTE_MOBILE.caminhao}
+        alt=""
+        recuo={null}
+        classeImagem="vei-ficha-arte"
+      />
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="vei-ficha-nome">{nomeVeiculo(v)}</p>
+          <p className="vei-ficha-detalhe">
+            {principal && (
+              <span className="vei-ficha-principal-marca">
+                <Star className="size-3 fill-current" /> Principal no SOS
+              </span>
             )}
-            <p className="mt-0.5 font-display text-[20px] leading-tight font-bold break-words text-ink">{nomeVeiculo(v)}</p>
-            <p className="mt-0.5 text-[13px] text-ink-3">{detalhes || 'Dados completos na próxima visita à Tecnoar'}</p>
-          </div>
-          <PlacaVeiculo placa={v.placa} className="mt-1" />
+            {detalhes || 'Dados completos na próxima visita à Tecnoar'}
+          </p>
         </div>
+        <PlacaVeiculo placa={v.placa} tamanho="lg" />
+      </div>
 
-        <button type="button" onClick={aoAtualizarKm} className="flex min-h-14 items-center gap-3 rounded-2xl bg-surface-2 px-3.5 text-left active:scale-[0.99]">
-          <Gauge className="size-5 shrink-0 text-ink-3" />
-          <span className="min-w-0 flex-1">
-            <span className="block text-[12px] text-ink-3">Quilometragem</span>
-            <span className="num block text-[15.5px] font-semibold text-ink">{kmTexto(v.km_atual) ?? 'Não informada'}</span>
-          </span>
-          <span className="text-[13.5px] font-semibold text-accent-ink">Atualizar</span>
+      {/* Campos estampados: rótulo pequeno em caixa alta, valor em tipo de
+          largura fixa. Separados por fio, não por caixa. */}
+      <dl className="vei-campos">
+        <button type="button" onClick={aoAtualizarKm} className="vei-campo vei-campo-toca">
+          <dt className="vei-campo-rotulo">Quilometragem</dt>
+          <dd className="vei-campo-valor num">{kmTexto(v.km_atual) ?? '—'}</dd>
+          <span className="vei-campo-acao">Atualizar</span>
         </button>
-
-        <section aria-label="Manutenção preventiva" className="flex flex-col gap-2">
-          <p className="text-[13.5px] font-semibold text-ink">Manutenção preventiva</p>
-          {carregandoLembretes ? (
-            <Esqueleto className="h-12" />
-          ) : lembretes.length === 0 ? (
-            <p className="flex items-center gap-2 rounded-2xl border border-line px-3.5 py-3 text-[13.5px] text-ink-2">
-              <Check className="size-4 shrink-0 text-ok" /> Em dia. Avisamos quando chegar a hora da revisão.
-            </p>
-          ) : (
-            <ul className="flex flex-col divide-y divide-line overflow-hidden rounded-2xl border border-line">
-              {lembretes.slice(0, 3).map((l) => {
-                const vencida = venceu(l.vence_em)
-                return (
-                  <li key={l.id}>
-                    <button type="button" onClick={() => agendar(l.titulo)} className="flex min-h-14 w-full items-center gap-3 px-3.5 py-2.5 text-left active:bg-surface-2">
-                      <BellRing className={cn('size-[18px] shrink-0', vencida ? 'text-crit' : 'text-warn')} />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[14px] leading-snug font-semibold text-ink">{l.titulo}</span>
-                        <span className={cn('block text-[12.5px]', vencida ? 'font-semibold text-crit-ink' : 'text-ink-3')}>
-                          {[l.vence_em ? `${vencida ? 'Venceu em' : 'Até'} ${dataNumerica(l.vence_em)}` : null, l.vence_km != null ? `aos ${kmTexto(l.vence_km)}` : null]
-                            .filter(Boolean)
-                            .join(' · ') || 'Pendente'}
-                        </span>
-                      </span>
-                      <span className="shrink-0 text-[13px] font-semibold text-accent-ink">Agendar</span>
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
+        <div className="vei-campo">
+          <dt className="vei-campo-rotulo">Manutenção</dt>
+          <dd className={cn('vei-campo-valor', urgente && 'vei-campo-valor-crit')}>
+            {carregandoLembretes ? '…' : urgente ? `${vencidos.length} vencida${vencidos.length > 1 ? 's' : ''}` : proximo ? 'A vencer' : 'Em dia'}
+          </dd>
+          {proximo && (
+            <span className="vei-campo-nota">
+              {proximo.titulo}
+              {proximo.vence_em ? ` · ${venceu(proximo.vence_em) ? 'venceu' : 'até'} ${dataNumerica(proximo.vence_em)}` : ''}
+            </span>
           )}
-        </section>
+        </div>
+      </dl>
 
-        <div className="flex flex-col gap-2 min-[380px]:flex-row">
-          <BotaoApp icone={CalendarPlus} onClick={() => agendar()} className="min-[380px]:flex-1">
+      <div className="vei-ficha-acoes">
+        {urgente ? (
+          <BotaoApp icone={CalendarPlus} onClick={() => agendar(proximo?.titulo)} className="flex-1">
             Agendar revisão
           </BotaoApp>
-          <BotaoApp variante="neutro" icone={History} onClick={() => navegar(`/historico?veiculo=${v.id}`)} className="min-[380px]:shrink-0 min-[380px]:px-4">
-            Histórico
-          </BotaoApp>
-        </div>
-      </div>
-      {!principal && (
-        <button
-          type="button"
-          disabled={ocupado}
-          onClick={aoTornarPrincipal}
-          className="flex min-h-12 w-full items-center justify-center gap-2 border-t border-line text-[13.5px] font-semibold text-ink-2 active:bg-surface-2 disabled:opacity-50"
-        >
-          <Star className="size-4" /> Usar como principal no SOS
+        ) : (
+          <button type="button" onClick={() => agendar()} className="vei-ficha-link sos-agendar-render">
+            <AcaoAgendar3D />
+          </button>
+        )}
+        <button type="button" onClick={() => navegar(`/historico?veiculo=${v.id}`)} className="vei-ficha-link">
+          <Arte src={ARTE3D.historico} alt="" recuo={<History className="size-4" />} classeImagem="size-8 shrink-0 object-contain" /> Histórico
         </button>
-      )}
+        {!principal && (
+          <button type="button" disabled={ocupado} onClick={aoTornarPrincipal} className="vei-ficha-link disabled:opacity-50">
+            <Star className="size-4" /> Usar no SOS
+          </button>
+        )}
+      </div>
     </li>
   )
 }
@@ -274,10 +290,11 @@ function FolhaNovoVeiculo({ aberta, aoFechar }: { aberta: boolean; aoFechar: () 
                 aria-pressed={tipo === t}
                 onClick={() => setTipo(t)}
                 className={cn(
-                  'min-h-12 rounded-xl border px-1 text-[13px] font-semibold transition-colors',
+                  'flex min-h-24 flex-col items-center justify-center gap-1 rounded-xl border px-1 text-[13px] font-semibold transition-colors',
                   tipo === t ? 'border-accent bg-accent-soft text-accent-ink' : 'border-line-strong bg-surface text-ink-2',
                 )}
               >
+                <Arte src={VEICULO_MOBILE[t]} alt="" recuo={<Truck className="size-7" />} classeImagem="h-12 w-16 object-contain" />
                 {ROTULO_TIPO_VEICULO[t]}
               </button>
             ))}
