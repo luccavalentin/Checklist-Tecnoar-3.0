@@ -113,13 +113,14 @@ export function PerfilCliente() {
           </div>
           {editando ? (
             <form onSubmit={enviar} className="flex flex-col gap-3.5">
-              <CampoApp rotulo="Nome" icone={User} autoComplete="name" value={nome} onChange={(e) => setNome(e.target.value)} />
+              <CampoApp rotulo="Nome" icone={User} peca={ARTE_MOBILE.conta} autoComplete="name" value={nome} onChange={(e) => setNome(e.target.value)} />
               <CampoApp
                 rotulo="Celular com DDD"
                 type="tel"
                 inputMode="tel"
                 autoComplete="tel"
                 icone={Phone}
+                peca={ARTE_MOBILE.telefone}
                 value={telefone}
                 onChange={(e) => setTelefone(mascaraTelefone(e.target.value))}
                 dica="É o número que vai para o especialista no pedido de socorro."

@@ -67,12 +67,12 @@ export const VEICULO_MOBILE: Readonly<Record<string, string>> = {
 
 export const PECA_SINTOMA: Readonly<Record<string, string>> = {
   ar: `${MOBILE}/manometro.webp`,
-  pedal: `${RAIZ}/freio.webp`,
+  pedal: `${MOBILE}/ocorrencia-freio-v2.webp`,
   travado: `${MOBILE}/freio-travado.webp`,
   chiado: `${MOBILE}/chiado-ar.webp`,
   quente: `${MOBILE}/roda-quente.webp`,
-  partida: `${RAIZ}/motor.webp`,
-  pneu: `${RAIZ}/pneu.webp`,
+  partida: `${MOBILE}/ocorrencia-motor-v2.webp`,
+  pneu: `${MOBILE}/ocorrencia-pneu-v2.webp`,
   painel: `${MOBILE}/alerta-painel.webp`,
   nao_sei: `${RAIZ}/outro.webp`,
 }
@@ -125,15 +125,15 @@ export const ARTE3D = {
  * traço sem a tela precisar saber disso.
  */
 export const PECA_OCORRENCIA: Partial<Record<OcorrenciaSOS, string>> = {
-  freios: `${RAIZ}/freio.webp`,
-  nao_liga: `${RAIZ}/motor.webp`,
-  mecanico: `${RAIZ}/cambio.webp`,
-  pane_eletrica: `${RAIZ}/bateria.webp`,
-  roda_pneu: `${RAIZ}/pneu.webp`,
-  vazamento: `${RAIZ}/vazamento.webp`,
-  parado: `${RAIZ}/caminhao.webp`,
-  outro: `${RAIZ}/outro.webp`,
-  desconhecido: `${RAIZ}/outro.webp`,
+  freios: `${MOBILE}/ocorrencia-freio-v2.webp`,
+  nao_liga: `${MOBILE}/ocorrencia-motor-v2.webp`,
+  mecanico: `${MOBILE}/ocorrencia-cambio-v2.webp`,
+  pane_eletrica: `${MOBILE}/ocorrencia-bateria-v2.webp`,
+  roda_pneu: `${MOBILE}/ocorrencia-pneu-v2.webp`,
+  vazamento: `${MOBILE}/ocorrencia-vazamento-v2.webp`,
+  parado: `${MOBILE}/ocorrencia-caminhao-v2.webp`,
+  outro: `${MOBILE}/ocorrencia-outro-v2.webp`,
+  desconhecido: `${MOBILE}/ocorrencia-outro-v2.webp`,
 }
 
 /** Esconde a arte que não carregou, em vez de deixar o ícone quebrado na tela. */

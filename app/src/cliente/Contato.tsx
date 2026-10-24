@@ -73,14 +73,14 @@ export function Contato() {
             <h2 className="font-display text-[16px] font-bold text-ink">Feridos ou fogo?</h2>
           </div>
           <p className="text-[14px] leading-snug text-ink-2">Ligue primeiro para o resgate. Depois, peça o socorro.</p>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 gap-2 min-[361px]:grid-cols-4">
             {[
               ['193', 'Bombeiros'],
               ['192', 'SAMU'],
               ['190', 'Polícia'],
               ['191', 'PRF'],
             ].map(([n, r]) => (
-              <a key={n} href={`tel:${n}`} className="flex min-h-16 flex-col items-center justify-center rounded-2xl bg-crit-soft text-crit-ink active:scale-[0.97]">
+              <a key={n} href={`tel:${n}`} className="sos-button-3d sos-button-3d-perigo flex min-h-16 min-w-0 flex-col items-center justify-center rounded-2xl">
                 <span className="font-display text-[19px] leading-none font-black">{n}</span>
                 <span className="mt-1 text-[11px] font-semibold">{r}</span>
               </a>

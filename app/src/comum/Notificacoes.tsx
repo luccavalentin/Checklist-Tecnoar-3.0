@@ -11,6 +11,8 @@ import { haQuanto } from '@/sos/rotulos'
 import { useSessao } from '../sessao'
 import { BotaoApp, CabecalhoTela, CartaoApp, Esqueleto, Faixa, Tela, VazioApp } from './ui'
 import { semMarcacao } from './avisos'
+import { Arte } from './Arte'
+import { ARTE_MOBILE } from './kit3d'
 
 const db = supabase as unknown as SupabaseClient
 
@@ -143,13 +145,13 @@ export function Notificacoes() {
       />
       <Tela>
         {permissao !== 'granted' && (
-          <CartaoApp className="flex flex-wrap items-center gap-3 border-accent/30">
-            <BellRing className="size-7 shrink-0 text-accent-ink" />
+          <CartaoApp className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 border-accent/30 min-[361px]:flex min-[361px]:flex-wrap">
+            <Arte src={ARTE_MOBILE.sino} alt="" classeImagem="size-10 shrink-0 object-contain" recuo={<BellRing className="size-7 shrink-0 text-accent-ink" />} />
             <div className="min-w-0 flex-1">
               <p className="font-display text-[15px] font-bold text-ink">Receba avisos no celular</p>
               <p className="text-[13px] text-ink-2">Mecânico a caminho, chegada e mensagens — mesmo com o app fechado.</p>
             </div>
-            <BotaoApp tamanho="md" onClick={() => void ativar()} disabled={permissao === 'indisponivel'}>
+            <BotaoApp className="max-[360px]:col-start-2 max-[360px]:justify-self-start" tamanho="md" onClick={() => void ativar()} disabled={permissao === 'indisponivel'}>
               Ativar
             </BotaoApp>
           </CartaoApp>

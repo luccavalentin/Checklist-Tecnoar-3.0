@@ -74,3 +74,22 @@
   }
   .cli-premium :is(.animate-ping, .sos-piscar) { animation: none !important; }
 }
+/* A peça decora o acionador nativo, que continua recebendo o toque e o foco. */
+.agendamento-data-3d .sos-field {
+  position: relative;
+}
+.agendamento-data-3d input[type="date"] {
+  padding-right: 2.75rem;
+}
+.agendamento-data-3d input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  cursor: pointer;
+}

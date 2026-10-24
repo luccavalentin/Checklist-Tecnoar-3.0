@@ -1,0 +1,50 @@
+[
+  {
+    "key": "pneu",
+    "prompt": "Create ONE premium photorealistic 3D mobile UI icon: a heavy truck wheel with a thick BLACK rubber tire, realistic deep tread and dark charcoal sidewall, brushed steel wheel rim and central hub. Three-quarter front view. Tire is unmistakably black, never white/silver/chrome rubber. Clean recognizable chunky silhouette at 40px. Isolated object on transparent background, no badge, no circle, no platform, no text or letters. Object fills 85% of square frame, centered, entirely visible. Studio softbox lighting upper left, natural realistic materials, restrained tiny orange and cyan reflections on the METAL ONLY. Strong midtone body, highlights controlled, no blown-out whites. This is part of a realistic automotive parts icon family for SOS Tecnoar.",
+    "tool": "imagegen (integrated)",
+    "source": "C:\\Users\\lucca\\.codex\\generated_images\\01a16f53-b17f-7be1-8ee5-b03f731ceb71\\exec-d1c986a4-ff38-455b-8bd8-f8ee072c9c22.png"
+  },
+  {
+    "key": "freio",
+    "prompt": "Create ONE premium photorealistic 3D mobile UI icon for SOS Tecnoar automotive app. Isolated object on truly transparent background. Three-quarter front view, studio softbox light upper left, realistic natural material colors, restrained tiny orange/cyan reflections on metal only. Strong readable chunky silhouette at 40px. No whitewash, no blown highlights, no white outline, no badge, no circle, no platform, no text. Object centered, completely visible, fills 85% square frame. Subject: heavy commercial truck brake assembly, dark cast iron brake disc with visible ventilation and a compact vivid orange brake caliper. Realistic solid metal mechanism, clean readable geometry.",
+    "tool": "imagegen (integrated)",
+    "source": "C:\\Users\\lucca\\.codex\\generated_images\\01a16f53-b17f-7be1-8ee5-b03f731ceb71\\exec-106dfe32-c044-4f8a-9c2a-f7efba3162d0.png"
+  },
+  {
+    "key": "motor",
+    "prompt": "Create ONE premium photorealistic 3D mobile UI icon for SOS Tecnoar automotive app. Isolated object on truly transparent background. Three-quarter front view, studio softbox light upper left, realistic natural material colors, restrained tiny orange/cyan reflections on metal only. Strong readable chunky silhouette at 40px. No whitewash, no blown highlights, no white outline, no badge, no circle, no platform, no text. Object centered, completely visible, fills 85% square frame. Subject: heavy duty diesel engine block, dark graphite cast iron housing with black hoses and small orange valve cover accent. Compact complete assembled engine, recognizable solid motor silhouette.",
+    "tool": "imagegen (integrated)",
+    "source": "C:\\Users\\lucca\\.codex\\generated_images\\01a16f53-b17f-7be1-8ee5-b03f731ceb71\\exec-d5fa3764-1e6c-4039-97e6-fed49ef3aa44.png"
+  },
+  {
+    "key": "cambio",
+    "prompt": "Create ONE premium photorealistic 3D mobile UI icon for SOS Tecnoar automotive app. Isolated object on truly transparent background. Three-quarter front view, studio softbox light upper left, realistic natural material colors, restrained tiny orange/cyan reflections on metal only. Strong readable chunky silhouette at 40px. No whitewash, no blown highlights, no white outline, no badge, no circle, no platform, no text. Object centered, completely visible, fills 85% square frame. Subject: heavy truck manual transmission gearbox with dark steel cast housing and a short gear lever rising from top, black rubber shift knob, tiny orange accents. No exploded view.",
+    "tool": "imagegen (integrated)",
+    "source": "C:\\Users\\lucca\\.codex\\generated_images\\01a16f53-b17f-7be1-8ee5-b03f731ceb71\\exec-c304487a-471a-455e-9d48-eccee55610c8.png"
+  },
+  {
+    "key": "bateria",
+    "prompt": "Create ONE premium photorealistic 3D mobile UI icon for SOS Tecnoar automotive app. Isolated object on truly transparent background. Three-quarter front view, studio softbox light upper left, realistic natural material colors, restrained tiny orange/cyan reflections on metal only. Strong readable chunky silhouette at 40px. No whitewash, no blown highlights, no white outline, no badge, no circle, no platform, no text. Object centered, completely visible, fills 85% square frame. Subject: a realistic heavy duty automotive battery, opaque dark navy black plastic case, two distinct metal terminal posts with red positive and black negative caps, orange carry handle. No text.",
+    "tool": "imagegen (integrated)",
+    "source": "C:\\Users\\lucca\\.codex\\generated_images\\01a16f53-b17f-7be1-8ee5-b03f731ceb71\\exec-1f57c980-c353-4c48-b840-ce58668b9d39.png"
+  },
+  {
+    "key": "vazamento",
+    "prompt": "Create ONE premium photorealistic 3D mobile UI icon for SOS Tecnoar automotive app. Isolated object on truly transparent background. Three-quarter front view, studio softbox light upper left, realistic natural material colors, restrained tiny orange/cyan reflections on metal only. Strong readable chunky silhouette at 40px. No whitewash, no blown highlights, no white outline, no badge, no circle, no platform, no text. Object centered, completely visible, fills 85% square frame. Subject: one large glossy translucent AMBER BROWN motor oil droplet with a small dark brown oil puddle beneath it. Clearly oil, not flame, not fire. Realistic oil viscosity and strong dark contour, controlled golden highlights.",
+    "tool": "imagegen (integrated)",
+    "source": "C:\\Users\\lucca\\.codex\\generated_images\\01a16f53-b17f-7be1-8ee5-b03f731ceb71\\exec-4f2fb232-c393-46c0-92ef-81bfbd44049b.png"
+  },
+  {
+    "key": "caminhao",
+    "prompt": "Create ONE premium photorealistic 3D mobile UI icon for SOS Tecnoar automotive app. Isolated object on truly transparent background. Three-quarter front view, studio softbox light upper left, realistic natural material colors, restrained tiny orange/cyan reflections on metal only. Strong readable chunky silhouette at 40px. No whitewash, no blown highlights, no white outline, no badge, no circle, no platform, no text. Object centered, completely visible, fills 85% square frame. Subject: orange heavy truck tractor cab with black rubber tires, dark chassis and dark glass windows, steel details. Complete vehicle, short tractor unit without trailer, three quarter front perspective.",
+    "tool": "imagegen (integrated)",
+    "source": "C:\\Users\\lucca\\.codex\\generated_images\\01a16f53-b17f-7be1-8ee5-b03f731ceb71\\exec-0334572d-6b28-4bfe-a1f2-ca9696cd5682.png"
+  },
+  {
+    "key": "outro",
+    "prompt": "Create ONE premium photorealistic 3D mobile UI icon for SOS Tecnoar automotive app. Isolated object on truly transparent background. Three-quarter front view, studio softbox light upper left, realistic natural material colors, restrained tiny orange/cyan reflections on metal only. Strong readable chunky silhouette at 40px. No whitewash, no blown highlights, no white outline, no badge, no circle, no platform, no text. Object centered, completely visible, fills 85% square frame. Subject: a compact realistic mechanic toolkit: dark navy metal toolbox with orange handle, a steel wrench and screwdriver visible. Simple bold silhouette, solid black rubber grips, no text or logos.",
+    "tool": "imagegen (integrated)",
+    "source": "C:\\Users\\lucca\\.codex\\generated_images\\01a16f53-b17f-7be1-8ee5-b03f731ceb71\\exec-65f70188-c65a-4cfb-8918-01cd90a7986c.png"
+  }
+]

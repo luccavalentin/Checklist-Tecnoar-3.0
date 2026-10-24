@@ -294,6 +294,9 @@
   background: radial-gradient(circle at 40% 30%, #fff 0%, #e6f0f6 62%, #b8cbd8 100%);
   box-shadow: inset 0 1px 1px #fff, 0 2px 3px #00182940;
   object-fit: contain;
+  /* A cor pertence ao render: o tema e a seleção não clareiam a peça. */
+  filter: none;
+  mix-blend-mode: normal;
   opacity: 1;
   transition: transform 140ms ease;
 }

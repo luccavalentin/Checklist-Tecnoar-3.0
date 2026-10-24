@@ -387,7 +387,19 @@ function FolhaAgendar({ inicial, aoFechar }: { inicial: EstadoAgendar | null; ao
           </div>
         )}
 
-        <CampoApp rotulo="Data que prefere (opcional)" type="date" min={hojeISO()} value={data} onChange={(e) => setData(e.target.value)} />
+        <CampoApp
+          className="agendamento-data-3d"
+          rotulo="Data que prefere (opcional)"
+          type="date"
+          min={hojeISO()}
+          value={data}
+          onChange={(e) => setData(e.target.value)}
+          direita={
+            <span aria-hidden="true" className="pointer-events-none absolute right-3.5 flex size-8 items-center justify-center">
+              <Arte src={ARTE_MOBILE.revisoes} alt="" classeImagem="size-8 object-contain" recuo={<CalendarCheck className="size-5 text-ink-3" />} />
+            </span>
+          }
+        />
 
         <Escolha
           rotulo="Período"
