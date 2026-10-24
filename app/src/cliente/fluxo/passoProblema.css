@@ -282,17 +282,20 @@
   transition: border-color 140ms ease, color 140ms ease;
 }
 
-/* A peça renderizada no lugar do ícone de traço. Só 32px, mas é o que separa
-   uma fila de opções de uma fila de peças que a oficina reconhece. */
+/* O suporte prateado separa as peças escuras da superfície do botão,
+   inclusive no tema escuro e quando a opção está selecionada. */
 .pp-tipo-peca {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   flex-shrink: 0;
+  padding: 3px;
+  border: 1px solid #a9c6d7;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, #fff 0%, #e6f0f6 62%, #b8cbd8 100%);
+  box-shadow: inset 0 1px 1px #fff, 0 2px 3px #00182940;
   object-fit: contain;
-  /* Fora da escolha a peça recua, para a fila não virar uma vitrine. */
-  filter: saturate(0.75);
-  opacity: 0.86;
-  transition: filter 140ms ease, opacity 140ms ease, transform 140ms ease;
+  opacity: 1;
+  transition: transform 140ms ease;
 }
 
 .pp-tipo-sel {
@@ -302,9 +305,7 @@
 }
 
 .pp-tipo-sel .pp-tipo-peca {
-  filter: none;
-  opacity: 1;
-  transform: scale(1.06);
+  transform: scale(1.03);
 }
 
 .pp-tipo:active {
