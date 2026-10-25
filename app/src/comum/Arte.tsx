@@ -66,7 +66,7 @@ export function Arte({
            dobra. Com `lazy`, o lugar delas ficava um buraco visível por
            alguns segundos, que é pior do que os 20 KB que ela economiza. */
         loading="eager"
-        fetchPriority="low"
+        fetchpriority="low"
         decoding="async"
         draggable={false}
         onError={() => setFalhou(true)}

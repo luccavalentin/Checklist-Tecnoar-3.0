@@ -93,7 +93,7 @@ export function BotaoSOS({
         aria-hidden="true"
         width={898}
         height={931}
-        fetchPriority="high"
+        fetchpriority="high"
         decoding="async"
         draggable={false}
         onError={sumirSeFalhar}

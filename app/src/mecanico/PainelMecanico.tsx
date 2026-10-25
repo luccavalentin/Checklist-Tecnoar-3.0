@@ -119,7 +119,7 @@ export function PainelMecanico() {
         </div>
         <div className="mi-studio-cena" aria-hidden="true">
           <span className="mi-studio-pista" />
-          <img src="/sos/mobile-3d/veiculo-utilitario.webp" alt="" draggable={false} width={256} height={256} fetchPriority="high" onError={sumirSeFalhar} />
+          <img src="/sos/mobile-3d/veiculo-utilitario.webp" alt="" draggable={false} width={256} height={256} fetchpriority="high" onError={sumirSeFalhar} />
         </div>
       </header>
 
