@@ -12,6 +12,7 @@ import { useInfoCentral, useOnline } from './dados'
 import { CHAVES_OS, invalidarDepoisDeLancar } from './os/dados'
 import { FichaProduto } from './FichaProduto'
 import { BotaoM, EsqueletoM, RotuloM, SeloM } from './ui'
+import { IconeM3D } from './ArteMecanico'
 
 export type TipoCatalogo = 'produto' | 'servico'
 
@@ -146,7 +147,7 @@ export function Catalogo({
     <div className="flex flex-col gap-4">
       {/* busca */}
       <label className="sos-field flex min-h-14 items-center gap-2.5 rounded-[1.15rem] px-3.5 transition-[border-color,box-shadow] focus-within:border-accent focus-within:ring-4 focus-within:ring-accent/15">
-        <Search className="size-5 shrink-0 text-ink-3" />
+        <IconeM3D icone={Search} className="size-8" />
         <input
           ref={campo}
           type="search"
@@ -505,9 +506,9 @@ function Miniatura({ id, produto, descricao }: { id: string; produto: boolean; d
       {url ? (
         <img src={url} alt={descricao} loading="lazy" className="size-full object-contain" />
       ) : produto ? (
-        <Package className="size-6" />
+        <IconeM3D icone={Package} className="size-10" />
       ) : (
-        <Wrench className="size-6" />
+        <IconeM3D icone={Wrench} className="size-10" />
       )}
     </span>
   )

@@ -1,5 +1,7 @@
 import { useCallback, useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
+import { Package, Wrench } from 'lucide-react'
+import { IconeM3D } from './ArteMecanico'
 import type { ItemCatalogo } from '@/sos/tipos'
 import { Catalogo } from './Catalogo'
 import { useDestinosLancamento } from './os/dados'
@@ -28,7 +30,7 @@ export function CatalogoMecanico() {
 
   return (
     <>
-      <TopoM voltar="/" titulo={produtos ? 'Produtos' : 'Serviços'} sub={sub} />
+      <TopoM voltar="/" titulo={produtos ? 'Produtos' : 'Serviços'} sub={sub} acao={<IconeM3D icone={produtos ? Package : Wrench} className="size-12" />} />
       <TelaM>
         {erro && !podeLancar && (
           <p className="rounded-2xl bg-warn-soft px-3.5 py-2.5 text-[13.5px] leading-snug font-medium text-warn-ink">

@@ -91,3 +91,10 @@
   .mi-studio :is(button,a), .ma-studio button { transition: none; }
   .mi-studio :is(button,a):active, .ma-studio button:active:not(:disabled) { transform: none; }
 }
+.mi-studio .mi-numero-icone {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: none;
+  opacity: 1;
+}

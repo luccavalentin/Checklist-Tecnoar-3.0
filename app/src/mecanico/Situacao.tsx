@@ -1,5 +1,5 @@
 import { Check, Coffee, Loader2, MoonStar, Power, Wrench, type LucideIcon } from 'lucide-react'
-import { ARTE3D, ARTE_MOBILE } from '../comum/kit3d'
+import { ARTE_MOBILE } from '../comum/kit3d'
 import { cn } from '@/lib/utils'
 import { destravarAudio } from '@/sos/alerta'
 import type { LeituraGPS } from '@/sos/geo'
@@ -22,11 +22,11 @@ const ICONES: Record<SituacaoMecanico, LucideIcon> = {
  * situação, não pelo ícone: o kit não distingue os dois pelo desenho.
  */
 const PECAS: Record<SituacaoMecanico, string> = {
-  disponivel: ARTE_MOBILE.seloSOS,
+  disponivel: ARTE_MOBILE.energia,
   em_atendimento: '/sos/mobile-3d/ferramentas.webp',
-  pausa: ARTE3D.tempo,
-  indisponivel: ARTE_MOBILE.cadeado,
-  offline: ARTE_MOBILE.sair,
+  pausa: ARTE_MOBILE.pausa,
+  indisponivel: ARTE_MOBILE.temaEscuro,
+  offline: ARTE_MOBILE.energia,
 }
 
 const ORDEM: SituacaoMecanico[] = ['disponivel', 'pausa', 'indisponivel', 'offline', 'em_atendimento']

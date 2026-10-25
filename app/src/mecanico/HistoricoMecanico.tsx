@@ -1,21 +1,23 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AlertTriangle, ChevronRight, ClipboardList, RefreshCw, Star } from 'lucide-react'
+import { AlertTriangle, ChevronRight, CircleCheck, ClipboardList, Phone, RefreshCw, Star, XCircle, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Estrelas } from '@/sos/componentes'
 import { STATUS_SOS, dataHoraCurta } from '@/sos/rotulos'
 import type { HomeMecanico } from '@/sos/tipos'
 import { useHomeMecanico } from './dados'
 import { Placa } from './pecas'
+import { IconeM3D } from './ArteMecanico'
+import { ARTE_MOBILE } from '../comum/kit3d'
 import { BotaoM, EsqueletoM, NumeroM, SeloM, TelaM, TopoM, VazioM } from './ui'
 
 type Filtro = 'todos' | 'finalizados' | 'cancelados' | 'avaliados'
 
-const FILTROS: Array<{ id: Filtro; rotulo: string }> = [
-  { id: 'todos', rotulo: 'Todos' },
-  { id: 'finalizados', rotulo: 'Finalizados' },
-  { id: 'avaliados', rotulo: 'Avaliados' },
-  { id: 'cancelados', rotulo: 'Cancelados' },
+const FILTROS: Array<{ id: Filtro; rotulo: string; icone: LucideIcon; peca?: string }> = [
+  { id: 'todos', rotulo: 'Todos', icone: ClipboardList },
+  { id: 'finalizados', rotulo: 'Finalizados', icone: CircleCheck },
+  { id: 'avaliados', rotulo: 'Avaliados', icone: Star },
+  { id: 'cancelados', rotulo: 'Cancelados', icone: XCircle, peca: ARTE_MOBILE.cancelarSocorro },
 ]
 
 /**
@@ -58,11 +60,11 @@ export function HistoricoMecanico() {
               <NumeroM
                 rotulo="Avaliação média"
                 valor={nota != null ? Number(nota).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '–'}
-                icone={nota != null ? Star : undefined}
+                icone={Star}
                 tom="ambar"
               />
-              <NumeroM rotulo="Chamados hoje" valor={h ? h.hoje.atendimentos : '–'} />
-              <NumeroM rotulo="Finalizados hoje" valor={h ? h.hoje.concluidos : '–'} tom="ok" />
+              <NumeroM rotulo="Chamados hoje" valor={h ? h.hoje.atendimentos : '–'} icone={Phone} />
+              <NumeroM rotulo="Finalizados hoje" valor={h ? h.hoje.concluidos : '–'} tom="ok" icone={CircleCheck} />
             </div>
 
             {h?.chamado_atual && (
@@ -94,12 +96,12 @@ export function HistoricoMecanico() {
                   aria-selected={filtro === f.id}
                   onClick={() => setFiltro(f.id)}
                   className={cn(
-                    'min-h-11 min-w-0 truncate rounded-xl px-1 text-[13px] font-bold whitespace-nowrap transition-colors',
-                    filtro === f.id ? 'bg-accent text-white' : 'text-ink-2 active:bg-surface-2',
+                    'sos-button-3d flex min-h-[4.5rem] min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[12px] font-bold transition-colors',
+                    filtro === f.id && 'sos-button-3d-primario',
                   )}
                 >
-                  {f.rotulo}
-                  {f.id === 'avaliados' && avaliados > 0 ? <span className="num ml-1 opacity-80">{avaliados}</span> : null}
+                  <IconeM3D icone={f.icone} peca={f.peca} className="size-7" />
+                  <span>{f.rotulo}{f.id === 'avaliados' && avaliados > 0 ? <span className="num ml-1 opacity-80">{avaliados}</span> : null}</span>
                 </button>
               ))}
             </div>

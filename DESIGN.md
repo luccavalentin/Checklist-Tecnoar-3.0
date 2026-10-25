@@ -1,5 +1,15 @@
 # Sistema visual Tecnoar
 
+## Correção de identidade e cobertura 3D — 24/10/2026
+
+O produto atende caminhoneiros e mecânicos de veículos pesados. O usuário rejeitou a figura com capacete de motociclista. Os ícones genéricos de Conta/Perfil dos dois aplicativos usam agora `perfil-profissional-v3.webp`, um busto de camisa de trabalho e cabeça descoberta. Não usar motociclista, capacete de moto, roupa de corrida ou acessórios de motociclismo como identidade de cliente ou especialista.
+
+Produtos/estoque usa `produtos-estoque-v3.webp`, uma caixa com peças organizadas; não representar o catálogo por uma peça de câmbio isolada. As fotos reais de produtos permanecem quando disponíveis. A busca recebe lupa 3D; itens sem foto usam a caixa de peças como alternativa visual.
+
+Painel do mecânico, atalho de pausa, opções de status, campos e interruptores do perfil, indicadores, filtros e estados vazios do histórico usam `IconeM3D`. Os números, permissões, disponibilidade e filtros continuam controlados pelos dados e comportamentos existentes. Café representa pausa; o símbolo de energia representa ligar/desligar; lua representa indisponibilidade; ferramentas representam atendimento. Ícones de direção, fechar e carregamento continuam funcionais e compactos.
+
+Os seis novos renders foram criados individualmente com imagegen e preservam cores e materiais nos dois temas. `design/prompts-profissionais-v3.json` registra prompts e origens; `scripts/design/preparar-profissionais-v3.py` prepara os WebP de até 320 px sem recortar fundos por cor. As capturas e os resultados locais ficam em `output/playwright/profissionais-v3`.
+
 ## Atualização mobile — 23 de outubro de 2026
 
 A referência visual atual para início, acesso, conta e Tecno IA são as imagens fornecidas pelo usuário nesta data: estrada molhada ao anoitecer, oficina industrial, navy profundo, laranja luminoso, filetes ciano e peças metálicas 3D. Esta seção substitui a orientação anterior de superfícies sólidas e frota em diorama nessas quatro telas. O aplicativo continua implementado em React web, com empacotamento Capacitor para celular.

@@ -312,7 +312,7 @@ function NumerosDoDia({ h, emAndamento }: { h: HomeMecanico | undefined; emAndam
 function Estatistica({ icone: Icone, rotulo, valor }: { icone: LucideIcon; rotulo: string; valor: ReactNode }) {
   return (
     <div className="mi-cartao mi-numero">
-      <Icone className="mi-numero-icone" strokeWidth={1.7} />
+      <IconeM3D icone={Icone} className="mi-numero-icone size-8" />
       <dd className="mi-numero-valor num">{valor}</dd>
       <dt className="mi-numero-rotulo">{rotulo}</dt>
     </div>

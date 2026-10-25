@@ -6,6 +6,7 @@ import { OCORRENCIAS, SITUACOES_MECANICO, formatarPlacaExibicao } from '@/sos/ro
 import type { OcorrenciaSOS, PrioridadeSOS, SituacaoMecanico } from '@/sos/tipos'
 import { Arte } from '../comum/Arte'
 import { PECA_OCORRENCIA } from '../comum/kit3d'
+import { IconeM3D } from './ArteMecanico'
 
 /**
  * Peças visuais só do app do especialista. O que é comum ao cliente fica em
@@ -98,7 +99,7 @@ export function Interruptor({
     >
       {Icone && (
         <span className="sos-chip flex size-10 shrink-0 items-center justify-center rounded-[1rem] text-ink-2">
-          <Icone className="size-5" />
+          <IconeM3D icone={Icone} className="size-8" />
         </span>
       )}
       <span className="min-w-0 flex-1">

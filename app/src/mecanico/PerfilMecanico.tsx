@@ -15,7 +15,7 @@ import { CartaoModoApp } from '../ModoApp'
 import { Avatar } from '../comum/ui'
 import { CartaoAparelho } from '../comum/Aparelho'
 import { IconeM3D } from './ArteMecanico'
-import { ARTE_MOBILE } from '../comum/kit3d'
+import { ARTE_MOBILE, VEICULO_MOBILE } from '../comum/kit3d'
 import { atualizarFicha, temaEscuroAgora, useHomeMecanico } from './dados'
 import { Interruptor, PontoSituacao } from './pecas'
 import { aplicarTemaMecanico, lerTemaMecanico, type TemaMecanico } from './tema'
@@ -131,6 +131,7 @@ export function PerfilMecanico() {
             <CampoM
               rotulo="Veículo de apoio"
               icone={Truck}
+              peca={VEICULO_MOBILE.utilitario}
               value={veiculo}
               maxLength={80}
               placeholder="Ex.: Strada branca ABC1D23"

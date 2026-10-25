@@ -196,9 +196,9 @@ export function NumeroM({
   const cor = tom === 'ok' ? 'text-ok-ink' : tom === 'laranja' ? 'text-accent-ink' : tom === 'ambar' ? 'text-warn-ink' : tom === 'ciano' ? 'text-cyan-ink' : 'text-ink'
   return (
     <div className={cn('flex min-w-0 flex-col rounded-2xl border border-line bg-surface px-3 py-3 mec-sombra', className)}>
+      {Icone && <IconeM3D icone={Icone} className="mb-2 size-8" />}
       <span className={cn('num flex items-center gap-1 text-[26px] leading-none font-semibold tracking-tight', cor)}>
         {valor}
-        {Icone && <Icone className="size-[18px] shrink-0" strokeWidth={2.4} />}
       </span>
       <span className="mt-2 text-[12px] leading-tight font-semibold text-ink-2">{rotulo}</span>
       {sub && <span className="mt-0.5 truncate text-[11px] text-ink-3">{sub}</span>}
@@ -305,8 +305,8 @@ export function ListaM({ children, className }: { children: ReactNode; className
 
 export const CampoM = forwardRef<
   HTMLInputElement,
-  InputHTMLAttributes<HTMLInputElement> & { rotulo: string; icone?: LucideIcon; dica?: ReactNode; erro?: string | null }
->(function CampoM({ rotulo, icone: Icone, dica, erro, className, id, ...props }, ref) {
+  InputHTMLAttributes<HTMLInputElement> & { rotulo: string; icone?: LucideIcon; peca?: string; dica?: ReactNode; erro?: string | null }
+>(function CampoM({ rotulo, icone: Icone, peca, dica, erro, className, id, ...props }, ref) {
   const idCampo = id ?? `campo-m-${rotulo.replace(/\W+/g, '-').toLowerCase()}`
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
@@ -314,7 +314,7 @@ export const CampoM = forwardRef<
         {rotulo}
       </label>
       <div className={cn('sos-field flex min-h-14 items-center gap-2.5 rounded-[1.15rem] px-3.5 transition-[border-color,box-shadow,background-color] focus-within:border-accent focus-within:ring-4 focus-within:ring-accent/15', erro && '!border-crit')}>
-        {Icone && <Icone className="size-5 shrink-0 text-ink-3" />}
+        {Icone && <IconeM3D icone={Icone} peca={peca} className="size-8 shrink-0" />}
         <input ref={ref} id={idCampo} className="min-w-0 flex-1 bg-transparent py-3 text-[16px] text-ink outline-none placeholder:text-ink-3" {...props} />
       </div>
       {erro ? <p className="text-[12.5px] font-semibold text-crit-ink">{erro}</p> : dica ? <p className="text-[12.5px] text-ink-3">{dica}</p> : null}
@@ -408,8 +408,8 @@ export function FolhaM({
 export function VazioM({ icone: Icone, titulo, texto, acao }: { icone: LucideIcon; titulo: string; texto?: ReactNode; acao?: ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-3 rounded-[1.25rem] border border-dashed border-line-strong px-6 py-8 text-center">
-      <span className="flex size-14 items-center justify-center rounded-2xl bg-surface-2 text-ink-2">
-        <Icone className="size-7" />
+      <span className="flex size-20 items-center justify-center text-ink-2">
+        <IconeM3D icone={Icone} className="size-20" />
       </span>
       <p className="font-display text-[17px] font-extrabold text-ink">{titulo}</p>
       {texto && <p className="max-w-[19rem] text-[14px] leading-relaxed text-ink-2">{texto}</p>}
