@@ -370,7 +370,7 @@ function AbrirChamado({ atual }: { atual: { id: string; protocolo: string; clien
           <IconeM3D icone={BellRing} className="size-10" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="mi-novo-titulo">Novo chamado</span>
+          <span className="mi-novo-titulo text-center">Novo chamado</span>
           <span className="mi-novo-sub">{ocupado ? 'Termine o atendimento atual primeiro' : 'Cliente na sua frente ou que ligou direto'}</span>
         </span>
         <span className="mi-novo-seta">

@@ -74,9 +74,9 @@ export function TopoM({
             type="button"
             aria-label="Voltar"
             onClick={aoVoltar}
-            className="sos-icon-button flex size-12 shrink-0 items-center justify-center rounded-full text-ink"
+            className="sos-button-3d flex size-12 shrink-0 items-center justify-center rounded-2xl"
           >
-            <ChevronLeft className="size-7" />
+            <ChevronLeft className="size-7 text-[#ff9b38]" strokeWidth={3} aria-hidden="true" />
           </button>
         )}
         <div className={cn('min-w-0 flex-1', !voltar && 'pl-1')}>
