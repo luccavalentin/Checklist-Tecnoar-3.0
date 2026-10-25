@@ -1,9 +1,11 @@
 import { Check, Coffee, Loader2, MoonStar, Power, Wrench, type LucideIcon } from 'lucide-react'
+import { ARTE3D, ARTE_MOBILE } from '../comum/kit3d'
 import { cn } from '@/lib/utils'
 import { destravarAudio } from '@/sos/alerta'
 import type { LeituraGPS } from '@/sos/geo'
 import { SITUACOES_MECANICO } from '@/sos/rotulos'
 import type { SituacaoMecanico } from '@/sos/tipos'
+import { IconeM3D } from './ArteMecanico'
 import { useDefinirSituacao } from './dados'
 import { FolhaM } from './ui'
 
@@ -15,15 +17,19 @@ const ICONES: Record<SituacaoMecanico, LucideIcon> = {
   offline: Power,
 }
 
-const ORDEM: SituacaoMecanico[] = ['disponivel', 'pausa', 'indisponivel', 'offline', 'em_atendimento']
-
-const COR: Record<SituacaoMecanico, string> = {
-  disponivel: 'bg-[#00afef] text-white',
-  em_atendimento: 'bg-cyan text-white',
-  pausa: 'bg-warn-soft text-warn-ink',
-  indisponivel: 'bg-crit-soft text-crit-ink',
-  offline: 'bg-surface-2 text-ink-2',
+/**
+ * Disponível e offline partilham o ícone de traço, então a peça vai por
+ * situação, não pelo ícone: o kit não distingue os dois pelo desenho.
+ */
+const PECAS: Record<SituacaoMecanico, string> = {
+  disponivel: ARTE_MOBILE.seloSOS,
+  em_atendimento: '/sos/mobile-3d/ferramentas.webp',
+  pausa: ARTE3D.tempo,
+  indisponivel: ARTE_MOBILE.cadeado,
+  offline: ARTE_MOBILE.sair,
 }
+
+const ORDEM: SituacaoMecanico[] = ['disponivel', 'pausa', 'indisponivel', 'offline', 'em_atendimento']
 
 /**
  * Troca rápida de situação (pausa, indisponível, offline). "Em atendimento"
@@ -78,8 +84,8 @@ export function FolhaSituacao({
                   bloqueado && 'opacity-45',
                 )}
               >
-                <span className={cn('flex size-11 shrink-0 items-center justify-center rounded-xl', COR[s])}>
-                  <Icone className="size-5" />
+                <span className="sos-subtle-chip flex size-11 shrink-0 items-center justify-center rounded-xl text-ink-2">
+                  <IconeM3D icone={Icone} peca={PECAS[s]} className="size-8" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block font-display text-[16px] font-bold text-ink">{info.rotulo}</span>
