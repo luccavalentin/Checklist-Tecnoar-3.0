@@ -5,6 +5,8 @@ import {
   Bell,
   BellRing,
   Brain,
+  CalendarCheck,
+  Check,
   ChevronRight,
   CircleCheck,
   ClipboardList,
@@ -20,6 +22,7 @@ import {
   Star,
   Sun,
   Wrench,
+  X,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -28,12 +31,13 @@ import { enderecoDoPonto } from '@/sos/geo'
 import { STATUS_SOS, formatarDistancia, haQuanto } from '@/sos/rotulos'
 import type { HomeMecanico, SituacaoMecanico } from '@/sos/tipos'
 import { useMecanico } from '../sessao'
-import { sumirSeFalhar } from '../comum/kit3d'
+import { ARTE_MOBILE } from '../comum/kit3d'
+import { Arte } from '../comum/Arte'
 import { IconeM3D } from './ArteMecanico'
 import { Avatar, LogoSOS } from '../comum/ui'
 import { useAlertaSOS } from './AlertaNovoSOS'
 import { useCasca } from './contexto'
-import { primeiroNome, useAgora, useDefinirSituacao, useDetalheChamado, useHomeMecanico, useOnline } from './dados'
+import { primeiroNome, useAgora, useAtendimentosAno, useDefinirSituacao, useDetalheChamado, useHomeMecanico, useOnline } from './dados'
 import { FaixaFila } from './FilaPendente'
 import { aplicarNoChamado, useFila } from './filaOffline'
 import { IconeOcorrencia, Placa } from './pecas'
@@ -116,8 +120,6 @@ export function PainelMecanico() {
           <p className="mi-sub">Pronto para o próximo atendimento?</p>
         </div>
         <div className="mi-studio-cena" aria-hidden="true">
-          <span className="mi-studio-pista" />
-          <img src="/sos/mobile-3d/veiculo-utilitario.webp" alt="" draggable={false} width={256} height={256} fetchpriority="high" onError={sumirSeFalhar} />
         </div>
       </header>
 
@@ -140,6 +142,10 @@ export function PainelMecanico() {
                 aoFicarDisponivel={ficarDisponivel}
                 aoFicarIndisponivel={() => definir.mutate({ situacao: 'indisponivel' })}
               />
+              <Link to="/chat-tecnoar" className="mi-cartao mi-chat-central" aria-label="Chat com a equipe Tecnoar">
+                <Arte src={ARTE_MOBILE.chatDuvidas} alt="" recuo={<Bell className="size-6" />} classeImagem="mi-chat-icone" />
+                <span>Chat<span className="mi-chat-sub">Equipe Tecnoar</span></span>
+              </Link>
               <CartaoArea />
             </div>
 
@@ -242,7 +248,9 @@ function ControleStatus({
       disabled={mudando || !online}
       className={cn('mi-cartao mi-status text-left disabled:cursor-not-allowed disabled:opacity-70', recebendo ? 'mi-status-on' : 'mi-status-off')}
     >
-      <span aria-hidden className="mi-status-ponto" />
+      <span aria-hidden className={cn('mi-status-simbolo', recebendo && 'mi-status-simbolo-on')}>
+        {recebendo ? <Check /> : <X />}
+      </span>
       <span className="min-w-0 flex-1">
         <span className="mi-status-rotulo">Status atual</span>
         <span className="mi-status-titulo">{titulo}</span>
@@ -276,7 +284,7 @@ function CartaoArea() {
   return (
     <Link to="/perfil" className="mi-cartao mi-area">
       <span className="mi-area-icone">
-        <IconeM3D icone={MapPin} className="size-8" />
+        <IconeM3D icone={MapPin} peca={ARTE_MOBILE.areaAtendimento} className="size-8" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="mi-area-titulo">
@@ -294,12 +302,15 @@ function CartaoArea() {
 /* ── números do dia ─────────────────────────────────────────────────────── */
 
 function NumerosDoDia({ h, emAndamento }: { h: HomeMecanico | undefined; emAndamento: number }) {
+  const { usuarioId } = useMecanico()
+  const anual = useAtendimentosAno(usuarioId)
   const nota = h?.hoje.nota_media
   return (
     <dl className="mi-numeros">
       <Estatistica icone={Phone} rotulo="Hoje" valor={h ? h.hoje.atendimentos : '–'} />
       <Estatistica icone={Clock} rotulo="Em andamento" valor={h ? emAndamento : '–'} />
       <Estatistica icone={CircleCheck} rotulo="Finalizados" valor={h ? h.hoje.concluidos : '–'} />
+      <Estatistica icone={CalendarCheck} rotulo="No ano" valor={anual.data ?? '–'} />
       <Estatistica
         icone={Star}
         rotulo="Avaliação"
@@ -370,9 +381,10 @@ function AbrirChamado({ atual }: { atual: { id: string; protocolo: string; clien
           <IconeM3D icone={BellRing} className="size-10" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="mi-novo-titulo text-center">Novo chamado</span>
+          <span className="mi-novo-titulo">Novo chamado</span>
           <span className="mi-novo-sub">{ocupado ? 'Termine o atendimento atual primeiro' : 'Cliente na sua frente ou que ligou direto'}</span>
         </span>
+        <Arte src={ARTE_MOBILE.caminhoneteTecnoar} alt="" recuo={null} classeImagem="mi-novo-caminhonete" />
         <span className="mi-novo-seta">
           <ChevronRight className="size-6" strokeWidth={2.2} />
         </span>

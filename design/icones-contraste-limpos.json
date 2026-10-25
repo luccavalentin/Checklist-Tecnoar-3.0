@@ -1,0 +1,26 @@
+[
+  {
+    "key": "tempo",
+    "prompt": "Clean up this isolated 3D app icon. Preserve the central object, its orange enamel face, polished steel and cyan rim, recognizable shape and perspective. REMOVE completely the dirty brown blobs, blue/black debris, ghost pixels, floor shadows and reflections below or beside the object. Output only the pristine free-floating solid object, no cast shadow, no ground, no pedestal, no scraps or extra shapes anywhere. Genuine transparent background, crisp clean alpha contour and solid opaque object, no checkerboard, no white matte. Bright controlled studio render readable at 38px. Preserve composition centered with small safe margin.",
+    "source": "C:\\Users\\lucca\\.codex\\generated_images\\01a16f53-b17f-7be1-8ee5-b03f731ceb71\\exec-f0660bdd-7cc5-43bd-8d3b-3ff7b1d8d476.png",
+    "out": "tempo-limpo.webp"
+  },
+  {
+    "key": "concluido",
+    "prompt": "Clean up this isolated 3D app icon. Preserve the central object, its orange enamel face, polished steel and cyan rim, recognizable shape and perspective. REMOVE completely the dirty brown blobs, blue/black debris, ghost pixels, floor shadows and reflections below or beside the object. Output only the pristine free-floating solid object, no cast shadow, no ground, no pedestal, no scraps or extra shapes anywhere. Genuine transparent background, crisp clean alpha contour and solid opaque object, no checkerboard, no white matte. Bright controlled studio render readable at 38px. Preserve composition centered with small safe margin.",
+    "source": "C:\\Users\\lucca\\.codex\\generated_images\\01a16f53-b17f-7be1-8ee5-b03f731ceb71\\exec-e7b60914-4ae5-4387-b579-94aad6ee32a6.png",
+    "out": "concluido-limpo.webp"
+  },
+  {
+    "key": "estrela",
+    "prompt": "Clean up this isolated 3D app icon. Preserve the central object, its orange enamel face, polished steel and cyan rim, recognizable shape and perspective. REMOVE completely the dirty brown blobs, blue/black debris, ghost pixels, floor shadows and reflections below or beside the object. Output only the pristine free-floating solid object, no cast shadow, no ground, no pedestal, no scraps or extra shapes anywhere. Genuine transparent background, crisp clean alpha contour and solid opaque object, no checkerboard, no white matte. Bright controlled studio render readable at 38px. Preserve composition centered with small safe margin.",
+    "source": "C:\\Users\\lucca\\.codex\\generated_images\\01a16f53-b17f-7be1-8ee5-b03f731ceb71\\exec-ef585f21-5de7-42ef-b837-4c98e8889838.png",
+    "out": "estrela-limpo.webp"
+  },
+  {
+    "key": "chat",
+    "prompt": "Edit this 3D headset-and-chat icon for much stronger contrast on a DARK NAVY app background. Keep the same compact silhouette and realistic product-render quality. Change the central speech bubble body to vivid ORANGE glossy enamel #ff7a00 with three DARK NAVY raised dots. Make the headset outer frame and earcup housings substantially brighter BRUSHED SILVER and chrome, with orange inset panels and subtle cyan rim light. Headband cushion remains black but narrow. Boom microphone metallic silver with a small orange tip. This must be an inherently bright, solid, clearly readable object at 38px WITHOUT placing any background behind it. Truly transparent background including around and inside the headset, NO white square, NO pale tile, NO disc, NO badge, NO platform, NO external glow cloud, NO text, NO logo. Controlled realistic highlights and well-defined silhouette.",
+    "source": "C:\\Users\\lucca\\.codex\\generated_images\\01a16f53-b17f-7be1-8ee5-b03f731ceb71\\exec-75e269d0-9935-4ef6-a597-c1deec54e1f1.png",
+    "out": "chat-tira-duvidas-claro.webp"
+  }
+]

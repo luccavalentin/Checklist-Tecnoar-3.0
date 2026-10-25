@@ -1,0 +1,40 @@
+/* Cena realista de socorro; controles e layout permanecem intactos. */
+#raiz .mec.mec-fundo {
+  background:
+    linear-gradient(180deg, #f5f7fbe8, #f5f7fbf2),
+    url('/sos/mobile-3d/socorro-estrada-mecanico.webp') center top / cover no-repeat,
+    #f5f7fb;
+}
+
+.dark #raiz .mec.mec-fundo {
+  background:
+    linear-gradient(180deg, #03101e70, #03101eb8 55%, #03101ed9),
+    url('/sos/mobile-3d/socorro-estrada-mecanico.webp') center top / cover no-repeat,
+    #03101e;
+}
+
+#raiz .mec.mec-fundo .mi.mi-studio {
+  background: transparent;
+}
+
+#raiz .mec.mec-fundo .mi.mi-studio .mi-topo {
+  background:
+    linear-gradient(90deg, #03101e9c, #03101e24),
+    url('/sos/mobile-3d/socorro-estrada-mecanico.webp') center 48% / cover no-repeat,
+    #03101e;
+}
+
+#raiz .mec.mec-fundo .mec-native-header {
+  background:
+    linear-gradient(100deg, #06192cf0, #06192c9c),
+    url('/sos/mobile-3d/socorro-estrada-mecanico.webp') center 48% / cover no-repeat,
+    #03101e;
+}
+
+/* O enquadramento do topo mantém o caminhão e a viatura visíveis nos dois temas. */
+.dark #raiz .mec.mec-fundo .mi.mi-studio .mi-topo {
+  background:
+    linear-gradient(90deg, #03101e9c, #03101e24),
+    url('/sos/mobile-3d/socorro-estrada-mecanico.webp') center 48% / cover no-repeat,
+    #03101e;
+}

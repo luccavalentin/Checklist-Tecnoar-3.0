@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Ban, Check, CheckCheck, Clock3, CornerUpLeft, MapPin, Pause, Play, Trash2 } from 'lucide-react'
+import { Ban, Check, CheckCheck, Clock3, Copy, CornerUpLeft, FileDown, MapPin, Pause, Play, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { MensagemSOS } from '../tipos'
 import { horaCurta } from '../rotulos'
@@ -90,8 +90,10 @@ export function Bolha({
           </button>
         )}
 
-        {ehImagem && urlMidia && <img src={urlMidia} alt="" loading="lazy" className="cv-foto" />}
+        {ehImagem && urlMidia && <a href={urlMidia} target="_blank" rel="noopener noreferrer" aria-label="Abrir foto em tamanho completo"><img src={urlMidia} alt="Foto enviada na conversa" loading="lazy" className="cv-foto" /></a>}
         {ehAudio && urlMidia && <Audio url={urlMidia} segundos={m.duracao_seg} minha={minha} />}
+        {m.midia_tipo?.startsWith('video/') && urlMidia && <video src={urlMidia} controls playsInline preload="metadata" className="cv-foto" />}
+        {m.midia_tipo && !ehImagem && !ehAudio && !m.midia_tipo.startsWith('video/') && urlMidia && <a className="cv-local" href={urlMidia} target="_blank" rel="noopener noreferrer"><FileDown className="size-5" /><span>Abrir documento</span></a>}
         {temLocal && (
           <a
             href={`https://www.google.com/maps?q=${m.local_lat},${m.local_lng}`}
@@ -144,6 +146,9 @@ export function Bolha({
                 <Trash2 className="size-4" /> Apagar para todos
               </button>
             )}
+            {m.texto && <button type="button" role="menuitem" onClick={() => {
+              void navigator.clipboard.writeText(m.texto!).then(() => setMenu(false)).catch(() => {})
+            }}><Copy className="size-4" /> Copiar texto</button>}
           </div>
         </>
       )}

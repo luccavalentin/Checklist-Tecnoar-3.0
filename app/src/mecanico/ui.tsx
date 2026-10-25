@@ -129,10 +129,10 @@ const VARIANTE: Record<VarianteM, string> = {
 }
 
 const TAMANHO: Record<TamanhoM, string> = {
-  md: 'min-h-12 gap-2 rounded-[1.05rem] px-4 text-[15px]',
-  lg: 'min-h-14 gap-2.5 rounded-[1.2rem] px-5 text-[16px]',
-  xl: 'min-h-16 gap-2.5 rounded-[1.35rem] px-4 text-[17px] max-[400px]:text-[16px]',
-  xxl: 'min-h-[4.5rem] gap-3 rounded-[1.45rem] px-4 text-[18px] max-[400px]:text-[16.5px]',
+  md: 'min-h-11 gap-1.5 rounded-xl px-3 text-[13px]',
+  lg: 'min-h-11 gap-2 rounded-xl px-4 text-[14px]',
+  xl: 'min-h-12 gap-2 rounded-xl px-4 text-[15px]',
+  xxl: 'min-h-[3.25rem] gap-2 rounded-xl px-4 text-[16px]',
 }
 
 export interface BotaoMProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -157,10 +157,10 @@ export const BotaoM = forwardRef<HTMLButtonElement, BotaoMProps>(function BotaoM
       className={cn(
         'inline-flex items-center justify-center text-center font-display leading-tight font-semibold tracking-tight transition-[transform,background-color,border-color,box-shadow] select-none active:scale-[0.985] disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100',
         VARIANTE[variante],
-        'sos-button-3d',
+        'sos-button-3d sos-controle-compacto',
         `sos-button-3d-${variante}`,
         TAMANHO[tamanho],
-        largo && 'w-full',
+        largo && 'w-full max-w-[280px] self-center',
         className,
       )}
       {...props}
@@ -168,7 +168,7 @@ export const BotaoM = forwardRef<HTMLButtonElement, BotaoMProps>(function BotaoM
       {carregando ? (
         <Loader2 className={cn('shrink-0 animate-spin', grande ? 'size-6' : 'size-5')} />
       ) : (
-        Icone && <IconeM3D icone={Icone} className={grande ? 'size-8' : 'size-7'} />
+        Icone && <IconeM3D icone={Icone} className={grande ? 'size-7' : 'size-6'} />
       )}
       <span className="min-w-0">{children}</span>
     </button>

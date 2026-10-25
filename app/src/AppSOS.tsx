@@ -12,6 +12,7 @@ import { TelaCarregandoApp } from './comum/Carregando'
  */
 
 const ConversaCliente = lazy(() => import('./cliente/ConversaCliente').then((m) => ({ default: m.ConversaCliente })))
+const ChatTecnoar = lazy(() => import('./comum/ChatTecnoar').then((m) => ({ default: m.ChatTecnoar })))
 const Entrar = lazy(() => import('./auth/Entrar').then((m) => ({ default: m.Entrar })))
 const Cadastro = lazy(() => import('./auth/Cadastro').then((m) => ({ default: m.Cadastro })))
 const EsqueciSenha = lazy(() => import('./auth/EsqueciSenha').then((m) => ({ default: m.EsqueciSenha })))
@@ -139,12 +140,14 @@ function PorPapel() {
           <Route path="chamado/:id" element={<ChamadoCliente />} />
           <Route path="chamado/:id/conversa" element={<ConversaCliente />} />
           <Route path="tecno-ia" element={<TecnoIA />} />
+          <Route path="chat-tecnoar" element={<ChatTecnoar />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       )
     case 'mecanico':
       return (
         <Routes>
+          <Route path="chat-tecnoar" element={<ChatTecnoar />} />
           <Route element={<CascaMecanico />}>
             <Route index element={<PainelMecanico />} />
             <Route path="chamados" element={<HistoricoMecanico />} />

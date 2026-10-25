@@ -28,7 +28,6 @@ import { CHAVES_SOS } from '@/sos/tempoReal'
 import { aplicarTema, lerTema, useCliente } from '../sessao'
 import { Avatar, BotaoApp, CabecalhoTela, CampoApp, Faixa, Folha, Tela } from '../comum/ui'
 import { useOnline } from '../comum/Pwa'
-import { CartaoAparelho } from '../comum/Aparelho'
 import { Arte } from '../comum/Arte'
 import { ARTE3D, ARTE_MOBILE, VEICULO_MOBILE, sumirSeFalhar } from '../comum/kit3d'
 import { useAlturaTeclado, useCasca, useHomeCliente, useInfoPublica } from './dados'
@@ -158,13 +157,6 @@ export function PerfilCliente() {
           <LinhaLista para="/revisoes" icone={CalendarCheck} peca={ARTE_MOBILE.revisoes} titulo="Revisões e agendamentos" detalhe="Acompanhe e agende serviços" />
           <LinhaLista para="/contato" icone={Headset} peca={ARTE_MOBILE.atendimento} titulo="Falar com a Tecnoar" detalhe="Tire dúvidas com nosso time" />
         </GrupoLista>
-
-        <section className="flex flex-col gap-2" aria-labelledby="perfil-aparelho">
-          <h2 id="perfil-aparelho" className="px-1 font-display text-[16px] font-bold text-ink">
-            Notificações
-          </h2>
-          <CartaoAparelho mostrarInstalacao={false} />
-        </section>
 
         <section className="flex flex-col gap-3 rounded-[1.25rem] border border-line bg-surface p-4">
           <h2 className="font-display text-[16px] font-bold text-ink">Aparência</h2>

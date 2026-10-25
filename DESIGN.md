@@ -1,5 +1,19 @@
 # Sistema visual Tecnoar
 
+## Contatos do cliente e ação do mecânico — 24/10/2026
+
+A faixa abaixo do SOS do cliente tem três acessos: Ligar, Chat tira-dúvidas e WhatsApp. Após esclarecimento do usuário, o chat abre `/chat-tecnoar`, canal humano independente do chamado. A Tecno IA permanece separada. `chat-tira-duvidas-claro.webp` é um fone metálico com balão laranja, gerado com imagegen para ter contraste próprio, sem pastilha branca. Os canais mantêm três colunas e passam a ícone acima do rótulo em celulares estreitos. As condições existentes de conexão e telefone são preservadas. Ativação e limites funcionais do canal estão em `docs/CHAT-TECNOAR-ATIVACAO.md`.
+
+O usuário definiu para os cartões de status e área do mecânico uma face navy com aro luminoso azul e detalhes âmbar, igual nos dois temas. O chat humano fica entre esses dois cartões. O status usa X para indisponível e check para disponível. A área usa `area-atendimento-premium.webp`, pino laranja sobre base metálica, gerado com imagegen. Os cinco indicadores incluem o total anual consultado diretamente dos chamados aceitos pelo usuário no ano civil de São Paulo; não é uma soma do histórico paginado. Sem resposta válida, exibe traço.
+
+O botão Novo chamado tem sirene de até 56 px, caminhonete laranja de até 96 px com identificação Tecnoar dentro da ação e face azul-marinho para contraste; a caminhonete decorativa foi removida do topo. A altura fica próxima de 66 px. Botões padrão do cliente/mecânico têm 44–52 px e largura máxima de 280 px quando largos, preservando as ações especiais do SOS. O relógio, check e estrela foram refeitos sem manchas/sombras externas; as artes limpas são compartilhadas pelos apps. A lista de produtos tem linhas, miniaturas e preço mais compactos, mantém fotos originais e exibe apenas preço de venda entre os valores financeiros. A repetição do cartão de ativação de notificações foi removida do perfil do cliente; a ativação continua na tela de Notificações. Prompts e origens em `design/icones-contraste-limpos.json`, `design/pino-area-premium.json` e `design/caminhonete-tecnoar.json`.
+
+## Fundo da visão do mecânico — 24/10/2026
+
+O fundo inicial de oficina foi substituído, a pedido do usuário, por uma cena fotográfica de socorro na estrada: caminhão com viatura de apoio, cones e pista molhada ao amanhecer. É uma cena diferente da versão do cliente. `mecanico/fundo-oficina.css` altera exclusivamente os backgrounds da casca e dos cabeçalhos do mecânico. A arte atual é `mobile-3d/socorro-estrada-mecanico.webp`; a picape da interface foi posteriormente movida para a ação Novo chamado, conforme descrito acima. Prompt e origem da nova imagem estão em `design/fundo-socorro-mecanico.json`.
+
+O tema claro usa uma camada clara sobre o cenário para preservar as cores atuais dos textos. O escuro revela mais da estrada, com uma camada navy para leitura. O usuário também solicitou o mesmo SOS do cliente: a navegação do mecânico reutiliza `BotaoSOS`, com a marca oficial e texto HTML, preservando a ação de atendimento e o tamanho do controle. Os favicons e ícones PNG do app foram derivados da composição do botão com logo; os links de favicon têm versão para atualizar o cache. Demais botões, cartões, avatares, tipografia, dimensões, espaçamentos e ações permanecem existentes.
+
 ## Correção de identidade e cobertura 3D — 24/10/2026
 
 O produto atende caminhoneiros e mecânicos de veículos pesados. O usuário rejeitou a figura com capacete de motociclista. Os ícones genéricos de Conta/Perfil dos dois aplicativos usam agora `perfil-profissional-v3.webp`, um busto de camisa de trabalho e cabeça descoberta. Não usar motociclista, capacete de moto, roupa de corrida ou acessórios de motociclismo como identidade de cliente ou especialista.

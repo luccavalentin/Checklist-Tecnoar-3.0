@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { ArrowDown, ChevronLeft, ImagePlus, Mic, MapPin, Send, Square, X } from 'lucide-react'
+import { ArrowDown, ChevronLeft, ImagePlus, Mic, MapPin, Search, Send, Square, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { sosApagarMensagem, sosEnviarAnexo, sosEnviarMensagem, sosMarcarMensagensLidas, sosUrlsArquivos } from '../api'
 import { CHAVES_SOS } from '../tempoReal'
@@ -9,6 +9,15 @@ import { useGravadorAudio } from '../componentes'
 import { Bolha, JANELA_APAGAR_MS, relogio } from './Bolha'
 import { usePresencaConversa } from './presenca'
 import './conversa.css'
+
+export interface EnvioConversa { texto?: string; rapida?: boolean; blob?: Blob; duracao?: number; lat?: number; lng?: number; respondeA?: string | null }
+export interface TransporteConversa {
+  sala: string; privada: boolean; chave: readonly unknown[]
+  enviar: (p: EnvioConversa) => Promise<unknown>
+  apagar: (id: string) => Promise<unknown>
+  ler: () => Promise<unknown>
+  urls: (caminhos: string[]) => Promise<Record<string, string>>
+}
 
 /**
  * A conversa entre o motorista e o mecânico, em tela cheia.
@@ -50,6 +59,8 @@ export function TelaConversa({
   aoVoltar,
   icones,
   marca,
+  transporte,
+  carregarAnteriores,
 }: {
   chamadoId: string
   mensagens: MensagemSOS[]
@@ -61,17 +72,20 @@ export function TelaConversa({
   aoVoltar: () => void
   icones?: { foto: ReactNode; local: ReactNode; audio: ReactNode; enviar: ReactNode; perfil?: ReactNode }
   marca?: ReactNode
+  transporte?: TransporteConversa
+  carregarAnteriores?: () => void
 }) {
   const qc = useQueryClient()
   const lista = useRef<HTMLDivElement>(null)
   const [texto, setTexto] = useState('')
+  const [busca, setBusca] = useState<string | null>(null)
   const [respondendo, setRespondendo] = useState<MensagemSOS | null>(null)
   const [erro, setErro] = useState<string | null>(null)
   const [noFim, setNoFim] = useState(true)
   const [destaque, setDestaque] = useState<string | null>(null)
   const foto = useRef<HTMLInputElement>(null)
   const gravador = useGravadorAudio()
-  const presenca = usePresencaConversa(chamadoId, meuId)
+  const presenca = usePresencaConversa(chamadoId, meuId, transporte?.sala, transporte?.privada)
 
   const porId = useMemo(() => new Map(mensagens.map((m) => [m.id, m])), [mensagens])
   const naoLidas = useMemo(
@@ -89,18 +103,23 @@ export function TelaConversa({
     const faltando = caminhos.filter((c) => !urls[c])
     if (!faltando.length) return
     let vivo = true
-    void sosUrlsArquivos(faltando)
+    void (transporte ? transporte.urls(faltando) : sosUrlsArquivos(faltando))
       .then((novas) => vivo && setUrls((a) => ({ ...a, ...novas })))
       .catch(() => {})
     return () => {
       vivo = false
     }
-  }, [caminhos, urls])
+  }, [caminhos, urls, transporte])
 
   /* ── lida ──────────────────────────────────────────────────────────────── */
   useEffect(() => {
-    if (naoLidas) void sosMarcarMensagensLidas(chamadoId).catch(() => {})
-  }, [naoLidas, chamadoId])
+    const marcar = () => {
+      if (naoLidas && document.visibilityState === 'visible') void (transporte ? transporte.ler() : sosMarcarMensagensLidas(chamadoId)).catch(() => {})
+    }
+    marcar()
+    document.addEventListener('visibilitychange', marcar)
+    return () => document.removeEventListener('visibilitychange', marcar)
+  }, [naoLidas, chamadoId, transporte])
 
   /* ── rolagem ───────────────────────────────────────────────────────────── */
   useEffect(() => {
@@ -117,6 +136,7 @@ export function TelaConversa({
       lat?: number
       lng?: number
     }) => {
+      if (transporte) return transporte.enviar({ ...p, respondeA: respondendo?.id ?? null })
       let midiaCaminho: string | null = null
       let midiaTipo: string | null = null
       if (p.blob) {
@@ -140,14 +160,14 @@ export function TelaConversa({
       setRespondendo(null)
       setNoFim(true)
       presenca.pararDigitando()
-      void qc.invalidateQueries({ queryKey: CHAVES_SOS.detalhe(chamadoId) })
+      void qc.invalidateQueries({ queryKey: transporte?.chave ?? CHAVES_SOS.detalhe(chamadoId) })
     },
     onError: (e) => setErro((e as Error).message),
   })
 
   const apagar = useMutation({
-    mutationFn: (id: string) => sosApagarMensagem(id),
-    onSuccess: () => void qc.invalidateQueries({ queryKey: CHAVES_SOS.detalhe(chamadoId) }),
+    mutationFn: (id: string) => transporte ? transporte.apagar(id) : sosApagarMensagem(id),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: transporte?.chave ?? CHAVES_SOS.detalhe(chamadoId) }),
     onError: (e) => setErro((e as Error).message),
   })
 
@@ -185,7 +205,7 @@ export function TelaConversa({
     window.setTimeout(() => setDestaque(null), 1400)
   }
 
-  const blocos = agruparPorDia(mensagens)
+  const blocos = agruparPorDia(busca?.trim() ? mensagens.filter(m => !m.apagada_em && m.texto?.toLocaleLowerCase('pt-BR').includes(busca.toLocaleLowerCase('pt-BR'))) : mensagens)
   const primeiraNaoLida = mensagens.find((m) => !m.lida_em && m.autor_id !== meuId)?.id ?? null
 
   return (
@@ -208,7 +228,9 @@ export function TelaConversa({
           </p>
         </div>
         {marca && <span className="cv-marca shrink-0">{marca}</span>}
+        <button type="button" className="cv-voltar" aria-label={busca === null ? 'Buscar mensagens' : 'Fechar busca'} onClick={() => setBusca(v => v === null ? '' : null)}>{busca === null ? <Search className="size-5" /> : <X className="size-5" />}</button>
       </header>
+      {busca !== null && <label className="flex items-center gap-2 border-b border-line bg-surface px-4 py-2"><Search className="size-4 text-ink-3" /><input autoFocus aria-label="Buscar nesta conversa" placeholder="Buscar nesta conversa" value={busca} onChange={e => setBusca(e.target.value)} className="min-h-10 min-w-0 flex-1 bg-transparent text-ink outline-none" /></label>}
 
       <div
         ref={lista}
@@ -218,6 +240,7 @@ export function TelaConversa({
           setNoFim(el.scrollHeight - el.scrollTop - el.clientHeight < 90)
         }}
       >
+        {carregarAnteriores && <button type="button" className="mx-auto mb-4 min-h-11 rounded-full bg-surface px-5 text-sm text-ink" onClick={() => { setNoFim(false); carregarAnteriores() }}>Carregar mensagens anteriores</button>}
         {mensagens.length === 0 && (
           <p className="cv-vazio">
             Nenhuma mensagem ainda. Mande um áudio contando o que está vendo — é mais rápido que escrever.
@@ -309,7 +332,7 @@ export function TelaConversa({
                 if (texto.trim()) enviar.mutate({ texto: texto.trim() })
               }}
             >
-              <button type="button" onClick={() => foto.current?.click()} aria-label="Mandar uma foto" className="cv-acessorio">
+              <button type="button" onClick={() => foto.current?.click()} aria-label={transporte ? 'Enviar foto, vídeo ou documento' : 'Mandar uma foto'} className="cv-acessorio">
                 {icones?.foto ?? <ImagePlus className="size-[21px]" />}
               </button>
               <button type="button" onClick={mandarLocal} aria-label="Mandar minha localização" className="cv-acessorio">
@@ -317,6 +340,7 @@ export function TelaConversa({
               </button>
               <textarea
                 value={texto}
+                maxLength={transporte ? 4000 : 2000}
                 rows={1}
                 placeholder="Mensagem"
                 aria-label="Mensagem"
@@ -350,8 +374,8 @@ export function TelaConversa({
           <input
             ref={foto}
             type="file"
-            accept="image/*"
-            capture="environment"
+            accept={transporte ? 'image/jpeg,image/png,image/webp,image/heic,video/mp4,video/webm,application/pdf,text/plain' : 'image/*'}
+            capture={transporte ? undefined : 'environment'}
             hidden
             onChange={(e) => {
               const f = e.target.files?.[0]

@@ -123,7 +123,13 @@
 #raiz .historico-filtros-3d [role='tab']:focus-visible { outline: 3px solid #007fb3; outline-offset: 3px; }
 .ini-app.ini-premium .ini-sos-descricao { font-size: 19px; line-height: 1.2; font-weight: 700; }
 .ini-app.ini-premium .ini-prontidao { margin-top: 4px; font-size: 13px; }
-.ini-app.ini-premium .ini-contatos { display: grid; grid-template-columns: 1.2fr 1fr; gap: 9px; width: 100%; margin-top: 12px; }
+.ini-app.ini-premium .ini-contatos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; width: 100%; margin-top: 12px; }
+.ini-app.ini-premium .ini-contatos .ini-ligar { min-width: 0; }
+.ini-chat-sub { display: block; margin-top: 1px; font-size: 10px; line-height: 1.15; font-weight: 500; }
+@media (max-width: 359px) {
+  .ini-app.ini-premium .ini-contatos .ini-ligar { flex-direction: column; gap: 2px; padding: 5px 3px; font-size: 11px; }
+  .ini-app.ini-premium .ini-contatos .ini-contato-peca { width: 26px; height: 26px; }
+}
 .ini-app.ini-premium .ini-contatos .ini-ligar {
   display: flex;
   align-items: center;
@@ -145,7 +151,8 @@
 .ini-app.ini-premium .ini-rodape { gap: 9px; padding: 12px 18px calc(98px + env(safe-area-inset-bottom)); }
 .ini-app.ini-premium :is(.ini-veiculo, .ini-pastilha) { border: 1px solid #3f617e; box-shadow: none; }
 .dark .ini-app.ini-premium :is(.ini-veiculo, .ini-pastilha) { background: var(--painel-mobile); box-shadow: inset 0 1px 1px #b8eaff26, 0 6px 18px -16px #00afef; }
-.ini-app.ini-premium .ini-veiculo { min-height: 62px; padding: 8px 12px; border-radius: 16px; }
+.ini-app.ini-premium .ini-veiculo { display: grid; grid-template-columns: 20px minmax(0, 1fr) 20px; min-height: 62px; padding: 8px 12px; border-radius: 16px; }
+.ini-app.ini-premium .ini-veiculo-conjunto { grid-column: 2; display: flex; align-items: center; justify-self: center; gap: 12px; min-width: 0; max-width: 100%; }
 .ini-app.ini-premium .ini-veiculo-icone { width: 48px; height: 44px; background: transparent; }
 .ini-app.ini-premium .ini-veiculo-icone img { width: 46px; height: 42px; object-fit: contain; }
 .ini-app.ini-premium .ini-pastilha { min-height: 100px; padding: 9px; }

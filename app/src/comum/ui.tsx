@@ -189,9 +189,9 @@ const VARIANTES: Record<VarianteApp, string> = {
 }
 
 const TAMANHOS: Record<TamanhoApp, string> = {
-  md: 'min-h-12 px-5 text-[15px] gap-2 rounded-[1.05rem]',
-  lg: 'min-h-14 px-6 text-[16px] gap-2.5 rounded-[1.25rem]',
-  xl: 'min-h-16 px-7 text-[17px] gap-3 rounded-[1.35rem]',
+  md: 'min-h-11 px-3 text-[13px] gap-1.5 rounded-xl',
+  lg: 'min-h-11 px-4 text-[14px] gap-2 rounded-xl',
+  xl: 'min-h-12 px-5 text-[15px] gap-2 rounded-xl',
 }
 
 export interface BotaoAppProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -216,10 +216,10 @@ export const BotaoApp = forwardRef<HTMLButtonElement, BotaoAppProps>(function Bo
       className={cn(
           'sos-motion-button inline-flex items-center justify-center font-display font-semibold tracking-tight transition-[transform,background-color,border-color,box-shadow] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:active:scale-100',
         VARIANTES[variante],
-        'sos-button-3d',
+        'sos-button-3d sos-controle-compacto',
         `sos-button-3d-${variante}`,
         TAMANHOS[tamanho],
-        largo && 'w-full',
+        largo && 'w-full max-w-[280px] self-center',
         className,
         agendar3d && 'sos-agendar-render',
       )}

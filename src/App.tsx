@@ -70,6 +70,8 @@ const Financeiro = lazy(() => import('@/paginas/financeiro/Financeiro').then((m)
 const Garantias = lazy(() => import('@/paginas/operacao/Garantias').then((m) => ({ default: m.Garantias })))
 const CentralSOS = lazy(() => import('@/paginas/sos/CentralSOS').then((m) => ({ default: m.CentralSOS })))
 
+const ChatEquipeCentral = lazy(() => import('@/paginas/sos/ChatEquipeCentral').then((m) => ({ default: m.ChatEquipeCentral })))
+
 /** Telas já implantadas. O restante do menu resolve para ModuloPendente. */
 const TELAS: Record<string, ComponentType> = {
   '/visao-geral': VisaoGeral,
@@ -77,6 +79,7 @@ const TELAS: Record<string, ComponentType> = {
   // escolhe o que mostrar pelo caminho.
   '/sos': CentralSOS,
   '/sos/chamados': CentralSOS,
+  '/sos/chat': ChatEquipeCentral,
   '/sos/mecanicos': CentralSOS,
   '/sos/clientes': CentralSOS,
   '/sos/contratos': CentralSOS,

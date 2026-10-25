@@ -27,6 +27,24 @@ export function useHomeMecanico() {
   })
 }
 
+/** Total de chamados aceitos no ano civil de São Paulo, independente da paginação. */
+export function useAtendimentosAno(usuarioId: string | null | undefined) {
+  const ano = Number(new Intl.DateTimeFormat('en', { timeZone: 'America/Sao_Paulo', year: 'numeric' }).format(new Date()))
+  return useQuery({
+    queryKey: ['sos', 'atendimentos-ano', usuarioId, ano],
+    enabled: !!usuarioId,
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const { count, error } = await dbSOS.from('sos_chamados').select('id', { count: 'exact', head: true })
+        .eq('mecanico_id', usuarioId!).gte('aceito_em', `${ano}-01-01T00:00:00-03:00`)
+        .lt('aceito_em', `${ano + 1}-01-01T00:00:00-03:00`)
+      if (error) throw error
+      if (count == null) throw new Error('Não foi possível conferir o total anual.')
+      return count
+    },
+  })
+}
+
 /** Telefone e WhatsApp da Tecnoar — "falar com a central" no meio do atendimento. */
 export function useInfoCentral() {
   return useQuery({ queryKey: ['sos', 'info-publica'], queryFn: sosInfoPublica, staleTime: 5 * 60_000, retry: false })

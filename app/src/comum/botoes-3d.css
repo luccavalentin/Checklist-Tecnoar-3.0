@@ -40,6 +40,7 @@
 :root .sos-button-3d:focus-visible { outline: 3px solid #00afef; outline-offset: 4px; }
 
 /* Seletores e ações compactas recebem o mesmo material em escala menor. */
+:root .sos-button-3d.sos-controle-compacto:not(.sos-agendar-render) { border-width: 3px; padding-block: 6px; }
 .sos-protocolo-3d {
   position: relative;
   border: 3px solid transparent;

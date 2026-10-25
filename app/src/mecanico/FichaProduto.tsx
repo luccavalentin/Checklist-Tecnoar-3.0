@@ -154,13 +154,6 @@ export function FichaProduto({ produtoId, aoFechar, acao }: { produtoId: string 
             </dl>
           </section>
 
-          {(p.custo_medio != null || p.preco_custo != null) && (
-            <section className="grid grid-cols-2 gap-2">
-              <Dado rotulo="Custo médio (Omie)" valor={p.custo_medio != null ? moeda(Number(p.custo_medio)) : null} />
-              <Dado rotulo="Preço de custo" valor={p.preco_custo != null ? moeda(Number(p.preco_custo)) : null} />
-            </section>
-          )}
-
           {p.descricao_detalhada && (
             <section>
               <RotuloM>Descrição</RotuloM>

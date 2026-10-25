@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { BellRing, ChevronRight, House, Package, Phone, UserRound, Volume2, type LucideIcon } from 'lucide-react'
+import { ChevronRight, House, Package, Phone, UserRound, Volume2, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { sosDetalhe } from '@/sos/api'
 import { destravarAudio, tocarAlerta } from '@/sos/alerta'
@@ -19,8 +19,7 @@ import { Placa } from './pecas'
 import { FolhaSituacao } from './Situacao'
 import { useTemaMecanico } from './tema'
 import { IconeM3D } from './ArteMecanico'
-import { ARTE_MOBILE } from '../comum/kit3d'
-import { Arte } from '../comum/Arte'
+import { BotaoSOS } from '../cliente/inicio/BotaoSOS'
 // A barra de abas (mi-abas) vive aqui: o estilo dela vale em todas as telas.
 import './inicioMecanico.css'
 
@@ -182,7 +181,7 @@ function BotaoAtendimento({ chamadoId, fila }: { chamadoId: string | null; fila:
       className="flex h-full w-full flex-col items-center justify-end gap-0.5 pb-1.5 active:scale-95"
     >
       <span className="mi-atendimento-fab">
-        <Arte src={ARTE_MOBILE.seloSOS} alt="" recuo={<BellRing className="size-[1.6rem]" strokeWidth={2} />} classeImagem="mec-atendimento-peca size-14 object-contain" />
+        <BotaoSOS className="mec-atendimento-sos" />
         {(chamadoId || fila) && <span aria-hidden className="mi-atendimento-ponto" />}
       </span>
       <span className="mi-atendimento-rotulo">Atendimento</span>

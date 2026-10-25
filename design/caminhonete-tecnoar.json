@@ -1,0 +1,5 @@
+{
+  "tool": "imagegen (integrated)",
+  "prompt": "Edit the first image, an isolated orange roadside service pickup truck icon. Preserve its same orange pickup model, 3/4 front view facing right, BLACK rubber tires, amber roof lightbar, black grille, realistic high-end 3D studio rendering and transparent background. Add the OFFICIAL TECNOAR FREIOS brand supplied in second image as a clearly visible high quality decal on the side front and rear doors, proportioned across the visible orange door panel, realistic planar perspective. Preserve the reference logo typography and navy/orange/cyan identity as closely as possible, must clearly read TECNOAR. Vehicle needs a bit more visible side door area to show the decal clearly while remaining a front three-quarter view. No extra words, no scenery, no floor, no badge, no border, no background. Entire vehicle within canvas with margin, fill 90% of frame. Output transparent PNG. The second image is logo reference only, not an object to duplicate separately.",
+  "source": "C:/Users/lucca/.codex/generated_images/01a16f53-b17f-7be1-8ee5-b03f731ceb71/exec-9599620d-2c4d-4c63-a57f-c6a3266e7d29.png"
+}

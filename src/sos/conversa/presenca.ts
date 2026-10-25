@@ -46,7 +46,7 @@ export interface Presenca {
   pararDigitando: () => void
 }
 
-export function usePresencaConversa(chamadoId: string | null, meuId: string | null | undefined): Presenca {
+export function usePresencaConversa(chamadoId: string | null, meuId: string | null | undefined, sala?: string, privada = false): Presenca {
   const [online, setOnline] = useState(false)
   const [digitando, setDigitando] = useState(false)
   const [vistoEm, setVistoEm] = useState<Date | null>(null)
@@ -57,7 +57,7 @@ export function usePresencaConversa(chamadoId: string | null, meuId: string | nu
 
   useEffect(() => {
     if (!chamadoId || !meuId) return
-    const c = supabase.channel(`sos:conversa:${chamadoId}`, { config: { presence: { key: meuId } } })
+    const c = supabase.channel(sala ?? `sos:conversa:${chamadoId}`, { config: { private: privada, presence: { key: meuId } } })
 
     function recontar() {
       const estado = c.presenceState() as Record<string, unknown[]>
@@ -95,7 +95,7 @@ export function usePresencaConversa(chamadoId: string | null, meuId: string | nu
       setDigitando(false)
       void supabase.removeChannel(c)
     }
-  }, [chamadoId, meuId])
+  }, [chamadoId, meuId, sala, privada])
 
   const avisarDigitando = useCallback(() => {
     const agora = Date.now()

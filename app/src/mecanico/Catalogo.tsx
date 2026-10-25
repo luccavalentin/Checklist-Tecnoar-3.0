@@ -144,7 +144,7 @@ export function Catalogo({
   const buscando = catalogo.isFetching && !catalogo.isFetchingNextPage
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="catalogo-compacto flex flex-col gap-3">
       {/* busca */}
       <label className="sos-field flex min-h-14 items-center gap-2.5 rounded-[1.15rem] px-3.5 transition-[border-color,box-shadow] focus-within:border-accent focus-within:ring-4 focus-within:ring-accent/15">
         <IconeM3D icone={Search} className="size-8" />
@@ -366,10 +366,10 @@ function LinhaCatalogo({
 
   const corpo = (
     <>
-      <div className="flex items-start gap-3.5">
+      <div className="catalogo-identidade flex items-start gap-2.5">
         <Miniatura id={i.id} produto={produto} descricao={i.descricao} />
         <div className="min-w-0 flex-1">
-          <p className="line-clamp-2 text-[15.5px] leading-snug font-semibold tracking-[-0.01em] text-ink">{i.descricao}</p>
+          <p className="line-clamp-2 text-[13px] leading-snug font-semibold text-ink">{i.descricao}</p>
           <p className="num mt-1 inline-flex max-w-full truncate rounded-md bg-surface-2 px-1.5 py-0.5 text-[11.5px] font-medium text-ink-3">{i.codigo ?? 'sem código'}</p>
           {aoVerFicha && (editavel || (aoEscolher && toqueLanca)) && (
             <button
@@ -390,12 +390,12 @@ function LinhaCatalogo({
           )}
         </div>
       </div>
-      <div className="flex items-end justify-between gap-3 pl-[4.05rem]">
+      <div className="catalogo-preco flex items-end justify-between gap-2 pl-[3.15rem]">
         <div className="min-w-0">
-          <p className="num text-[20px] leading-none font-semibold tracking-[-0.01em] text-ink">{i.preco != null ? moeda(Number(i.preco)) : 'sem preço'}</p>
-          <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <p className="num text-[16px] leading-none font-semibold text-ink">{i.preco != null ? moeda(Number(i.preco)) : 'sem preço'}</p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1">
             {estoque && (
-              <span className={cn('num rounded-full px-2 py-0.5 text-[12.5px] font-semibold', classeDisponivelPilula(disponivel))}>{estoque}</span>
+              <span className={cn('num rounded-full px-1.5 py-0.5 text-[11px] font-semibold', classeDisponivelPilula(disponivel))}>{estoque}</span>
             )}
             {estoqueEm && <span className="num text-[11.5px] whitespace-nowrap text-ink-3">{estoqueEm}</span>}
           </div>
@@ -498,7 +498,7 @@ function Miniatura({ id, produto, descricao }: { id: string; produto: boolean; d
     <span
       ref={ref}
       className={cn(
-        'mt-0.5 flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-line',
+        'catalogo-miniatura mt-0.5 flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-line',
         url ? 'bg-white' : 'sos-subtle-chip',
         !url && (produto ? 'text-accent-ink' : 'text-cyan-ink'),
       )}
@@ -506,9 +506,9 @@ function Miniatura({ id, produto, descricao }: { id: string; produto: boolean; d
       {url ? (
         <img src={url} alt={descricao} loading="lazy" className="size-full object-contain" />
       ) : produto ? (
-        <IconeM3D icone={Package} className="size-10" />
+        <IconeM3D icone={Package} className="size-8" />
       ) : (
-        <IconeM3D icone={Wrench} className="size-10" />
+        <IconeM3D icone={Wrench} className="size-8" />
       )}
     </span>
   )

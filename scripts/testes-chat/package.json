@@ -1,0 +1,13 @@
+{
+  "name": "testes-chat-tecnoar",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:sql": "node test-chat-sql.mjs",
+    "test:ui": "node verificar-interface.mjs"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "playwright": "1.60.0"
+  }
+}

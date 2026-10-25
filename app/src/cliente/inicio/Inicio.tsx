@@ -139,9 +139,17 @@ export function Inicio({
                 aria-label="Ligar para a Tecnoar"
               >
                 <Arte src={ARTE3D.ligar} alt="" recuo={<PhoneCall className="size-[18px]" strokeWidth={2} />} classeImagem="ini-contato-peca" />
-                Ligar para a Tecnoar
+                Ligar
               </a>
             )}
+              <Link
+                to="/chat-tecnoar"
+                className="ini-ligar ini-chat-duvidas"
+                aria-label="Chat tira-dúvidas com a equipe Tecnoar"
+              >
+                <Arte src={ARTE_MOBILE.chatDuvidas} alt="" recuo={<MessageCircle className="size-[18px]" aria-hidden="true" />} classeImagem="ini-contato-peca" />
+                <span>Chat<span className="ini-chat-sub">Tira-dúvidas</span></span>
+              </Link>
             {online && whatsapp && (
               <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="ini-ligar" aria-label="Falar com a Tecnoar no WhatsApp">
                 <Arte src={ARTE_MOBILE.whatsapp} alt="" recuo={<MessageCircle className="size-[18px]" aria-hidden="true" />} classeImagem="ini-contato-peca" />
@@ -160,14 +168,16 @@ export function Inicio({
           <Esqueleto className="h-[3.4rem] rounded-[1.1rem]" />
         ) : (
           <Link to={v ? '/veiculos' : '/veiculos?novo=1'} className="ini-veiculo">
+            <span className="ini-veiculo-conjunto">
             <span className="ini-veiculo-icone">
               <IconeVeiculo tipo={v?.tipo} className="size-[22px]" />
             </span>
-            <span className="min-w-0 flex-1">
+            <span className="min-w-0">
               <span className="ini-veiculo-nome">{v ? nomeVeiculo(v) : 'Cadastrar meu veículo'}</span>
               <span className="ini-veiculo-sub">
                 {v ? v.placa : 'Com a placa salva, o socorro sai mais rápido.'}
               </span>
+            </span>
             </span>
             <ChevronRight aria-hidden className="size-5 shrink-0 opacity-50" />
           </Link>

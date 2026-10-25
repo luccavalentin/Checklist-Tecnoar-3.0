@@ -55,6 +55,9 @@ export const ARTE_MOBILE = {
   compartilhar: `${MOBILE}/compartilhar-premium.webp`,
   centralizar: `${MOBILE}/centralizar-premium.webp`,
   cadeado: `${MOBILE}/cadeado-premium.webp`,
+  areaAtendimento: `${MOBILE}/area-atendimento-premium.webp`,
+  caminhoneteTecnoar: `${MOBILE}/caminhonete-tecnoar.webp`,
+  chatDuvidas: `${MOBILE}/chat-tira-duvidas-claro.webp`,
 } as const
 
 export const VEICULO_MOBILE: Readonly<Record<string, string>> = {
@@ -111,9 +114,9 @@ export const ARTE3D = {
   ia: `${MOBILE}/cerebro-dual-premium.webp`,
   revisoes: `${MOBILE}/revisoes.webp`,
   local: `${RAIZ}/local.webp`,
-  estrela: `${RAIZ}/estrela.webp`,
-  concluido: `${RAIZ}/concluido.webp`,
-  tempo: `${RAIZ}/tempo.webp`,
+  estrela: `${MOBILE}/estrela-limpo.webp`,
+  concluido: `${MOBILE}/concluido-limpo.webp`,
+  tempo: `${MOBILE}/tempo-limpo.webp`,
   estrada: `${RAIZ}/estrada.webp`,
   seguranca: `${RAIZ}/seguranca.webp`,
 } as const
