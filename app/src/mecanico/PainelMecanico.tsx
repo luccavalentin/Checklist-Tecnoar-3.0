@@ -23,8 +23,6 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useToast } from '@/componentes/ui/Toast'
-import { ativarNotificacoes, permissaoAtual } from '@/notificacoes/sistema'
 import { destravarAudio } from '@/sos/alerta'
 import { enderecoDoPonto } from '@/sos/geo'
 import { STATUS_SOS, formatarDistancia, haQuanto } from '@/sos/rotulos'
@@ -55,7 +53,7 @@ import './mecanico3d.css'
  * e os últimos chamados. Claro e escuro têm o mesmo desenho.
  */
 export function PainelMecanico() {
-  const { perfil, usuarioId } = useMecanico()
+  const { perfil } = useMecanico()
   const home = useHomeMecanico()
   const { gps, abrirSituacao, naoLidas } = useCasca()
   const { abrir } = useAlertaSOS()
@@ -169,8 +167,6 @@ export function PainelMecanico() {
                 )}
               </SecaoM>
             )}
-
-            <AvisoNotificacoes usuarioId={usuarioId} />
 
             <AcessosRapidos aoPausa={abrirSituacao} />
 
@@ -565,47 +561,6 @@ function UltimosChamados({ h, agora }: { h: HomeMecanico | undefined; agora: num
           )
         })}
       </ul>
-    </section>
-  )
-}
-
-/* ── avisos ─────────────────────────────────────────────────────────────── */
-
-/** Sem notificação, o SOS só toca com o app aberto na tela. */
-function AvisoNotificacoes({ usuarioId }: { usuarioId: string | null }) {
-  const toast = useToast()
-  const [permissao, setPermissao] = useState(() => permissaoAtual())
-  if (permissao === 'granted') return null
-
-  async function ativar() {
-    if (!usuarioId) return
-    const r = await ativarNotificacoes(usuarioId)
-    setPermissao(permissaoAtual())
-    if (r === 'ativadas') toast.ok('Notificações ativadas', 'Os chamados de SOS chegam mesmo com o app fechado.')
-    else if (r === 'negada') toast.atencao('Notificações bloqueadas', 'Libere as notificações do app nas configurações do aparelho.')
-    else toast.atencao('Indisponível neste aparelho', 'No iPhone, instale o app na tela de início para receber avisos.')
-  }
-
-  return (
-    <section className="mi-cartao mi-aviso">
-      <span className="mi-aviso-icone">
-        <IconeM3D icone={Bell} />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="mi-aviso-titulo">{permissao === 'denied' ? 'Notificações bloqueadas' : 'Receba SOS com o app fechado'}</p>
-        <p className="mi-aviso-texto">
-          {permissao === 'denied'
-            ? 'Libere nas configurações do aparelho para não perder chamados.'
-            : permissao === 'indisponivel'
-              ? 'No iPhone, instale o app na tela de início primeiro.'
-              : 'Sem isso, o chamado só toca com o app aberto.'}
-        </p>
-      </div>
-      {permissao === 'default' && (
-        <button type="button" onClick={() => void ativar()} className="mi-aviso-botao">
-          Ativar
-        </button>
-      )}
     </section>
   )
 }
