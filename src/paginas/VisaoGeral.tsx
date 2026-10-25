@@ -9,7 +9,6 @@ import {
   ArrowRight,
   BarChart3,
   Car,
-  ChevronRight,
   CircleDollarSign,
   Gauge,
   Monitor,
@@ -18,13 +17,15 @@ import {
   Users,
   Wrench,
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 import { moeda } from '@/lib/formatos'
 import { useAuth } from '@/auth/AuthProvider'
 import { usePermissoes } from '@/permissoes/PermissoesProvider'
-import { BotaoIcone } from '@/componentes/ui/Botao'
+import { Botao, BotaoIcone } from '@/componentes/ui/Botao'
+import { Segmentado } from '@/componentes/ui/Campo'
+import { CabecalhoPagina } from '@/componentes/ui/Painel'
 import { CLASSE_COR_STATUS } from '@/paginas/cadastros/StatusOS'
 import { EstadoCarregando } from '@/componentes/ui/Estados'
 import type { IndicadoresGestao } from '@/tipos/db'
@@ -45,54 +46,53 @@ function Header({
   onRefresh: () => void
   loading: boolean
 }) {
+  const navegar = useNavigate()
+  /*
+   * Este cabeçalho era desenhado à mão e destoava do resto do sistema, logo na
+   * primeira tela de quem entra:
+   *
+   *   · um rótulo "Dashboard" acima do título — em inglês, num sistema em
+   *     português, dizendo o que o próprio título já diz;
+   *   · h1 em 20px bold, enquanto toda outra página usa 27px semibold: a tela
+   *     inicial parecia menos importante que a de Tags;
+   *   · um seletor de período improvisado, com texto de 10px em alvos de 24px
+   *     de altura — ilegível e pequeno demais para o dedo, com `Segmentado`
+   *     existindo no sistema para exatamente isso;
+   *   · `bg-accent/8`, opacidade avulsa que não vem de token nenhum.
+   *
+   * Agora usa `CabecalhoPagina`, o mesmo de todas as páginas. Sem sobretítulo:
+   * aqui ele seria o rótulo banido — a barra lateral já diz onde se está.
+   */
   return (
-    <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div className="space-y-0.5">
-        <div className="flex items-center gap-2">
-          <span className="h-0.5 w-6 rounded-full bg-accent" />
-          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-ink-3">Dashboard</p>
-        </div>
-        <h1 className="font-display text-xl font-bold text-ink tracking-tight">Visão Operacional</h1>
-        <p className="text-[12px] text-ink-2">
-          Olá, <span className="font-semibold text-accent">{nome}</span> — resumo em tempo real
+    <CabecalhoPagina
+      titulo="Visão Operacional"
+      meta={
+        <p className="text-[13px] text-ink-2">
+          Olá, <span className="font-semibold text-accent-ink">{nome}</span> — resumo em tempo real
         </p>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <Link
-          to="/operacao/modo-tv"
-          className={cn(
-            'inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-[11px] font-semibold transition-all',
-            'border-accent/30 bg-accent/8 text-accent-ink',
-            'hover:bg-accent/15 hover:border-accent/50'
-          )}
-        >
-          <Monitor className="size-3.5" />
-          <span className="hidden sm:inline">Modo TV</span>
-          <ChevronRight className="size-2.5 opacity-60" />
-        </Link>
-
-        <div className="inline-flex rounded-lg border border-line bg-surface-2 p-0.5">
-          {(['7d', '30d', '90d'] as const).map((p) => (
-            <button
-              key={p}
-              onClick={() => onPeriodo(p)}
-              className={cn(
-                'rounded px-3 py-1 text-[10px] font-semibold transition-all',
-                periodo === p ? 'bg-ink text-surface shadow-sm' : 'text-ink-2 hover:text-ink'
-              )}
-            >
-              {p === '7d' ? '7D' : p === '30d' ? '30D' : '90D'}
-            </button>
-          ))}
-        </div>
-
-        {/* Botao sem texto precisa de rotulo acessivel: BotaoIcone exige um. */}
-        <BotaoIcone rotulo="Atualizar indicadores" onClick={onRefresh} disabled={loading}>
-          <RefreshCw className={cn('size-3.5', loading && 'animate-spin')} />
-        </BotaoIcone>
-      </div>
-    </header>
+      }
+      acoes={
+        <>
+          <Botao variante="secundario" iconeInicio={<Monitor />} onClick={() => navegar('/operacao/modo-tv')}>
+            Modo TV
+          </Botao>
+          <Segmentado
+            rotuloGrupo="Período dos indicadores"
+            valor={periodo}
+            onChange={onPeriodo}
+            opcoes={[
+              { valor: '7d', rotulo: '7 dias' },
+              { valor: '30d', rotulo: '30 dias' },
+              { valor: '90d', rotulo: '90 dias' },
+            ]}
+          />
+          {/* Botão sem texto precisa de rótulo acessível: BotaoIcone exige um. */}
+          <BotaoIcone rotulo="Atualizar indicadores" onClick={onRefresh} disabled={loading}>
+            <RefreshCw className={cn('size-4', loading && 'animate-spin')} />
+          </BotaoIcone>
+        </>
+      }
+    />
   )
 }
 

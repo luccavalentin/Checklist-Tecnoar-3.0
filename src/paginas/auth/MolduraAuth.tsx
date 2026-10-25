@@ -65,8 +65,12 @@ export function MolduraAuth({
 }) {
   return (
     <div className="grid min-h-dvh bg-canvas lg:grid-cols-[1fr_minmax(480px,44%)]">
-      {/* Painel da marca — escondido no mobile para dar espaço ao formulário */}
-      <section className="malha-tecnica relative hidden flex-col justify-between overflow-hidden bg-surface p-14 lg:flex">
+      {/* Painel da marca — escondido no mobile para dar espaço ao formulário.
+          Saiu daqui a malha de linhas hairline: com as duas lavagens radiais
+          abaixo, eram três camadas decorativas empilhadas, e a grade é a que
+          não significa nada — grade pertence a mapa, planta ou medição, não a
+          um fundo. Superfície lisa, as duas lavagens da marca, e o conteúdo. */}
+      <section className="relative hidden flex-col justify-between overflow-hidden bg-surface p-14 lg:flex">
         <div
           aria-hidden
           className="pointer-events-none absolute -top-40 -left-44 size-[900px] rounded-full"

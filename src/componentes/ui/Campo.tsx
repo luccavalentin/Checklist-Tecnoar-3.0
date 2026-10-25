@@ -204,6 +204,10 @@ export function Segmentado<T extends string>({
               'flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-[5px] px-3 py-1.5',
               'font-display text-[11.5px] font-semibold transition-colors duration-150 whitespace-nowrap',
               '[&_svg]:size-3.5',
+              // No toque o alvo cresce para 44 px (WCAG 2.2 AA, 2.5.8): no
+              // monitor 30 px é densidade boa, no celular é mira. Mesmo
+              // recurso já usado nas Abas da central.
+              'max-lg:min-h-11',
               ativo ? 'bg-surface-2 text-ink shadow-e1' : 'text-ink-3 hover:text-ink-2',
             )}
           >
