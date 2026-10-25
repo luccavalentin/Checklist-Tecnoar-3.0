@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronRight, LogOut, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -54,6 +54,14 @@ export function BarraLateral({
   }
 
   const grupoAtivo = useMemo(() => grupoDaRota(pathname)?.id, [pathname])
+
+  /** `recurso: null` é público; senão vale o recurso ou qualquer alternativa. */
+  const liberado = useCallback(
+    (i: ItemMenu) =>
+      i.recurso === null || podeVer(i.recurso) || (i.recursosAlternativos?.some((r) => podeVer(r)) ?? false),
+    [podeVer],
+  )
+
   const grupos = useMemo(
     () =>
       NAVEGACAO.map((g) => ({
@@ -61,11 +69,11 @@ export function BarraLateral({
         itens: g.itens
           .map((i) => ({
             ...i,
-            subitens: i.subitens?.filter((s) => s.recurso === null || podeVer(s.recurso)),
+            subitens: i.subitens?.filter(liberado),
           }))
-          .filter((i) => i.recurso === null || podeVer(i.recurso) || (i.subitens?.length ?? 0) > 0),
+          .filter((i) => liberado(i) || (i.subitens?.length ?? 0) > 0),
       })).filter((g) => g.itens.length > 0),
-    [podeVer],
+    [liberado],
   )
 
   useEffect(() => {

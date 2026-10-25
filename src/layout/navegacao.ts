@@ -28,6 +28,7 @@ import {
   Package,
   PackageSearch,
   PhoneCall,
+  Radius,
   ScrollText,
   Sunrise,
   Sunset,
@@ -59,6 +60,13 @@ export interface ItemMenu {
    * permissão de visualizar. `null` = disponível para qualquer conta ativa.
    */
   recurso: string | null
+  /**
+   * Recursos alternativos: o item aparece se o usuário tiver QUALQUER um
+   * deles (ou `recurso`). Serve para módulo cujo recurso próprio pode não
+   * existir ainda no banco — ter uma alternativa é melhor do que o item
+   * desaparecer de quem já o usava.
+   */
+  recursosAlternativos?: string[]
   subitens?: ItemMenu[]
 }
 
@@ -90,6 +98,7 @@ export const NAVEGACAO: GrupoMenu[] = [
       { rotulo: 'Contratos e SLA', rota: '/sos/contratos', icone: Handshake, etapa: 15, recurso: 'sos' },
       { rotulo: 'Agendamentos', rota: '/sos/agendamentos', icone: CalendarClock, etapa: 15, recurso: 'sos' },
       { rotulo: 'Peças e serviços', rota: '/sos/catalogo', icone: PackageSearch, etapa: 15, recurso: 'sos' },
+      { rotulo: 'Cobertura e despacho', rota: '/sos/cobertura', icone: Radius, etapa: 15, recurso: 'sos' },
       { rotulo: 'Relatórios SOS', rota: '/sos/relatorios', icone: BarChart3, etapa: 15, recurso: 'sos' },
       { rotulo: 'Configurações SOS', rota: '/sos/configuracoes', icone: SlidersHorizontal, etapa: 15, recurso: 'sos' },
     ],
@@ -179,9 +188,22 @@ export const NAVEGACAO: GrupoMenu[] = [
     id: 'gestao',
     rotulo: 'Gestão',
     itens: [
-      /* Financeiro ainda não tem recurso próprio na tabela de permissões — a
-         migração o cria. Até lá herda o público de Indicadores, que é o mesmo. */
-      { rotulo: 'Financeiro', rota: '/gestao/financeiro', icone: Landmark, etapa: 13, recurso: 'indicadores' },
+      /* O recurso `financeiro` passou a existir em
+         20261003_financeiro_recurso_de_permissao.sql — antes dela, conceder
+         "financeiro" a um perfil era impossível (chave estrangeira para
+         `recursos.chave`) e a tela só abria para administradores.
+
+         `indicadores` fica como alternativa para o item não desaparecer de
+         quem já o usava caso a migração ainda não tenha sido aplicada, e
+         porque é o mesmo público. A tela faz a mesma concessão. */
+      {
+        rotulo: 'Financeiro',
+        rota: '/gestao/financeiro',
+        icone: Landmark,
+        etapa: 13,
+        recurso: 'financeiro',
+        recursosAlternativos: ['indicadores'],
+      },
       { rotulo: 'Indicadores', rota: '/gestao/indicadores', icone: Gauge, etapa: 13, recurso: 'indicadores' },
       { rotulo: 'Performance', rota: '/gestao/performance', icone: TrendingUp, etapa: 13, recurso: 'performance' },
       {

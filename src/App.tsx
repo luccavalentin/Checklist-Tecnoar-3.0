@@ -69,7 +69,6 @@ const Estoque = lazy(() => import('@/paginas/comercial/Estoque').then((m) => ({ 
 const Financeiro = lazy(() => import('@/paginas/financeiro/Financeiro').then((m) => ({ default: m.Financeiro })))
 const Garantias = lazy(() => import('@/paginas/operacao/Garantias').then((m) => ({ default: m.Garantias })))
 const CentralSOS = lazy(() => import('@/paginas/sos/CentralSOS').then((m) => ({ default: m.CentralSOS })))
-
 const ChatEquipeCentral = lazy(() => import('@/paginas/sos/ChatEquipeCentral').then((m) => ({ default: m.ChatEquipeCentral })))
 
 /** Telas já implantadas. O restante do menu resolve para ModuloPendente. */
@@ -85,6 +84,7 @@ const TELAS: Record<string, ComponentType> = {
   '/sos/contratos': CentralSOS,
   '/sos/agendamentos': CentralSOS,
   '/sos/catalogo': CentralSOS,
+  '/sos/cobertura': CentralSOS,
   '/sos/relatorios': CentralSOS,
   '/sos/configuracoes': CentralSOS,
   '/cadastros/clientes': Clientes,

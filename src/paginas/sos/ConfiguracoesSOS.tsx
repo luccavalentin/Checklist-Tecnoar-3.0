@@ -103,6 +103,7 @@ const ORDEM_PROVEDORES: ProvedorIa[] = ['anthropic', 'openai', 'gemini']
 interface Formulario {
   modo_distribuicao: 'manual' | 'inteligente'
   raio_busca_km: string
+  busca_limite_min: string
   velocidade_media_kmh: string
   tempo_aceite_min: string
   telefone_central: string
@@ -149,6 +150,7 @@ function doConfig(c: ConfigSOS): Formulario {
   return {
     modo_distribuicao: c.modo_distribuicao,
     raio_busca_km: String(c.raio_busca_km ?? ''),
+    busca_limite_min: String(c.busca_limite_min ?? 12),
     velocidade_media_kmh: String(c.velocidade_media_kmh ?? ''),
     // A central pensa em minutos; o banco guarda segundos.
     tempo_aceite_min: String(Math.round(((c.tempo_aceite_seg ?? 120) / 60) * 10) / 10),
@@ -251,6 +253,9 @@ export function ConfiguracoesSOS({ podeConfigurar }: { podeConfigurar: boolean }
     const e: Partial<Record<keyof Formulario, string>> = {}
     const raio = numero(form.raio_busca_km)
     if (raio == null || raio <= 0 || raio > 1000) e.raio_busca_km = 'Entre 1 e 1000 km.'
+    const limiteBusca = numero(form.busca_limite_min)
+    if (limiteBusca == null || limiteBusca < 1 || limiteBusca > 120 || !Number.isInteger(limiteBusca))
+      e.busca_limite_min = 'Minutos inteiros, de 1 a 120.'
     const vel = numero(form.velocidade_media_kmh)
     if (vel == null || vel < 5 || vel > 150) e.velocidade_media_kmh = 'Entre 5 e 150 km/h.'
     const aceite = numero(form.tempo_aceite_min)
@@ -304,6 +309,7 @@ export function ConfiguracoesSOS({ podeConfigurar }: { podeConfigurar: boolean }
       sosSalvarConfig({
         modo_distribuicao: f.modo_distribuicao,
         raio_busca_km: numero(f.raio_busca_km)!,
+        busca_limite_min: numero(f.busca_limite_min)!,
         velocidade_media_kmh: numero(f.velocidade_media_kmh)!,
         tempo_aceite_seg: Math.round(numero(f.tempo_aceite_min)! * 60),
         telefone_central: f.telefone_central.replace(/\D/g, '') || null,
@@ -410,7 +416,7 @@ export function ConfiguracoesSOS({ podeConfigurar }: { podeConfigurar: boolean }
                     onClick={() => mudar('modo_distribuicao', 'inteligente')}
                     icone={<Brain />}
                     titulo="Inteligente"
-                    texto="O SOS vai direto para todos os mecânicos disponíveis; o primeiro que aceitar atende. Se ninguém aceitar no prazo, o vigia avisa de novo e aciona a central."
+                    texto="O SOS é oferecido em etapas — primeiro a equipe Tecnoar na área prioritária, depois o parceiro autorizado — e o primeiro que aceitar atende. Esgotadas as etapas, ou passado o limite de busca, a central assume. As etapas ficam em Cobertura e despacho."
                   />
                   <OpcaoModo
                     ativo={form.modo_distribuicao === 'manual'}
@@ -431,6 +437,25 @@ export function ConfiguracoesSOS({ podeConfigurar }: { podeConfigurar: boolean }
                     {(p) => <Entrada {...p} inputMode="decimal" value={form.tempo_aceite_min} onChange={(e) => mudar('tempo_aceite_min', e.target.value)} mono />}
                   </Campo>
                 </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <Campo
+                    rotulo="Limite de busca (min)"
+                    erro={erros.busca_limite_min}
+                    dica="Teto do despacho automático. Estourado, a central assume."
+                    obrigatorio
+                  >
+                    {(p) => <Entrada {...p} inputMode="numeric" value={form.busca_limite_min} onChange={(e) => mudar('busca_limite_min', e.target.value)} mono />}
+                  </Campo>
+                </div>
+                {/* O "Raio de busca" acima é o padrão de cobertura de uma base
+                    NOVA; a área que vale é a de cada base, em Cobertura e
+                    despacho. Dizer isso aqui evita a leitura de que mudar este
+                    número reconfigura a área da matriz. */}
+                <p className="text-[12.5px] leading-relaxed text-ink-3">
+                  O raio acima é o padrão de uma base nova. A área prioritária que vale no despacho é a de cada base, em{' '}
+                  <strong className="font-semibold text-ink-2">Cobertura e despacho</strong> — onde também ficam as etapas de oferta e o
+                  histórico de versões da política.
+                </p>
               </div>
             </Painel>
           </Secao>

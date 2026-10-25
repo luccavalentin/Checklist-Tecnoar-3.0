@@ -9,6 +9,7 @@ import {
   PackageSearch,
   Plus,
   Radar,
+  Radius,
   Settings2,
   Smartphone,
   Volume2,
@@ -24,6 +25,7 @@ import { tocarAlerta } from '@/sos/alerta'
 import type { StatusSOS } from '@/sos/tipos'
 import { Agendamentos } from './Agendamentos'
 import { CatalogoSOS } from './CatalogoSOS'
+import { CoberturaSOS } from './CoberturaSOS'
 import { ConfiguracoesSOS } from './ConfiguracoesSOS'
 import { ContasApp } from './ContasApp'
 import { ContratosSOS } from './ContratosSOS'
@@ -35,7 +37,17 @@ import { PainelOperacao } from './PainelOperacao'
 import { RelatoriosSOS } from './RelatoriosSOS'
 import { EstadoSOSInativo, SeloVigia, TEMPO_ACEITE_PADRAO_SEG, ehErroNaoAtivado, useConfigSOS, useIndicadoresSOS, useSomLiberado } from './comum'
 
-type AbaSOS = 'operacao' | 'chamados' | 'mecanicos' | 'contas' | 'contratos' | 'agendamentos' | 'catalogo' | 'relatorios' | 'configuracoes'
+type AbaSOS =
+  | 'operacao'
+  | 'chamados'
+  | 'mecanicos'
+  | 'contas'
+  | 'contratos'
+  | 'agendamentos'
+  | 'catalogo'
+  | 'cobertura'
+  | 'relatorios'
+  | 'configuracoes'
 
 /** Cada área do módulo tem o próprio endereço — é o que o menu lateral abre. */
 const ROTA_DA_ABA: Record<AbaSOS, string> = {
@@ -46,6 +58,7 @@ const ROTA_DA_ABA: Record<AbaSOS, string> = {
   contratos: '/sos/contratos',
   agendamentos: '/sos/agendamentos',
   catalogo: '/sos/catalogo',
+  cobertura: '/sos/cobertura',
   relatorios: '/sos/relatorios',
   configuracoes: '/sos/configuracoes',
 }
@@ -59,6 +72,7 @@ const TITULOS: Record<AbaSOS, string> = {
   contratos: 'Contratos e SLA',
   agendamentos: 'Agendamentos',
   catalogo: 'Peças e serviços',
+  cobertura: 'Cobertura e despacho',
   relatorios: 'Relatórios',
   configuracoes: 'Configurações',
 }
@@ -173,6 +187,7 @@ export function CentralSOS() {
     { valor: 'contratos', rotulo: 'Contratos e SLA', icone: <Handshake /> },
     { valor: 'agendamentos', rotulo: 'Agendamentos', icone: <CalendarClock />, contador: ind?.agendamentos_pendentes || undefined },
     { valor: 'catalogo', rotulo: 'Peças e serviços', icone: <PackageSearch /> },
+    { valor: 'cobertura', rotulo: 'Cobertura', icone: <Radius /> },
     { valor: 'relatorios', rotulo: 'Relatórios', icone: <BarChart3 /> },
     ...(podeConfigurar ? [{ valor: 'configuracoes' as const, rotulo: 'Configurações', icone: <Settings2 /> }] : []),
   ]
@@ -259,6 +274,7 @@ export function CentralSOS() {
           {aba === 'contas' && <ContasApp podeEditar={podeEditar} />}
           {aba === 'contratos' && <ContratosSOS podeConfigurar={podeConfigurar} />}
           {aba === 'catalogo' && <CatalogoSOS />}
+          {aba === 'cobertura' && <CoberturaSOS podeConfigurar={podeConfigurar} />}
           {aba === 'relatorios' && <RelatoriosSOS />}
           {aba === 'configuracoes' && <ConfiguracoesSOS podeConfigurar={podeConfigurar} />}
         </>
