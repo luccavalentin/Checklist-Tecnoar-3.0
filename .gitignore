@@ -3,6 +3,7 @@ dist
 dist-ssr
 .env
 .env.local
+.env.vps
 *.local
 .DS_Store
 .vite
@@ -15,3 +16,4 @@ docs/manual/*.png
 
 # Capturas e artefatos gerados por scripts de teste/manual
 output/
+.claude/settings.local.json

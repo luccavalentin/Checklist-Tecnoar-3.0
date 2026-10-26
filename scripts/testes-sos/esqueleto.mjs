@@ -102,6 +102,7 @@ create schema if not exists auth;
 create schema if not exists storage;
 create schema if not exists net;
 create schema if not exists privado;
+create schema if not exists realtime;
 do $$ begin create role anon; exception when duplicate_object then null; end $$;
 do $$ begin create role authenticated; exception when duplicate_object then null; end $$;
 do $$ begin create role service_role; exception when duplicate_object then null; end $$;
@@ -121,11 +122,29 @@ $f$;
 grant execute on function auth.uid() to anon, authenticated, service_role;
 grant select on auth.users to authenticated, anon;
 
-create table storage.buckets (id text primary key, name text, public boolean, file_size_limit bigint);
+create table storage.buckets (id text primary key, name text, public boolean, file_size_limit bigint, allowed_mime_types text[]);
 create table storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text, name text);
 alter table storage.objects enable row level security;
 create function storage.foldername(name text) returns text[] language sql immutable as $f$
   select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1]
+$f$;
+
+-- Canal de presença do Realtime. As políticas de sala privada são escritas
+-- sobre realtime.messages e realtime.topic(); sem elas aqui, a migração que
+-- as cria derruba a montagem do banco inteiro. topic() lê um setting, para o
+-- teste poder dizer em que sala está.
+create table realtime.messages (
+  id bigint generated always as identity primary key,
+  topic text not null,
+  extension text,
+  payload jsonb,
+  event text,
+  private boolean default false,
+  inserted_at timestamptz not null default now()
+);
+alter table realtime.messages enable row level security;
+create function realtime.topic() returns text language sql stable as $f$
+  select nullif(current_setting('realtime.topic', true), '')
 $f$;
 
 create table net.chamadas (id bigint generated always as identity, url text, headers jsonb, body jsonb);
